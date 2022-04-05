@@ -19,7 +19,8 @@
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error",
     "react/display-name": "off",
-    "react/prop-types": "off",
+    "react/prop-types": "off", //ปิดการแจ้งเตือนproptype
+     "no-unused-vars": "off",  //ปิดการแจ้งเตือนการประกาศแต่ไม่ใช้
     "prettier/prettier": "warn", //A warning will pop up when the prettier setting is not met
     "react/react-in-jsx-scope": "off" // You must use the import React rule to close jsx files
   },
