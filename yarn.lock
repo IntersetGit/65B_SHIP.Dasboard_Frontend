@@ -2774,6 +2774,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@esri/react-arcgis@^5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@esri/react-arcgis/-/react-arcgis-5.1.0.tgz#1d49380cb8f99a3968e0e72b83c0516a9273c213"
+  integrity sha512-4zXVx5DoJ5OFN+s1gp9sIWsTP307NlvT7meCsFe/lqPJfs239ztYNnEy6V9tMpPBIx+Lz5fTy47SS61VJM7ToQ==
+
 "@firebase/analytics-types@0.5.0":
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@firebase/analytics-types/-/analytics-types-0.5.0.tgz#cfa1dc34034fc478eca360f5faa4b4d0466892ce"
@@ -7758,6 +7763,11 @@ esrecurse@^4.1.0, esrecurse@^4.3.0:
   integrity sha512-KmfKL3b6G+RXvP8N1vr3Tq1kL/oCFgn2NYXEtqP8/L3pKapUA4G8cFVaoF3SU323CD4XypR/ffioHmkti6/Tag==
   dependencies:
     estraverse "^5.2.0"
+
+esri-loader@^3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/esri-loader/-/esri-loader-3.5.0.tgz#f536cbaaf676d54f6b05a706e51ececd9303ce05"
+  integrity sha512-rIXyT51x/co86DPORKBMMldJrdLjghDepJ3WjDVTr2yZXBbghMbGgNA8yIQ9Pd/Gw6/fMgF9YHZU+wjRHRCDoA==
 
 estraverse@^4.1.1, estraverse@^4.2.0:
   version "4.3.0"

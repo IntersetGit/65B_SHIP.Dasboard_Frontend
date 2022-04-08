@@ -52,7 +52,7 @@ const defaultConfig = {
   direction: ThemeDirection.LTR,
   themeMode: ThemeMode.SEMI_DARK,
   footerType: FooterType.FLUID,
-  navStyle: NavStyle.DEFAULT,
+  navStyle: NavStyle.MINI_SIDEBAR_TOGGLE,
   layoutType: LayoutType.FULL_WIDTH,
   footer: false,
   rtlLocale: ['ar'],

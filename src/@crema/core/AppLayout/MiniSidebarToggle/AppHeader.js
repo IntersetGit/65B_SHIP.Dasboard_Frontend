@@ -32,9 +32,9 @@ const AppHeader = ({isCollapsed, onToggleSidebar}) => {
           onClick: onToggleSidebar,
         },
       )}
-      <AppLogo />
+      {/* <AppLogo /> */}
 
-      <Search
+      {/* <Search
         className='header-search-mini-sidebar'
         placeholder={messages['common.searchHere']}
       />
@@ -42,7 +42,7 @@ const AppHeader = ({isCollapsed, onToggleSidebar}) => {
         <AppLanguageSwitcher />
         <AppHeaderMessages />
         <AppNotifications />
-      </div>
+      </div> */}
       <div className='app-header-mini-sidebar-section-mobile'>
         <Dropdown overlay={menuMobile} trigger={['click']}>
           <a className='ant-dropdown-link' onClick={(e) => e.preventDefault()}>

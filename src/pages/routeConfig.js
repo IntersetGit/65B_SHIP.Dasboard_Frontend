@@ -13,7 +13,7 @@ import Icon from '@ant-design/icons';
 const routesConfig = [
   {
     id: 'app',
-    title: 'Sample',
+    title: 'Mornitor',
     messageId: 'sidebar.sample',
     type: 'group',
     children: [
@@ -23,7 +23,7 @@ const routesConfig = [
         messageId: 'sidebar.sample.page1',
         type: 'item',
         icon: <Icon component={() => (<img src={WorkpermistIcon} width="20" />)} />,
-        path: '/sample/page-1',
+        path: '/workpermit',
       },
       {
         id: 'page-2',
