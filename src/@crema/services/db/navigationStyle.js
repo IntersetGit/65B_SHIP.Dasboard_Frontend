@@ -9,84 +9,84 @@ export const navStyles = [
   {
     id: 1,
     alias: NavStyle.DEFAULT,
-    image: '/assets/images/navigationStyle/default.svg',
+    image: '/ship/assets/images/navigationStyle/default.svg',
   },
   {
     id: 2,
     alias: NavStyle.BIT_BUCKET,
-    image: '/assets/images/navigationStyle/bit_bucket.svg',
+    image: '/ship/assets/images/navigationStyle/bit_bucket.svg',
   },
   {
     id: 3,
     alias: NavStyle.STANDARD,
-    image: '/assets/images/navigationStyle/standard.svg',
+    image: '/ship/assets/images/navigationStyle/standard.svg',
   },
   {
     id: 4,
     alias: NavStyle.DRAWER,
-    image: '/assets/images/navigationStyle/drawer.svg',
+    image: '/ship/assets/images/navigationStyle/drawer.svg',
   },
   {
     id: 5,
     alias: NavStyle.MINI,
-    image: '/assets/images/navigationStyle/mini.svg',
+    image: '/ship/assets/images/navigationStyle/mini.svg',
   },
   {
     id: 6,
     alias: NavStyle.MINI_SIDEBAR_TOGGLE,
-    image: '/assets/images/navigationStyle/mini-sidebar-toggle.svg',
+    image: '/ship/assets/images/navigationStyle/mini-sidebar-toggle.svg',
   },
   {
     id: 7,
     alias: NavStyle.HEADER_USER,
-    image: '/assets/images/navigationStyle/user-header.svg',
+    image: '/ship/assets/images/navigationStyle/user-header.svg',
   },
   {
     id: 8,
     alias: NavStyle.HEADER_USER_MINI,
-    image: '/assets/images/navigationStyle/user-mini-header.svg',
+    image: '/ship/assets/images/navigationStyle/user-mini-header.svg',
   },
   {
     id: 9,
     alias: NavStyle.H_DEFAULT,
-    image: '/assets/images/navigationStyle/hor-header-fixed.svg',
+    image: '/ship/assets/images/navigationStyle/hor-header-fixed.svg',
   },
   {
     id: 10,
     alias: NavStyle.HOR_HEADER_FIXED,
-    image: '/assets/images/navigationStyle/h-default.svg',
+    image: '/ship/assets/images/navigationStyle/h-default.svg',
   },
   {
     id: 11,
     alias: NavStyle.HOR_DARK_LAYOUT,
-    image: '/assets/images/navigationStyle/hor-dark-layout.svg',
+    image: '/ship/assets/images/navigationStyle/hor-dark-layout.svg',
   },
 ];
 
 export const sidebarBgImages = [
   {
     id: 1,
-    image: '/assets/images/sidebar/thumb/1.png',
+    image: '/ship/assets/images/sidebar/thumb/1.png',
   },
   {
     id: 2,
-    image: '/assets/images/sidebar/thumb/2.png',
+    image: '/ship/assets/images/sidebar/thumb/2.png',
   },
   {
     id: 3,
-    image: '/assets/images/sidebar/thumb/3.png',
+    image: '/ship/assets/images/sidebar/thumb/3.png',
   },
   {
     id: 4,
-    image: '/assets/images/sidebar/thumb/4.png',
+    image: '/ship/assets/images/sidebar/thumb/4.png',
   },
   {
     id: 5,
-    image: '/assets/images/sidebar/thumb/5.png',
+    image: '/ship/assets/images/sidebar/thumb/5.png',
   },
   {
     id: 6,
-    image: '/assets/images/sidebar/thumb/6.png',
+    image: '/ship/assets/images/sidebar/thumb/6.png',
   },
 ];
 
@@ -94,27 +94,27 @@ export const menuStyles = [
   {
     id: 1,
     alias: MenuStyle.DEFAULT,
-    image: '/assets/images/sidebar/menu/1.svg',
+    image: '/ship/assets/images/sidebar/menu/1.svg',
   },
   {
     id: 2,
     alias: MenuStyle.STANDARD,
-    image: '/assets/images/sidebar/menu/2.svg',
+    image: '/ship/assets/images/sidebar/menu/2.svg',
   },
   {
     id: 3,
     alias: MenuStyle.ROUNDED,
-    image: '/assets/images/sidebar/menu/3.svg',
+    image: '/ship/assets/images/sidebar/menu/3.svg',
   },
   {
     id: 4,
     alias: MenuStyle.ROUNDED_REVERSE,
-    image: '/assets/images/sidebar/menu/4.svg',
+    image: '/ship/assets/images/sidebar/menu/4.svg',
   },
   {
     id: 5,
     alias: MenuStyle.CURVED_MENU,
-    image: '/assets/images/sidebar/menu/5.svg',
+    image: '/ship/assets/images/sidebar/menu/5.svg',
   },
 ];
 
@@ -314,16 +314,16 @@ export const layoutTypes = [
   {
     id: 1,
     alias: LayoutType.FULL_WIDTH,
-    image: '/assets/images/layouts/full-width.svg',
+    image: '/ship/assets/images/layouts/full-width.svg',
   },
   {
     id: 2,
     alias: LayoutType.BOXED,
-    image: '/assets/images/layouts/boxed.svg',
+    image: '/ship/assets/images/layouts/boxed.svg',
   },
   {
     id: 3,
     alias: LayoutType.FRAMED,
-    image: '/assets/images/layouts/framed.svg',
+    image: '/ship/assets/images/layouts/framed.svg',
   },
 ];

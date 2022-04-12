@@ -8,7 +8,7 @@ import './index.style.less';
 const PersonalInfo = () => {
   const {user} = useAuthUser();
 
-  const [userImage, setUserImage] = useState('/assets/images/placeholder.jpg');
+  const [userImage, setUserImage] = useState('/ship/assets/images/placeholder.jpg');
 
   const {getRootProps, getInputProps} = useDropzone({
     accept: 'image/*',
@@ -18,7 +18,7 @@ const PersonalInfo = () => {
   });
 
   const onReset = () => {
-    setUserImage('/assets/images/placeholder.jpg');
+    setUserImage('/ship/assets/images/placeholder.jpg');
   };
 
   const onFinish = (values) => {
@@ -32,7 +32,7 @@ const PersonalInfo = () => {
         ...user,
         userImage: user.photoURL
           ? user.photoURL
-          : '/assets/images/placeholder.jpg',
+          : '/ship/assets/images/placeholder.jpg',
       }}>
       <Form.Item className='info-upload'>
         <Avatar className='info-upload-avatar' src={userImage} />

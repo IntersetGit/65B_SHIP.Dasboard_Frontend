@@ -1,5 +1,5 @@
 // ForJWT Auth
-/*import { getUserFromJwtAuth } from "./helper/AuthHelper";
+import { getUserFromJwtAuth } from "./helper/AuthHelper";
 import {
   useJWTAuth,
   useJWTAuthActions,
@@ -22,9 +22,9 @@ export const useAuthMethod = () => {
     logout,
     signUpUser,
   };
-};*/
+};
 //For Firebase Auth
-import {
+/* import {
   useFirebase,
   useFirebaseActions,
 } from '../services/auth/firebase/FirebaseAuthProvider';
@@ -53,7 +53,7 @@ export const useAuthMethod = () => {
     signInWithPopup,
     logout,
   };
-};
+}; */
 
 /*
 // For AWS Auth

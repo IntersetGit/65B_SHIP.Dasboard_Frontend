@@ -3,12 +3,13 @@ import './index.style.less';
 import AuthWrapper from '../AuthWrapper';
 import AppPageMetadata from '../../../@crema/core/AppPageMetadata';
 import SignInFirebase from './SigninFirebase';
+import SigninJwtAuth from './SigninJwtAuth';
 
 const Signin = () => {
   return (
     <AuthWrapper>
       <AppPageMetadata title='Login' />
-      <SignInFirebase />
+      <SigninJwtAuth />
     </AuthWrapper>
   );
 };

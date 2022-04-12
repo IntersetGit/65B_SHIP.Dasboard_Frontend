@@ -107,15 +107,8 @@ body {
 .Map {
     height: 70vh;
     width: 100%;
-}
-
-#logoDiv {
-    padding: 12px;
-    background-color: black;
-    color: rgb(255, 255, 255);
-    text-align: center;
-    border-radius: 20px;
-    overflow: hidden;
+    height: 70vh;
+    position: relative;
 }
 
 

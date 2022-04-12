@@ -24,7 +24,7 @@ const MiniSidebarToggle = () => {
         appMainFooter: footer && footerType === FooterType.FLUID,
         appMainFixedFooter: footer && footerType === FooterType.FIXED,
       })}>
-      <AppSidebar isCollapsed={isCollapsed} />
+      <AppSidebar isCollapsed={isCollapsed} onToggleSidebar={onToggleSidebar} />
       <Layout className='app-layout-mini-sidebar-main'>
         <AppHeader
           isCollapsed={isCollapsed}

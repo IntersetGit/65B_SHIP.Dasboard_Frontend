@@ -1,0 +1,60 @@
+@import '../../../shared/styles/variable';
+
+.esri-ui-corner .esri-component {
+  box-shadow: 0 1px 2px rgb(0 0 0 / 30%);
+  border-radius: 9px !important;
+  overflow: hidden;
+}
+.esri-widget--button {
+  width: 39px !important;
+  height: 39px !important;
+  background-color: black !important;
+  color: #fff !important;
+}
+#serchmap {
+  padding: 12px;
+  background-color: black;
+  color: rgb(255, 255, 255);
+  text-align: center;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.ant-drawer-header {
+  position: absolute;
+  padding: 16px 24px;
+  z-index: 99999;
+  color: rgba(0, 0, 0, 0.65);
+  background: #fff;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-bottom: 1px solid #e8e8e8;
+  border-radius: 4px 4px 0 0;
+}
+.ant-drawer-body {
+  padding: 24px;
+  margin-top: 3rem;
+  font-size: 14px;
+  line-height: 1.5;
+  word-wrap: break-word;
+}
+.menuserchslide {
+  position: fixed;
+  background-color: rgb(244, 244, 244) !important;
+  right: 60px;
+  width: 350px;
+  min-width: 300px;
+  height: 60vh;
+  overflow: hidden;
+  border-radius: 10px;
+  padding: 20px;
+  @media screen and (max-width: @screen-sm) {
+    position: absolute;
+    right: 0;
+    width: 0;
+    height: 100%;
+    overflow: hidden;
+
+  }
+}

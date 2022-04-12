@@ -1,15 +1,18 @@
-import {Link, useLocation} from 'react-router-dom';
-import {Menu} from 'antd';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu } from 'antd';
+import {
+  WarningFilled
+} from '@ant-design/icons';
 import React from 'react';
 import routesConfig from '../../pages/routeConfig';
-import {useIntl} from 'react-intl';
-import {useSidebarContext} from './AppContextProvider/SidebarContextProvider';
+import { useIntl } from 'react-intl';
+import { useSidebarContext } from './AppContextProvider/SidebarContextProvider';
 
 function getStyles(item, sidebarColorSet, isSidebarBgImage, index, isGroup) {
-  const {pathname} = useLocation();
-  const selectedKeys = pathname.substr(1);
+  const { pathname } = useLocation();
+  // const selectedKeys = pathname.substr(1);
+  const selectedKeys = pathname;
   const defaultOpenKeys = selectedKeys.split('/');
-
   if (index === 0 || isGroup) {
     return {
       color: sidebarColorSet.sidebarTextColor,
@@ -17,7 +20,6 @@ function getStyles(item, sidebarColorSet, isSidebarBgImage, index, isGroup) {
     };
   } else {
     const isActive = defaultOpenKeys[index] === item.id;
-
     return {
       color: isActive
         ? sidebarColorSet.sidebarMenuSelectedTextColor
@@ -25,15 +27,15 @@ function getStyles(item, sidebarColorSet, isSidebarBgImage, index, isGroup) {
       backgroundColor: isActive
         ? sidebarColorSet.sidebarMenuSelectedBgColor
         : isSidebarBgImage
-        ? ''
-        : sidebarColorSet.sidebarBgColor,
+          ? ''
+          : sidebarColorSet.sidebarBgColor,
     };
   }
 }
 
 const renderMenuItemChildren = (item) => {
-  const {icon, messageId, path} = item;
-  const {messages} = useIntl();
+  const { icon, messageId, path } = item;
+  const { messages } = useIntl();
 
   if (path && path.includes('/'))
     return (
@@ -46,6 +48,9 @@ const renderMenuItemChildren = (item) => {
           ))}
         <span data-testid={messageId.toLowerCase + '-nav'}>
           {messages[messageId]}
+        </span>
+        <span style={{ position: 'absolute', right: 5 }}>
+          <WarningFilled style={{ color: '#ff7a0e' }} />
         </span>
       </Link>
     );
@@ -105,18 +110,18 @@ const renderMenu = (item, sidebarColorSet, isSidebarBgImage, index) => {
       {item.children
         ? item.children
         : renderMenuItemChildren(
-            item,
-            sidebarColorSet,
-            isSidebarBgImage,
-            index,
-          )}
+          item,
+          sidebarColorSet,
+          isSidebarBgImage,
+          index,
+        )}
     </Menu.Item>
   );
 };
 
 export const getRouteMenus = () => {
-  const {sidebarColorSet} = useSidebarContext();
-  const {isSidebarBgImage} = useSidebarContext();
+  const { sidebarColorSet } = useSidebarContext();
+  const { isSidebarBgImage } = useSidebarContext();
   return routesConfig.map((route) =>
     renderMenu(route, sidebarColorSet, isSidebarBgImage, 0),
   );

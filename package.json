@@ -1,6 +1,7 @@
 {
-  "name": "crema",
+  "name": "PTTMORNITOR",
   "version": "0.1.0",
+  "homepage": "https://hrconnext.co/ship/",
   "private": true,
   "dependencies": {
     "@ant-design/colors": "^6.0.0",

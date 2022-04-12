@@ -21,7 +21,7 @@ const MainSidebar = ({children, className, collapsed = false, ...props}) => {
         backgroundColor: sidebarColorSet.sidebarBgColor,
         color: sidebarColorSet.sidebarTextColor,
         backgroundImage: isSidebarBgImage
-          ? `url(/assets/images/sidebar/images/${sidebarBgImage}.png)`
+          ? `url(/ship/assets/images/sidebar/images/${sidebarBgImage}.png)`
           : '',
       }}
       collapsed={collapsed}

@@ -18,20 +18,20 @@ const routesConfig = [
     type: 'group',
     children: [
       {
-        id: 'page-1',
-        title: 'Page 1',
+        id: 'workpermit',
+        title: 'workpermit',
         messageId: 'sidebar.sample.page1',
         type: 'item',
         icon: <Icon component={() => (<img src={WorkpermistIcon} width="20" />)} />,
         path: '/workpermit',
       },
       {
-        id: 'page-2',
-        title: 'Page 2',
+        id: 'vehicle',
+        title: 'vehicle',
         messageId: 'sidebar.sample.page2',
         type: 'item',
         icon: <Icon component={() => (<img src={VechicleIcon} width="20" />)} />,
-        path: '/sample/page-2',
+        path: '/vehicle',
       },
       {
         id: 'page-3',
@@ -39,7 +39,7 @@ const routesConfig = [
         messageId: 'sidebar.sample.page3',
         type: 'item',
         icon: <Icon component={() => (<img src={EquipmentIcon} width="20" />)} />,
-        path: '/sample/page-2',
+        path: '/equipment',
       },
       {
         id: 'page-4',
@@ -47,7 +47,7 @@ const routesConfig = [
         messageId: 'sidebar.sample.page4',
         type: 'item',
         icon: <Icon component={() => (<img src={ScaffoldingIcon} width="20" />)} />,
-        path: '/sample/page-2',
+        path: '/scaffolding',
       },
       {
         id: 'page-5',
@@ -55,7 +55,7 @@ const routesConfig = [
         messageId: 'sidebar.sample.page5',
         type: 'item',
         icon: <Icon component={() => (<img src={PeopleTrackingIcon} width="20" />)} />,
-        path: '/sample/page-2',
+        path: '/peopleTracking',
       },
       {
         id: 'page-6',
@@ -63,7 +63,7 @@ const routesConfig = [
         messageId: 'sidebar.sample.page6',
         type: 'item',
         icon: <Icon component={() => (<img src={AcessIcon} width="20" />)} />,
-        path: '/sample/page-2',
+        path: '/acess',
       },
       {
         id: 'page-7',
@@ -71,7 +71,7 @@ const routesConfig = [
         messageId: 'sidebar.sample.page7',
         type: 'item',
         icon: <Icon component={() => (<img src={NotificationIcon} width="20" />)} />,
-        path: '/sample/page-2',
+        path: '/notification',
       },
     ],
   },

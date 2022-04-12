@@ -36,7 +36,7 @@ export const AunwaSidebar = {
 const defaultConfig = {
   sidebar: {
     borderColor: '#757575',
-    menuStyle: MenuStyle.DEFAULT,
+    menuStyle: MenuStyle.ROUNDED_REVERSE,
     isSidebarBgImage: false,
     sidebarBgImage: 1,
     colorSet: AunwaSidebar,

@@ -29,6 +29,7 @@ const JWTAuthAuthProvider = ({children}) => {
       const token = localStorage.getItem('token');
 
       if (!token) {
+        console.log('nologin')
         setJWTAuthData({
           user: undefined,
           isLoading: false,

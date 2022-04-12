@@ -67,14 +67,14 @@ const SignInJwtAuth = () => {
             </Button>
           </div>
 
-          <div className='form-field-action'>
+          {/* <div className='form-field-action'>
             <span className='sign-text-grey'>
               <IntlMessages id='common.dontHaveAccount' />
             </span>
             <Link to='/signup' className='underlineNone colorTextPrimary'>
               <IntlMessages id='common.signup' />
             </Link>
-          </div>
+          </div> */}
         </Form>
       </div>
     </div>
