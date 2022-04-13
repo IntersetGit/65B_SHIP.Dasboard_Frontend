@@ -102,6 +102,7 @@ const Page1 = () => {
   const [stateMap, setStateMap] = useState(null);
   const [stateView, setStateView] = useState(null);
   const refdrawn = useRef();
+  const refdetail = useRef();
   useEffect(() => {
     (async () => {
       const WFSLayer = await loadModules(["esri/layers/WFSLayer"]).then(([WFSLayer]) => WFSLayer);
@@ -278,13 +279,18 @@ const Page1 = () => {
       // collapseIconClass:'esri-icon-search',
       expandIconClass: 'esri-icon-search',
       content: refdrawn.current,
-      expanded: true
+      // expanded: true
+    });
+    const detaillayer = new Expand({
+      view: view,
+      content: refdetail.current,
+      expandIconClass: "esri-icon-notice-round",
+      group: "top-right"
     });
 
-    view.ui.add(expand, "top-right");
+    view.ui.add([expand,detaillayer], "top-right");
 
 
-    // view.ui.add("drawnerright", "top-right");
     view.ui.add(fullscreenui, "top-right");
     view.ui.add(zoomui, "top-right");
 
@@ -294,7 +300,7 @@ const Page1 = () => {
   }
   return (
     <div>
-      <Map className="Map" onLoad={Onload} mapProperties={{ basemap: `${'arcgis-light-gray' ?? 'arcgis-navigation'}`, autoResize: false, }} viewProperties={{ center: [100.3330867, 14.5548052], ui: { components: ['attribution', 'compass'] } }} >
+      <Map className="Mapacrgis" onLoad={Onload} mapProperties={{ basemap: `${'arcgis-light-gray' ?? 'arcgis-navigation'}`, autoResize: false, }} viewProperties={{ center: [100.3330867, 14.5548052], ui: { components: ['attribution', 'compass'] } }} >
         <div ref={refdrawn} className="esri-widget menuserchslide">
           <Form labelCol={{ span: 9 }} wrapperCol={{ span: 16 }} name="nest-messages" >
             <Form.Item name={['user', 'name']} label="วันเวลา เริ้มต้น" rules={[{ required: true }]}>
@@ -314,7 +320,6 @@ const Page1 = () => {
                 mode="multiple"
                 showArrow
                 tagRender={tagRender}
-                defaultValue={['gold', 'cyan']}
                 style={{ width: '100%' }}
                 options={options}
               />
@@ -328,6 +333,9 @@ const Page1 = () => {
               </Button>
             </Form.Item>
           </Form>
+        </div>
+        <div ref={refdetail} style={{position: "initial",display:'flex',flex:1,width:'100%'}}>
+          <h3>dfsfsd</h3>
         </div>
 
       </Map>

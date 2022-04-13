@@ -104,10 +104,9 @@ body {
     width: 100% !important;
 }
 
-.Map {
-    height: 70vh;
+.Mapacrgis {
     width: 100%;
-    height: 70vh;
+    height: 400px;
     position: relative;
 }
 
