@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Table, Tag, Space, Form, Input, InputNumber, Button, Select } from 'antd';
 import { Map, WebScene, } from '@esri/react-arcgis';
-import { setDefaultOptions, loadModules } from 'esri-loader';
+import { setDefaultOptions, loadModules,loadCss } from 'esri-loader';
 import './index.style.less';
+import io from 'socket.io-client';
 
 setDefaultOptions({ css: true });
+const socket = io.connect('http://localhost:3001');
 
 const options = [{ value: 'gold' }, { value: 'lime' }, { value: 'green' }, { value: 'cyan' }];
 function tagRender(props) {
@@ -103,8 +105,12 @@ const Page1 = () => {
   const [stateView, setStateView] = useState(null);
   const refdrawn = useRef();
   const refdetail = useRef();
+
+
+
   useEffect(() => {
     (async () => {
+
       const WFSLayer = await loadModules(["esri/layers/WFSLayer"]).then(([WFSLayer]) => WFSLayer);
       const layer2 = new WFSLayer({
         url: "https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WFSServer?request=GetCapabilities&service=WFS",
@@ -122,9 +128,13 @@ const Page1 = () => {
         console.log("Names of all child sublayers", names.join());
       });
       stateMap?.add(layer)
-      GetCluster()
+      // GetCluster()
+
+
+
     })();
   }, [stateMap, stateView,]);
+
 
   loadModules(["esri/config", "esri/Map", 'esri/views/MapView', "esri/layers/TileLayer"])
     .then(async ([esriConfig, Map, MapView, TileLayer]) => {
@@ -152,118 +162,6 @@ const Page1 = () => {
 
 
 
-
-  const GetCluster = async () => {
-    loadModules([
-      "esri/layers/FeatureLayer",
-      "esri/layers/GeoJSONLayer",
-      "esri/views/MapView",
-      "esri/widgets/Legend",
-      "esri/widgets/Expand",
-      "esri/widgets/Home",
-      "esri/Graphic"
-    ])
-      .then(([FeatureLayer, GeoJSONLayer, MapView, Legend, Expand, Home, Graphic]) => {
-        const clusterConfig = {
-          type: "cluster",
-          clusterRadius: "100px",
-          // {cluster_count} is an aggregate field containing
-          // the number of features comprised by the cluster
-          popupTemplate: {
-            title: "Cluster summary",
-            content: "This cluster represents {cluster_count} earthquakes.",
-            fieldInfos: [
-              {
-                fieldName: "cluster_count",
-                format: {
-                  places: 0,
-                  digitSeparator: true
-                }
-              }
-            ]
-          },
-          clusterMinSize: "24px",
-          clusterMaxSize: "60px",
-          labelingInfo: [
-            {
-              deconflictionStrategy: "none",
-              labelExpressionInfo: {
-                expression: "Text($feature.cluster_count, '#,###')"
-              },
-              symbol: {
-                type: "text",
-                color: "#004a5d",
-                font: {
-                  weight: "bold",
-                  family: "Noto Sans",
-                  size: "12px"
-                }
-              },
-              labelPlacement: "center-center"
-            }
-          ]
-        };
-
-        const layer = new GeoJSONLayer({
-          title: "Earthquakes from the last month",
-          url: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson",
-          copyright: "USGS Earthquakes",
-
-          featureReduction: clusterConfig,
-
-          // popupTemplates can still be viewed on
-          // individual features
-          popupTemplate: {
-            title: "Magnitude {mag} {type}",
-            content: "Magnitude {mag} {type} hit {place} on {time}",
-            fieldInfos: [
-              {
-                fieldName: "time",
-                format: {
-                  dateFormat: "short-date-short-time"
-                }
-              }
-            ]
-          },
-          renderer: {
-            type: "simple",
-            field: "mag",
-            symbol: {
-              type: "simple-marker",
-              size: 4,
-              color: "#69dcff",
-              outline: {
-                color: "rgba(0, 139, 174, 0.5)",
-                width: 5
-              }
-            }
-          }
-        });
-
-        const point = {
-          type: "point", // autocasts as new Point()
-          longitude: -49.97,
-          latitude: 41.73
-        };
-        const markerSymbol = {
-          type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-          color: [226, 119, 40],
-          outline: {
-            color: [255, 255, 255],
-            width: 2
-          }
-        };
-        const pointGraphic = new Graphic({
-          geometry: point,
-          symbol: markerSymbol
-        });
-        stateView?.graphics?.addMany([pointGraphic]);
-        // stateMap?.add(layer);
-      });
-
-
-  }
-
   const Onload = async (map, view) => {
     const { Fullscreen, UI, Zoom, Expand } = await loadModules(["esri/widgets/Fullscreen", "esri/views/ui/UI", "esri/widgets/Zoom", "esri/widgets/Expand",]).then(([Fullscreen, UI, Zoom, Expand]) => { return { Fullscreen, UI, Zoom, Expand } });
     const fullscreenui = new Fullscreen({
@@ -288,7 +186,7 @@ const Page1 = () => {
       group: "top-right"
     });
 
-    view.ui.add([expand,detaillayer], "top-right");
+    view.ui.add([expand, detaillayer], "top-right");
 
 
     view.ui.add(fullscreenui, "top-right");
@@ -296,6 +194,38 @@ const Page1 = () => {
 
     setStateMap(map);
     setStateView(view);
+
+    socket.on("latlng", async (latlng) => {
+      const { Graphic } = await loadModules(["esri/Graphic",]).then(([Graphic]) => { return { Graphic } });
+      view?.graphics?.removeAll();
+      console.log('latlng :>> ', latlng);
+      latlng.map((data) => {
+        const point = {
+          type: "point", // autocasts as new Point()
+          longitude: data.longitude,
+          latitude: data.latitude
+        };
+        const markerSymbol = {
+          type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+          color: [226, 119, 40],
+          outline: {
+            color: [255, 255, 255],
+            width: 2
+          }
+        };
+        const pointGraphic = new Graphic({
+          geometry: point,
+          symbol: markerSymbol,
+          popupTemplate:{
+            title:"TestData",
+            content:`sadsadsad`
+          }
+        });
+
+        view?.graphics?.addMany([pointGraphic]);
+      })
+
+    })
     // console.log('map,view :>> ', map, view);
   }
   return (
@@ -334,7 +264,7 @@ const Page1 = () => {
             </Form.Item>
           </Form>
         </div>
-        <div ref={refdetail} style={{position: "initial",display:'flex',flex:1,width:'100%'}}>
+        <div ref={refdetail} style={{ position: "initial", display: 'flex', flex: 1, width: '100%' }}>
           <h3>dfsfsd</h3>
         </div>
 

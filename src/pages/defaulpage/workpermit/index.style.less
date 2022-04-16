@@ -46,16 +46,36 @@
   right: 60px;
   width: 350px;
   min-width: 300px;
-  height: 60vh;
+  height: auto;
   overflow: hidden;
   border-radius: 10px;
   padding: 20px;
+  z-index: 99;
   @media screen and (max-width: @screen-sm) {
-    position: absolute;
+    position: relative;
     right: 0;
-    width: 0;
     height: 100%;
-    overflow: hidden;
+    overflow: auto;
 
   }
 }
+
+// .esri-view-height-xsmall .esri-ui-corner .esri-component .esri-expand__content {
+//   max-height: 240px;
+//   width: max-content;
+// }
+
+// .esri-expand__container esri-expand__container--expanded {
+//   position: inherit;
+// }
+
+// .esri-view-width-xsmall .esri-expand--auto .esri-expand__container--expanded {
+//   position: inherit;
+//   top: 0;
+//   bottom: 0;
+//   margin: 0;
+//   height: 100%;
+//   background: #fff;
+//   z-index: 1;
+//   overflow: auto;
+// }

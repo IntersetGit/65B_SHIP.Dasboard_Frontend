@@ -84,6 +84,7 @@
     "reqwest": "^2.0.5",
     "simplebar-react": "^2.3.6",
     "slick-carousel": "^1.8.1",
+    "socket.io-client": "^4.4.1",
     "use-url-search-params": "^2.3.13",
     "web-vitals": "^1.0.1"
   },
