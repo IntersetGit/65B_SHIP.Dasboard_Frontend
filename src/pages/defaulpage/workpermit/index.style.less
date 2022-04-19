@@ -46,17 +46,46 @@
   right: 60px;
   width: 350px;
   min-width: 300px;
-  height: auto;
-  overflow: hidden;
+
   border-radius: 10px;
   padding: 20px;
-  z-index: 99;
+  z-index: 2;
   @media screen and (max-width: @screen-sm) {
     position: relative;
     right: 0;
     height: 100%;
     overflow: auto;
 
+  }
+}
+
+.detailemo {
+  background-color: #f5f5f5 !important;
+  border: 2px solid #0000001c;
+}
+
+#divtable {
+  height: 30vh;
+  overflow: auto;
+}
+.table-row-red {
+  background-color: rgb(255, 128, 0);
+}
+
+.ant-table-wrapper {
+  background-color: white ;
+}
+
+.esri-ui-bottom-left {
+  display: block !important;
+  width: 80vw;
+}
+.esri-ui-bottom-left {
+  display: none !important;
+  &.esri-ui-corner .esri-component {
+    border-radius: 0px !important;
+    overflow: hidden;
+    padding: 5px;
   }
 }
 

@@ -1,9 +1,13 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Table, Tag, Space, Form, Input, InputNumber, Button, Select } from 'antd';
+import { Table, Tag, Space, Form, Input, InputNumber, Button, Select, Row, Col, Modal } from 'antd';
 import { Map, WebScene, } from '@esri/react-arcgis';
-import { setDefaultOptions, loadModules,loadCss } from 'esri-loader';
+import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
 import './index.style.less';
 import io from 'socket.io-client';
+import DaraArea from './dataarea';
+import { useDispatch } from 'react-redux';
+import { setStatus } from '../../../redux/actions'
+import { object } from 'prop-types';
 
 setDefaultOptions({ css: true });
 const socket = io.connect('http://localhost:3001');
@@ -27,86 +31,60 @@ function tagRender(props) {
     </Tag>
   );
 }
-const columns = [
-  {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
-    render: text => <a>{text}</a>,
-  },
-  {
-    title: 'Age',
-    dataIndex: 'age',
-    key: 'age',
-  },
-  {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
-  },
-  {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
-    render: tags => (
-      <>
-        {tags.map(tag => {
-          let color = tag.length > 5 ? 'geekblue' : 'green';
-          if (tag === 'loser') {
-            color = 'volcano';
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
-  {
-    title: 'Action',
-    key: 'action',
-    render: (text, record) => (
-      <Space size="middle">
-        <a>Invite {record.name}</a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
-];
 
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
-  },
-];
+
 
 const Page1 = () => {
   const [stateMap, setStateMap] = useState(null);
   const [stateView, setStateView] = useState(null);
   const refdrawn = useRef();
   const refdetail = useRef();
+  const [tabledata, setTabledata] = useState([]);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [datamodal, setDatamodal] = useState(null);
+  const dispatch = useDispatch();
 
-
+  const columns = [
+    {
+      title: 'fullName',
+      dataIndex: 'fullName',
+      key: 'fullName',
+      render: text => <a>{text}</a>,
+    },
+    {
+      title: 'email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: 'phone',
+      dataIndex: 'phone',
+      key: 'phone',
+    },
+    {
+      title: 'state',
+      key: 'state',
+      dataIndex: 'state',
+      render: tags => (
+        <>
+          <Tag color={'blue'} key={tags}>
+            {tags.toUpperCase()}
+          </Tag>
+        </>
+      ),
+    },
+    {
+      title: '',
+      key: '',
+      render: (text, record) => {
+        return (
+          <Space size="middle">
+            <Button type='primary' onClick={() => { setDatamodal(record), setIsModalVisible(!isModalVisible) }}>Show</Button>
+          </Space>
+        )
+      },
+    },
+  ];
 
   useEffect(() => {
     (async () => {
@@ -128,7 +106,7 @@ const Page1 = () => {
         console.log("Names of all child sublayers", names.join());
       });
       stateMap?.add(layer)
-      // GetCluster()
+      CreateArea()
 
 
 
@@ -159,8 +137,51 @@ const Page1 = () => {
 
     });
 
+  const CreateArea = async () => {
+    const { Graphic, GraphicsLayer, Polygon } = await loadModules(["esri/Graphic", "esri/layers/GraphicsLayer", "esri/geometry/Polygon"]).then(([Graphic, GraphicsLayer, Polygon]) => { return { Graphic, GraphicsLayer, Polygon } });
+    for (const layer in DaraArea) {
+      // DaraArea.map( async(layer) => {
+      let layerArea = new GraphicsLayer({
+        id: DaraArea[layer].name
+      });
+      stateMap?.add(layerArea, 0);
 
+      const polygon = new Polygon({
+        rings: DaraArea[layer].geomantry
+      });
 
+      // Create a symbol for rendering the graphic
+      const fillSymbol = {
+        type: "simple-fill", // autocasts as new SimpleFillSymbol()
+        color: DaraArea[layer].color,
+        outline: {
+          // autocasts as new SimpleLineSymbol()
+          color: [255, 255, 255],
+          width: 1
+        }
+      };
+
+      // Add the geometry and symbol to a new graphic
+      const polygonGraphic = new Graphic({
+        geometry: polygon,
+        symbol: fillSymbol
+      });
+      // stateView?.graphics?.addMany([polygonGraphic]);
+      await layerArea.add(polygonGraphic);
+
+      await stateView?.goTo(polygon.extent)
+
+      // })
+    }
+
+  }
+
+  const Status_cal = async (data) => {
+    const sum = data.map((data, key) => data.type );
+    let result = [...new Set(sum)].reduce((acc,curr)=> (acc[curr]=(sum.filter(a=>a==curr)).length,acc),{});
+    // console.log('result :>> ', result);
+    dispatch(setStatus(result));
+  }
 
   const Onload = async (map, view) => {
     const { Fullscreen, UI, Zoom, Expand } = await loadModules(["esri/widgets/Fullscreen", "esri/views/ui/UI", "esri/widgets/Zoom", "esri/widgets/Expand",]).then(([Fullscreen, UI, Zoom, Expand]) => { return { Fullscreen, UI, Zoom, Expand } });
@@ -177,28 +198,34 @@ const Page1 = () => {
       // collapseIconClass:'esri-icon-search',
       expandIconClass: 'esri-icon-search',
       content: refdrawn.current,
-      // expanded: true
     });
     const detaillayer = new Expand({
       view: view,
       content: refdetail.current,
       expandIconClass: "esri-icon-notice-round",
-      group: "top-right"
     });
+    view.ui.add('button-top', "top-left");
 
-    view.ui.add([expand, detaillayer], "top-right");
-
-
+    view.ui.add(expand, "top-right");
     view.ui.add(fullscreenui, "top-right");
     view.ui.add(zoomui, "top-right");
+    view.ui.add(detaillayer, "top-right");
 
     setStateMap(map);
     setStateView(view);
+    const { Graphic, GraphicsLayer } = await loadModules(["esri/Graphic", "esri/layers/GraphicsLayer"]).then(([Graphic, GraphicsLayer]) => { return { Graphic, GraphicsLayer } });
+
+    let layer = new GraphicsLayer({
+      id: 'poi'
+    });
+    map.add(layer, 99);
 
     socket.on("latlng", async (latlng) => {
-      const { Graphic } = await loadModules(["esri/Graphic",]).then(([Graphic]) => { return { Graphic } });
-      view?.graphics?.removeAll();
-      console.log('latlng :>> ', latlng);
+      Status_cal(latlng);
+      setTabledata(latlng);
+      view.ui.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
+      // console.log('latlng :>> ', latlng);
+      layer.removeAll();
       latlng.map((data) => {
         const point = {
           type: "point", // autocasts as new Point()
@@ -207,31 +234,43 @@ const Page1 = () => {
         };
         const markerSymbol = {
           type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-          color: [226, 119, 40],
+          color: data.type == 'warning' ? [255, 128, 0] : [226, 255, 40],
           outline: {
-            color: [255, 255, 255],
-            width: 2
-          }
+            color: [0, 0, 0],
+            width: 1
+          },
+          style: data.type == 'warning' ? 'triangle' : 'circle'
         };
         const pointGraphic = new Graphic({
           geometry: point,
           symbol: markerSymbol,
-          popupTemplate:{
-            title:"TestData",
-            content:`sadsadsad`
+          popupTemplate: {
+            title: "TestData",
+            content: `sadsadsad`
+          },
+          id: 'poi',
+          attributes: {
+            "name": "poi",
           }
         });
-
-        view?.graphics?.addMany([pointGraphic]);
+        layer.add(pointGraphic);
+        // view?.graphics?.addMany([pointGraphic]);
       })
-
     })
-    // console.log('map,view :>> ', map, view);
   }
   return (
-    <div>
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <Map className="Mapacrgis" onLoad={Onload} mapProperties={{ basemap: `${'arcgis-light-gray' ?? 'arcgis-navigation'}`, autoResize: false, }} viewProperties={{ center: [100.3330867, 14.5548052], ui: { components: ['attribution', 'compass'] } }} >
-        <div ref={refdrawn} className="esri-widget menuserchslide">
+        <div id='button-top' className='button-topleft'>
+          <div className='esri-widget--button esri-icon-table' onClick={() => {
+            if (document.querySelector('.esri-ui-bottom-left').style.display === "none" || document.querySelector('.esri-ui-bottom-left').style.display === "") {
+              document.querySelector('.esri-ui-bottom-left').style.setProperty("display", "block", "important")
+            } else {
+              document.querySelector('.esri-ui-bottom-left').style.setProperty("display", "none", "important")
+            }
+          }} />
+        </div>
+        <div ref={refdrawn} id="viewtest" className='menuserchslide esri-widget' >
           <Form labelCol={{ span: 9 }} wrapperCol={{ span: 16 }} name="nest-messages" >
             <Form.Item name={['user', 'name']} label="วันเวลา เริ้มต้น" rules={[{ required: true }]}>
               <Input size='small' />
@@ -264,14 +303,56 @@ const Page1 = () => {
             </Form.Item>
           </Form>
         </div>
-        <div ref={refdetail} style={{ position: "initial", display: 'flex', flex: 1, width: '100%' }}>
-          <h3>dfsfsd</h3>
+        <div ref={refdetail} className="menuserchslide detailemo esri-widget">
+          <Row>
+            <Col span={8}>
+              <p>ใช้ 8 สีแทนประเภท</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridGap: '5px' }}>
+                <span>🔴</span>
+                <span>🟠</span>
+                <span>🟡</span>
+                <span>🟢</span>
+                <span>🔵</span>
+              </div>
+            </Col>
+            <Col span={8}>
+              <p>ใช้ 2 สีแทนประเภท</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridGap: '5px' }}>
+                <span>🟢</span>
+                <span>🔵</span>
+              </div>
+            </Col>
+            <Col span={8}>
+              <p>ใช้สัญลักษณ์แทนการแจ้งเตือน</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridGap: '5px' }}>
+                <span>🚸</span>
+                <span>⛔</span>
+                <span>✅</span>
+                <span>🛑</span>
+                <span>🚯</span>
+              </div>
+            </Col>
+          </Row>
         </div>
+        <Table id="divtable" rowClassName={(record, index) => record.type === 'warning' ? 'table-row-red' : ''} rowKey={(i) => i.phone} columns={columns} dataSource={tabledata} />
 
       </Map>
 
       {/* <div id="viewDiv" style={{height:'70vh'}}></div> */}
-      <Table columns={columns} dataSource={data} />
+
+      <Modal title="รายละเอียด" onCancel={() => setIsModalVisible(!isModalVisible)} visible={isModalVisible} >
+        {datamodal && Object.entries(datamodal).map(([key, value]) => (
+          <Row key={key}>
+            <Col span={12}>
+              <a>{key}</a>
+            </Col>
+            <Col span={12}>
+              {value}
+            </Col>
+          </Row>
+        ))
+        }
+      </Modal>
     </div>
   )
 }
