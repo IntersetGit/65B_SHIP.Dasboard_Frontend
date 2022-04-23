@@ -6,11 +6,11 @@ import './index.style.less';
 import io from 'socket.io-client';
 import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
-import { setStatus } from '../../../redux/actions'
+import { setStatus } from '../../../redux/actions';
 import { object } from 'prop-types';
+import cars from '../../../../src/assets/iconmap/car/cars.png';
 
 setDefaultOptions({ css: true });
-const socket = io.connect('http://localhost:3001');
 
 const options = [{ value: 'gold' }, { value: 'lime' }, { value: 'green' }, { value: 'cyan' }];
 function tagRender(props) {
@@ -39,7 +39,7 @@ const Page1 = () => {
   const [stateView, setStateView] = useState(null);
   const refdrawn = useRef();
   const refdetail = useRef();
-  const [tabledata, setTabledata] = useState([]);
+  const [tabledata, setTabledata] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [datamodal, setDatamodal] = useState(null);
   const dispatch = useDispatch();
@@ -87,8 +87,9 @@ const Page1 = () => {
   ];
 
   useEffect(() => {
+    let isMounted = true;
+    const socket = io.connect('http://localhost:3001');
     (async () => {
-
       const WFSLayer = await loadModules(["esri/layers/WFSLayer"]).then(([WFSLayer]) => WFSLayer);
       const layer2 = new WFSLayer({
         url: "https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WFSServer?request=GetCapabilities&service=WFS",
@@ -108,9 +109,58 @@ const Page1 = () => {
       stateMap?.add(layer)
       CreateArea()
 
+      const { Graphic, GraphicsLayer } = await loadModules(["esri/Graphic", "esri/layers/GraphicsLayer"]).then(([Graphic, GraphicsLayer]) => { return { Graphic, GraphicsLayer } });
 
+      let layerpoi = new GraphicsLayer({
+        id: 'poi'
+      });
+      stateMap?.add(layerpoi, 99);
+      socket.on("latlng", async (latlng) => {
+        Status_cal(latlng);
+        setTabledata(latlng);
+        stateView?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
+        // console.log('latlng :>> ', latlng);
+        layerpoi.removeAll();
+        latlng.map((data) => {
+          const point = {
+            type: "point", // autocasts as new Point()
+            longitude: data.longitude,
+            latitude: data.latitude
+          };
+          const imageicon = {
+            type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
+            url: cars,
+            width: "40px",
+            height: "40px"
+          }
+          const markerSymbol = {
+            type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+            color: data.type == 'warning' ? [255, 128, 0] : [226, 255, 40],
+            outline: {
+              color: [0, 0, 0],
+              width: 1
+            },
+            style: data.type == 'warning' ? 'triangle' : 'circle'
+          };
+          const pointGraphic = new Graphic({
+            geometry: point,
+            symbol: markerSymbol,
+            popupTemplate: {
+              title: data.fullName,
+              content: data.phone
+            },
+            id: 'poi',
+            attributes: {
+              "name": "poi",
+            }
+          });
+          layerpoi.add(pointGraphic);
+          // view?.graphics?.addMany([pointGraphic]);
+        })
+      })
 
     })();
+    return () => { isMounted = false, socket.disconnect(); };
   }, [stateMap, stateView,]);
 
 
@@ -170,6 +220,7 @@ const Page1 = () => {
       await layerArea.add(polygonGraphic);
 
       await stateView?.goTo(polygon.extent)
+      console.log('polygon.extent :>> ', polygon.extent.toJSON());
 
       // })
     }
@@ -177,10 +228,10 @@ const Page1 = () => {
   }
 
   const Status_cal = async (data) => {
-    const sum = data.map((data, key) => data.type );
-    let result = [...new Set(sum)].reduce((acc,curr)=> (acc[curr]=(sum.filter(a=>a==curr)).length,acc),{});
+    const sum = data.map((data, key) => data.type);
+    let result = [...new Set(sum)].reduce((acc, curr) => (acc[curr] = (sum.filter(a => a == curr)).length, acc), {});
     // console.log('result :>> ', result);
-    dispatch(setStatus(result));
+    dispatch(setStatus({ ...result, total: sum.length }));
   }
 
   const Onload = async (map, view) => {
@@ -210,57 +261,30 @@ const Page1 = () => {
     view.ui.add(fullscreenui, "top-right");
     view.ui.add(zoomui, "top-right");
     view.ui.add(detaillayer, "top-right");
+    view?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
 
     setStateMap(map);
     setStateView(view);
-    const { Graphic, GraphicsLayer } = await loadModules(["esri/Graphic", "esri/layers/GraphicsLayer"]).then(([Graphic, GraphicsLayer]) => { return { Graphic, GraphicsLayer } });
 
-    let layer = new GraphicsLayer({
-      id: 'poi'
-    });
-    map.add(layer, 99);
-
-    socket.on("latlng", async (latlng) => {
-      Status_cal(latlng);
-      setTabledata(latlng);
-      view.ui.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
-      // console.log('latlng :>> ', latlng);
-      layer.removeAll();
-      latlng.map((data) => {
-        const point = {
-          type: "point", // autocasts as new Point()
-          longitude: data.longitude,
-          latitude: data.latitude
-        };
-        const markerSymbol = {
-          type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-          color: data.type == 'warning' ? [255, 128, 0] : [226, 255, 40],
-          outline: {
-            color: [0, 0, 0],
-            width: 1
-          },
-          style: data.type == 'warning' ? 'triangle' : 'circle'
-        };
-        const pointGraphic = new Graphic({
-          geometry: point,
-          symbol: markerSymbol,
-          popupTemplate: {
-            title: "TestData",
-            content: `sadsadsad`
-          },
-          id: 'poi',
-          attributes: {
-            "name": "poi",
-          }
-        });
-        layer.add(pointGraphic);
-        // view?.graphics?.addMany([pointGraphic]);
-      })
-    })
   }
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <Map className="Mapacrgis" onLoad={Onload} mapProperties={{ basemap: `${'arcgis-light-gray' ?? 'arcgis-navigation'}`, autoResize: false, }} viewProperties={{ center: [100.3330867, 14.5548052], ui: { components: ['attribution', 'compass'] } }} >
+      <WebScene className="Mapacrgis" onLoad={Onload} mapProperties={{
+        basemap: /*`${'arcgis-light-gray'?? 'arcgis-navigation'}`*/ {
+          portalItem: {
+            id: "8d91bd39e873417ea21673e0fee87604" // nova basemap
+          }
+        },
+        autoResize: false,
+        extend: {
+          type: "extent",
+          spatialReference: {wkid: 4326},
+          xmax: 100.32800674438477,
+          xmin: 100.30938148498534,
+          ymax: 13.785986924617411,
+          ymin: 13.767647416498118,
+        },
+      }} viewProperties={{ center: [100.3330867, 14.5548052], ui: { components: ['attribution', 'compass'] } }} >
         <div id='button-top' className='button-topleft'>
           <div className='esri-widget--button esri-icon-table' onClick={() => {
             if (document.querySelector('.esri-ui-bottom-left').style.display === "none" || document.querySelector('.esri-ui-bottom-left').style.display === "") {
@@ -334,9 +358,9 @@ const Page1 = () => {
             </Col>
           </Row>
         </div>
-        <Table id="divtable" rowClassName={(record, index) => record.type === 'warning' ? 'table-row-red' : ''} rowKey={(i) => i.phone} columns={columns} dataSource={tabledata} />
+        <Table id="divtable" size='small' rowClassName={(record, index) => record.type === 'warning' ? 'table-row-red' : ''} rowKey={(i) => i.id} columns={columns} dataSource={tabledata} />
 
-      </Map>
+      </WebScene>
 
       {/* <div id="viewDiv" style={{height:'70vh'}}></div> */}
 

@@ -65,14 +65,14 @@ const routesConfig = [
         icon: <Icon component={() => (<img src={AcessIcon} width="20" />)} />,
         path: '/acess',
       },
-      {
-        id: 'page-7',
-        title: 'Page 7',
-        messageId: 'sidebar.sample.page7',
-        type: 'item',
-        icon: <Icon component={() => (<img src={NotificationIcon} width="20" />)} />,
-        path: '/notification',
-      },
+      // {
+      //   id: 'page-7',
+      //   title: 'Page 7',
+      //   messageId: 'sidebar.sample.page7',
+      //   type: 'item',
+      //   icon: <Icon component={() => (<img src={NotificationIcon} width="20" />)} />,
+      //   path: '/notification',
+      // },
     ],
   },
 

@@ -1,98 +1,373 @@
-import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
-import { GoogleMap, InfoWindow, withGoogleMap } from 'react-google-maps';
-import { Map } from '@esri/react-arcgis';
-import { setDefaultOptions, loadModules } from 'esri-loader';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { Table, Tag, Space, Form, Input, InputNumber, Button, Select, Row, Col, Modal } from 'antd';
+import { Map, WebScene, } from '@esri/react-arcgis';
+import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
+import './index.style.less';
+import io from 'socket.io-client';
+import DaraArea from './dataarea';
+import { useDispatch } from 'react-redux';
+import { setStatus } from '../../../redux/actions'
+import { object } from 'prop-types';
+
 setDefaultOptions({ css: true });
 
-const google = window.google;
-
-const Mapsgoogle = withGoogleMap((props) => (
-  <GoogleMap
-    ref={props.onMapMounted}
-    onZoomChanged={props.onZoomChanged}
-    defaultCenter={props.center}
-    defaultOptions={{ fullscreenControl: false, zoomControl: false, streetViewControl: false }}
-    zoom={props.zoom}>
-    <InfoWindow defaultPosition={props.center}>
-      <div>{props.content}</div>
-    </InfoWindow>
-  </GoogleMap>
-));
-
-function usePrevious(value) {
-  const ref = useRef();
-  useEffect(() => {
-    ref.current = value;
-  }, [value]);
-  return ref.current;
+const options = [{ value: 'gold' }, { value: 'lime' }, { value: 'green' }, { value: 'cyan' }];
+function tagRender(props) {
+  const { label, value, closable, onClose } = props;
+  const onPreventMouseDown = event => {
+    event.preventDefault();
+    event.stopPropagation();
+  };
+  return (
+    <Tag
+      color={value}
+      onMouseDown={onPreventMouseDown}
+      closable={closable}
+      onClose={onClose}
+      style={{ marginRight: 3 }}
+    >
+      {label}
+    </Tag>
+  );
 }
 
-function Page1() {
-  const Mapref = useRef();
+
+
+const Vehicle = () => {
   const [stateMap, setStateMap] = useState(null);
+  const [stateView, setStateView] = useState(null);
+  const refdrawn = useRef();
+  const refdetail = useRef();
+  const [tabledata, setTabledata] = useState(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [datamodal, setDatamodal] = useState(null);
+  const dispatch = useDispatch();
 
-  loadModules(["esri/Map",'esri/views/MapView', 'esri/WebMap'])
-    .then(([Map,MapView, WebMap]) => {
-      const map = new Map({
-        basemap: "topo-vector"
-      });
+  const columns = [
+    {
+      title: 'fullName',
+      dataIndex: 'fullName',
+      key: 'fullName',
+      render: text => <a>{text}</a>,
+    },
+    {
+      title: 'email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: 'phone',
+      dataIndex: 'phone',
+      key: 'phone',
+    },
+    {
+      title: 'state',
+      key: 'state',
+      dataIndex: 'state',
+      render: tags => (
+        <>
+          <Tag color={'blue'} key={tags}>
+            {tags.toUpperCase()}
+          </Tag>
+        </>
+      ),
+    },
+    {
+      title: '',
+      key: '',
+      render: (text, record) => {
+        return (
+          <Space size="middle">
+            <Button type='primary' onClick={() => { setDatamodal(record), setIsModalVisible(!isModalVisible) }}>Show</Button>
+          </Space>
+        )
+      },
+    },
+  ];
 
-      const view = new MapView({
-        container: "viewDiv",
-        map: map
-      });
-    });
   useEffect(() => {
+    let isMounted = true;
+    const socket = io.connect('http://localhost:3001');
+    (async () => {
+      const WFSLayer = await loadModules(["esri/layers/WFSLayer"]).then(([WFSLayer]) => WFSLayer);
+      const layer2 = new WFSLayer({
+        url: "https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WFSServer?request=GetCapabilities&service=WFS",
+
+      });
+      const WMSLayer = await loadModules(["esri/layers/WMSLayer"]).then(([WMSLayer]) => WMSLayer);
+      const layer = new WMSLayer({
+        url: "https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WMSServer?request=GetCapabilities&service=WMS",
+
+      });
+      layer.load().then(() => {
+        const names = layer.allSublayers
+          .filter((sublayer) => !sublayer.sublayers) // Non-grouping layers will not have any "sublayers".
+          .map((sublayer) => sublayer.name);
+        console.log("Names of all child sublayers", names.join());
+      });
+      stateMap?.add(layer)
+      CreateArea()
+
+      const { Graphic, GraphicsLayer } = await loadModules(["esri/Graphic", "esri/layers/GraphicsLayer"]).then(([Graphic, GraphicsLayer]) => { return { Graphic, GraphicsLayer } });
+
+      let layerpoi = new GraphicsLayer({
+        id: 'poi'
+      });
+      stateMap?.add(layerpoi, 99);
+      socket.on("latlng", async (latlng) => {
+        Status_cal(latlng);
+        setTabledata(latlng);
+        stateView?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
+        // console.log('latlng :>> ', latlng);
+        layerpoi.removeAll();
+        latlng.map((data) => {
+          const point = {
+            type: "point", // autocasts as new Point()
+            longitude: data.longitude,
+            latitude: data.latitude
+          };
+          const imageicon = {
+            type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
+            url: "https://static.arcgis.com/images/Symbols/Shapes/BlackStarLargeB.png",
+            width: "64px",
+            height: "64px"
+          }
+          const markerSymbol = {
+            type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+            color: data.type == 'warning' ? [255, 128, 0] : [226, 255, 40],
+            outline: {
+              color: [0, 0, 0],
+              width: 1
+            },
+            style: data.type == 'warning' ? 'triangle' : 'circle'
+          };
+          const pointGraphic = new Graphic({
+            geometry: point,
+            symbol: markerSymbol,
+            popupTemplate: {
+              title: data.fullName,
+              content: data.phone
+            },
+            id: 'poi',
+            attributes: {
+              "name": "poi",
+            }
+          });
+          layerpoi.add(pointGraphic);
+          // view?.graphics?.addMany([pointGraphic]);
+        })
+      })
+
+    })();
+    return () => { isMounted = false, socket.disconnect(); };
+  }, [stateMap, stateView,]);
 
 
-  }, []);
+  loadModules(["esri/config", "esri/Map", 'esri/views/MapView', "esri/layers/TileLayer"])
+    .then(async ([esriConfig, Map, MapView, TileLayer]) => {
+      esriConfig.apiKey = "AAPKf24959e55476492eb12c8cbaa4d1261etdgkaLK718fs8_EuvckemKt2gyRR-8p04PR7mC2G8Oi5oNli_65xV-C8u8BuPQTZ";
+
+      // var map = new Map({
+      //   basemap: "streets"
+      // });
+
+      // var view = new MapView({
+      //   container: "viewDiv",  // Reference to the DOM node that will contain the view
+      //   map: map               // References the map object created in step 3
+      // });
+
+      // const Fullscreen = await loadModules(["esri/widgets/Fullscreen"]).then(([Fullscreen]) => Fullscreen);
+      // const full = new Fullscreen({
+      //   view: view
+      // });
+      // console.log('full :>> ', full);
+      // view.ui.add(full, "top-left");
 
 
-  // useLayoutEffect(() => {
-  //   if (stateMap) {
-  //     console.log('Mapref :>> ', Mapref);
-  //       // const marker = new google.maps.Marker({
-  //       //   position: { lat: -34.397, lng: 150.644 },
-  //       //   map: stateMap.context.__SECRET_MAP_DO_NOT_USE_OR_YOU_WILL_BE_FIRED,
-  //       // });
-  //       stateMap.addListener("click", (mapsMouseEvent) => {
-  //         console.log('mapsMouseEvent :>> ', mapsMouseEvent);
-  //         // Close the current InfoWindow.
-  //         // infoWindow.close();
-  //         // // Create a new InfoWindow.
-  //         let infoWindow = new google.maps.InfoWindow({
-  //           position: mapsMouseEvent.latLng,
-  //         });
-  //         infoWindow.setContent(
-  //           JSON.stringify(mapsMouseEvent.latLng.toJSON(), null, 2)
-  //         );
-  //         infoWindow.open(stateMap);
-  //       });
-  //   }
-  // }, [stateMap]);
+    });
 
+  const CreateArea = async () => {
+    const { Graphic, GraphicsLayer, Polygon } = await loadModules(["esri/Graphic", "esri/layers/GraphicsLayer", "esri/geometry/Polygon"]).then(([Graphic, GraphicsLayer, Polygon]) => { return { Graphic, GraphicsLayer, Polygon } });
+    for (const layer in DaraArea) {
+      // DaraArea.map( async(layer) => {
+      let layerArea = new GraphicsLayer({
+        id: DaraArea[layer].name
+      });
+      stateMap?.add(layerArea, 0);
 
+      const polygon = new Polygon({
+        rings: DaraArea[layer].geomantry
+      });
 
+      // Create a symbol for rendering the graphic
+      const fillSymbol = {
+        type: "simple-fill", // autocasts as new SimpleFillSymbol()
+        color: DaraArea[layer].color,
+        outline: {
+          // autocasts as new SimpleLineSymbol()
+          color: [255, 255, 255],
+          width: 1
+        }
+      };
+
+      // Add the geometry and symbol to a new graphic
+      const polygonGraphic = new Graphic({
+        geometry: polygon,
+        symbol: fillSymbol
+      });
+      // stateView?.graphics?.addMany([polygonGraphic]);
+      await layerArea.add(polygonGraphic);
+
+      await stateView?.goTo(polygon.extent)
+
+      // })
+    }
+
+  }
+
+  const Status_cal = async (data) => {
+    const sum = data.map((data, key) => data.type);
+    let result = [...new Set(sum)].reduce((acc, curr) => (acc[curr] = (sum.filter(a => a == curr)).length, acc), {});
+    // console.log('result :>> ', result);
+    dispatch(setStatus({ ...result, total: sum.length }));
+  }
+
+  const Onload = async (map, view) => {
+    const { Fullscreen, UI, Zoom, Expand } = await loadModules(["esri/widgets/Fullscreen", "esri/views/ui/UI", "esri/widgets/Zoom", "esri/widgets/Expand",]).then(([Fullscreen, UI, Zoom, Expand]) => { return { Fullscreen, UI, Zoom, Expand } });
+    const fullscreenui = new Fullscreen({
+      view: view
+    });
+    const zoomui = new Zoom({
+      view: view
+    });
+    const expand = new Expand({
+      expandTooltip: "ค้นหา",
+      view: view,
+      autoCollapse: false,
+      // collapseIconClass:'esri-icon-search',
+      expandIconClass: 'esri-icon-search',
+      content: refdrawn.current,
+    });
+    const detaillayer = new Expand({
+      view: view,
+      content: refdetail.current,
+      expandIconClass: "esri-icon-notice-round",
+    });
+    view.ui.add('button-top', "top-left");
+
+    view.ui.add(expand, "top-right");
+    view.ui.add(fullscreenui, "top-right");
+    view.ui.add(zoomui, "top-right");
+    view.ui.add(detaillayer, "top-right");
+    view?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
+
+    setStateMap(map);
+    setStateView(view);
+
+  }
   return (
-    <div>
-      {/* <Mapsgoogle
-        loadingElement={<div style={{ height: `100%` }} />}
-        containerElement={<div style={{ height: `400px` }} />}
-        mapElement={<div style={{ height: `60vh` }} />}
-        onMapMounted={(m) => {setStateMap(m?.context?.__SECRET_MAP_DO_NOT_USE_OR_YOU_WILL_BE_FIRED),Mapref.current = m}}
-        // onZoomChanged={onMapmount}
-        center={new google.maps.LatLng(47.646935, -122.303763)}
-        zoom={15}
-        content={"Change the zoom level"}
-      /> */}
-      <Map  style={{ height: 500 }}  mapProperties={{ basemap: {portalItem: {
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+      <Map className="Mapacrgis" onLoad={Onload} mapProperties={{
+        basemap: /*`${'arcgis-light-gray'?? 'arcgis-navigation'}`*/ {
+          portalItem: {
             id: "8d91bd39e873417ea21673e0fee87604" // nova basemap
-          }} }} />
-      {/* <div className='viewDiv' id="viewDiv" style={{height:500}}></div> */}
+          }
+        }, autoResize: false,
+      }} viewProperties={{ center: [100.3330867, 14.5548052], ui: { components: ['attribution', 'compass'] } }} >
+        <div id='button-top' className='button-topleft'>
+          <div className='esri-widget--button esri-icon-table' onClick={() => {
+            if (document.querySelector('.esri-ui-bottom-left').style.display === "none" || document.querySelector('.esri-ui-bottom-left').style.display === "") {
+              document.querySelector('.esri-ui-bottom-left').style.setProperty("display", "block", "important")
+            } else {
+              document.querySelector('.esri-ui-bottom-left').style.setProperty("display", "none", "important")
+            }
+          }} />
+        </div>
+        <div ref={refdrawn} id="viewtest" className='menuserchslide esri-widget' >
+          <Form labelCol={{ span: 9 }} wrapperCol={{ span: 16 }} name="nest-messages" >
+            <Form.Item name={['user', 'name']} label="วันเวลา เริ้มต้น" rules={[{ required: true }]}>
+              <Input size='small' />
+            </Form.Item>
+            <Form.Item name={['user', 'email']} label="วันเวลา สิ้นสุด" rules={[{ type: 'email' }]}>
+              <Input size='small' />
+            </Form.Item>
+            <Form.Item name={['user', 'age']} label="สถานที่ปฎิบัติงาน" rules={[{ type: 'number', min: 0, max: 99 }]}>
+              <InputNumber size='small' />
+            </Form.Item>
+            <Form.Item name={['user', 'website']} label="ประเภทใบอนุญาติ">
+              <Input size='small' />
+            </Form.Item>
+            <Form.Item name={['user', 'website']} label="หัวข้อการค้นหา">
+              <Select
+                mode="multiple"
+                showArrow
+                tagRender={tagRender}
+                style={{ width: '100%' }}
+                options={options}
+              />
+            </Form.Item>
+            <Form.Item name={['user', 'introduction']} label="Introduction">
+              <Input.TextArea size='ข้อเสนอแนะ' />
+            </Form.Item>
+            <Form.Item wrapperCol={{ span: 16, offset: 18 }} >
+              <Button type="primary" htmlType="submit">
+                ค้นหา
+              </Button>
+            </Form.Item>
+          </Form>
+        </div>
+        <div ref={refdetail} className="menuserchslide detailemo esri-widget">
+          <Row>
+            <Col span={8}>
+              <p>ใช้ 8 สีแทนประเภท</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridGap: '5px' }}>
+                <span>🔴</span>
+                <span>🟠</span>
+                <span>🟡</span>
+                <span>🟢</span>
+                <span>🔵</span>
+              </div>
+            </Col>
+            <Col span={8}>
+              <p>ใช้ 2 สีแทนประเภท</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridGap: '5px' }}>
+                <span>🟢</span>
+                <span>🔵</span>
+              </div>
+            </Col>
+            <Col span={8}>
+              <p>ใช้สัญลักษณ์แทนการแจ้งเตือน</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridGap: '5px' }}>
+                <span>🚸</span>
+                <span>⛔</span>
+                <span>✅</span>
+                <span>🛑</span>
+                <span>🚯</span>
+              </div>
+            </Col>
+          </Row>
+        </div>
+        <Table id="divtable" size='small' rowClassName={(record, index) => record.type === 'warning' ? 'table-row-red' : ''} rowKey={(i) => i.id} columns={columns} dataSource={tabledata} />
 
+      </Map>
 
+      {/* <div id="viewDiv" style={{height:'70vh'}}></div> */}
+
+      <Modal title="รายละเอียด" onCancel={() => setIsModalVisible(!isModalVisible)} visible={isModalVisible} >
+        {datamodal && Object.entries(datamodal).map(([key, value]) => (
+          <Row key={key}>
+            <Col span={12}>
+              <a>{key}</a>
+            </Col>
+            <Col span={12}>
+              {value}
+            </Col>
+          </Row>
+        ))
+        }
+      </Modal>
     </div>
   )
 }
 
-export default Page1
+export default Vehicle

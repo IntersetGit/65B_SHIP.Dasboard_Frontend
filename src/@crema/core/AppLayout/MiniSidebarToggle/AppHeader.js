@@ -12,6 +12,7 @@ import { useAuthMethod, useAuthUser } from '../../../utility/AuthHooks';
 import { Avatar, List, Comment } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { useThemeContext } from '../../../utility/AppContextProvider/ThemeContextProvider';
+import { useSelector } from 'react-redux'
 
 import UserInfo from '../../../core/AppLayout/components/UserInfo';
 const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
@@ -22,7 +23,7 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
   const navigate = useNavigate();
   const { logout } = useAuthMethod();
   const { themeMode } = useThemeContext();
-
+  const StatusMap = useSelector(({ status }) => status);
   const menuMobile = (
     <Menu>
       <AppHeaderMessages />
@@ -56,26 +57,20 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
           onClick: onToggleSidebar,
         },
       )}
+      {Object.keys(StatusMap).length > 0 &&
+        <div className='headerstatus' >
 
-      <div className='headerstatus' >
-        <div className='textstatus'>
-          <p>Total</p>
-          <p>20</p>
-        </div>
-        <div className='textstatus'>
-          <p>Open</p>
-          <p>50</p>
-        </div>
-        <div className='textstatus'>
-          <p>Warning</p>
-          <p>50</p>
-        </div>
-        <div className='textstatus'>
-          <p>Close</p>
-          <p>50</p>
-        </div>
+          {(Object.keys(StatusMap).map((status) => {
+            return (
+              <div key={status} className='textstatus'>
+                <p>{status}</p>
+                <p>{StatusMap[status]}</p>
+              </div>
+            )
+          }))}
 
-      </div>
+        </div>
+      }
 
       {/* <AppLogo /> */}
 
