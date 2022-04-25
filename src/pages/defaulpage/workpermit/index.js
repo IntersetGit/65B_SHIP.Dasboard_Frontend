@@ -115,7 +115,7 @@ const Page1 = () => {
         id: 'poi'
       });
       stateMap?.add(layerpoi, 99);
-      socket.on("latlng", async (latlng) => {
+   /*    socket.on("latlng", async (latlng) => {
         Status_cal(latlng);
         setTabledata(latlng);
         stateView?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
@@ -157,7 +157,7 @@ const Page1 = () => {
           layerpoi.add(pointGraphic);
           // view?.graphics?.addMany([pointGraphic]);
         })
-      })
+      }) */
 
     })();
     return () => { isMounted = false, socket.disconnect(); };
@@ -167,23 +167,6 @@ const Page1 = () => {
   loadModules(["esri/config", "esri/Map", 'esri/views/MapView', "esri/layers/TileLayer"])
     .then(async ([esriConfig, Map, MapView, TileLayer]) => {
       esriConfig.apiKey = "AAPKf24959e55476492eb12c8cbaa4d1261etdgkaLK718fs8_EuvckemKt2gyRR-8p04PR7mC2G8Oi5oNli_65xV-C8u8BuPQTZ";
-
-      // var map = new Map({
-      //   basemap: "streets"
-      // });
-
-      // var view = new MapView({
-      //   container: "viewDiv",  // Reference to the DOM node that will contain the view
-      //   map: map               // References the map object created in step 3
-      // });
-
-      // const Fullscreen = await loadModules(["esri/widgets/Fullscreen"]).then(([Fullscreen]) => Fullscreen);
-      // const full = new Fullscreen({
-      //   view: view
-      // });
-      // console.log('full :>> ', full);
-      // view.ui.add(full, "top-left");
-
 
     });
 
