@@ -7,7 +7,7 @@ const setStatusReducer = (state = initialSettings, action) => {
   switch (action.type) {
     case "SET_STATUS":
       return {
-        ...state,
+        // ...state,
         ...action.payload,
       };
 

@@ -41,11 +41,11 @@ const AppThemeSetting = () => {
 
   return (
     <div className='customizer-option'>
-      <Button
+      {/* <Button
         className='customizer-btn'
         onClick={() => setCustomizerStatus(!open)}>
         <FiSettings className='ant-spin-dot-spin' style={{ fontSize: 20 }} />
-      </Button>
+      </Button> */}
       <Drawer
         placement={direction === 'ltr' ? 'right' : 'left'}
         className={clsx('customize-drawer', {

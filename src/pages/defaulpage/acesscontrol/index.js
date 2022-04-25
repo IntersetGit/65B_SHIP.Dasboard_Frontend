@@ -6,9 +6,9 @@ import './index.style.less';
 import io from 'socket.io-client';
 import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
-import { setStatus } from '../../../redux/actions';
+import { setStatus } from '../../../redux/actions'
 import { object } from 'prop-types';
-import cars from '../../../../src/assets/iconmap/car/cars.png';
+import Demodata from '../../demodata'
 
 setDefaultOptions({ css: true });
 
@@ -34,7 +34,7 @@ function tagRender(props) {
 
 
 
-const Page1 = () => {
+const Vehicle = () => {
   const [stateMap, setStateMap] = useState(null);
   const [stateView, setStateView] = useState(null);
   const refdrawn = useRef();
@@ -43,28 +43,29 @@ const Page1 = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [datamodal, setDatamodal] = useState(null);
   const dispatch = useDispatch();
+  const datademo = new Demodata("access_control");
 
   const columns = [
     {
-      title: 'fullName',
-      dataIndex: 'fullName',
-      key: 'fullName',
+      title: 'contractor_name',
+      dataIndex: 'contractor_name',
+      key: 'contractor_name',
       render: text => <a>{text}</a>,
     },
     {
-      title: 'email',
-      dataIndex: 'email',
-      key: 'email',
+      title: 'time_scan',
+      dataIndex: 'time_scan',
+      key: 'time_scan',
     },
     {
-      title: 'phone',
-      dataIndex: 'phone',
-      key: 'phone',
+      title: 'supervisor',
+      dataIndex: 'supervisor',
+      key: 'supervisor',
     },
     {
-      title: 'state',
-      key: 'state',
-      dataIndex: 'state',
+      title: 'people_type',
+      key: 'people_type',
+      dataIndex: 'people_type',
       render: tags => (
         <>
           <Tag color={'blue'} key={tags}>
@@ -74,12 +75,22 @@ const Page1 = () => {
       ),
     },
     {
+      title: 'exchange_card_in',
+      dataIndex: 'exchange_card_in',
+      key: 'exchange_card_in',
+    },
+    {
+      title: 'exchange_card_out',
+      dataIndex: 'exchange_card_out',
+      key: 'exchange_card_out',
+    },
+    {
       title: '',
       key: '',
       render: (text, record) => {
         return (
           <Space size="middle">
-            <Button type='primary' onClick={() => { setDatamodal(record), setIsModalVisible(!isModalVisible) }}>Show</Button>
+            <Button type='primary' onClick={() => { setDatamodal(record), setIsModalVisible(!isModalVisible) }}>Detail</Button>
           </Space>
         )
       },
@@ -88,6 +99,7 @@ const Page1 = () => {
 
   useEffect(() => {
     let isMounted = true;
+    var loopdata;
     const socket = io.connect('http://localhost:3001');
     (async () => {
       const WFSLayer = await loadModules(["esri/layers/WFSLayer"]).then(([WFSLayer]) => WFSLayer);
@@ -115,7 +127,53 @@ const Page1 = () => {
         id: 'poi'
       });
       stateMap?.add(layerpoi, 99);
-      socket.on("latlng", async (latlng) => {
+      /*  socket.on("latlng", async (latlng) => {
+         Status_cal(latlng);
+         setTabledata(latlng);
+         stateView?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
+         // console.log('latlng :>> ', latlng);
+         layerpoi.removeAll();
+         latlng.map((data) => {
+           const point = {
+             type: "point", // autocasts as new Point()
+             longitude: data.longitude,
+             latitude: data.latitude
+           };
+           const imageicon = {
+             type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
+             url: "https://static.arcgis.com/images/Symbols/Shapes/BlackStarLargeB.png",
+             width: "64px",
+             height: "64px"
+           }
+           const markerSymbol = {
+             type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+             color: data.type == 'warning' ? [255, 128, 0] : [226, 255, 40],
+             outline: {
+               color: [0, 0, 0],
+               width: 1
+             },
+             style: data.type == 'warning' ? 'triangle' : 'circle'
+           };
+           const pointGraphic = new Graphic({
+             geometry: point,
+             symbol: markerSymbol,
+             popupTemplate: {
+               title: data.fullName,
+               content: data.phone
+             },
+             id: 'poi',
+             attributes: {
+               "name": "poi",
+             }
+           });
+           layerpoi.add(pointGraphic);
+           // view?.graphics?.addMany([pointGraphic]);
+         })
+       })
+  */
+
+       loopdata = setInterval(async () => {
+        let latlng = await datademo.getDemodata();
         Status_cal(latlng);
         setTabledata(latlng);
         stateView?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
@@ -127,27 +185,22 @@ const Page1 = () => {
             longitude: data.longitude,
             latitude: data.latitude
           };
-          const imageicon = {
-            type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
-            url: cars,
-            width: "40px",
-            height: "40px"
-          }
+
           const markerSymbol = {
             type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-            color: data.type == 'warning' ? [255, 128, 0] : [226, 255, 40],
+            color: data.status_warnning !== null && data?.status_warnning !== undefined  ? [255, 128, 0] : [226, 255, 40],
             outline: {
               color: [0, 0, 0],
               width: 1
             },
-            style: data.type == 'warning' ? 'triangle' : 'circle'
+            style: data.status_warnning !== null && data?.status_warnning !== undefined ? 'triangle' : 'circle'
           };
           const pointGraphic = new Graphic({
             geometry: point,
             symbol: markerSymbol,
             popupTemplate: {
-              title: data.fullName,
-              content: data.phone
+              title: data.contractor_name,
+              content: data.people_type
             },
             id: 'poi',
             attributes: {
@@ -155,12 +208,10 @@ const Page1 = () => {
             }
           });
           layerpoi.add(pointGraphic);
-          // view?.graphics?.addMany([pointGraphic]);
         })
-      })
-
+      }, 5000)
     })();
-    return () => { isMounted = false, socket.disconnect(); };
+    return () => { isMounted = false, socket.disconnect(), clearInterval(loopdata) };
   }, [stateMap, stateView,]);
 
 
@@ -220,7 +271,6 @@ const Page1 = () => {
       await layerArea.add(polygonGraphic);
 
       await stateView?.goTo(polygon.extent)
-      console.log('polygon.extent :>> ', polygon.extent.toJSON());
 
       // })
     }
@@ -228,10 +278,11 @@ const Page1 = () => {
   }
 
   const Status_cal = async (data) => {
-    const sum = data.map((data, key) => data.type);
+    let warning = data.filter((data, key) => data.status_warnning !== null);
+    const sum = data.map((data, key) => data.people_type);
     let result = [...new Set(sum)].reduce((acc, curr) => (acc[curr] = (sum.filter(a => a == curr)).length, acc), {});
     // console.log('result :>> ', result);
-    dispatch(setStatus({ ...result, total: sum.length }));
+    dispatch(setStatus({ ...result, warning: warning.length, total: sum.length }));
   }
 
   const Onload = async (map, view) => {
@@ -269,21 +320,12 @@ const Page1 = () => {
   }
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <WebScene className="Mapacrgis" onLoad={Onload} mapProperties={{
+      <Map className="Mapacrgis" onLoad={Onload} mapProperties={{
         basemap: /*`${'arcgis-light-gray'?? 'arcgis-navigation'}`*/ {
           portalItem: {
             id: "8d91bd39e873417ea21673e0fee87604" // nova basemap
           }
-        },
-        autoResize: false,
-        extend: {
-          type: "extent",
-          spatialReference: {wkid: 4326},
-          xmax: 100.32800674438477,
-          xmin: 100.30938148498534,
-          ymax: 13.785986924617411,
-          ymin: 13.767647416498118,
-        },
+        }, autoResize: false,
       }} viewProperties={{ center: [100.3330867, 14.5548052], ui: { components: ['attribution', 'compass'] } }} >
         <div id='button-top' className='button-topleft'>
           <div className='esri-widget--button esri-icon-table' onClick={() => {
@@ -358,13 +400,13 @@ const Page1 = () => {
             </Col>
           </Row>
         </div>
-        <Table id="divtable" size='small' rowClassName={(record, index) => record.type === 'warning' ? 'table-row-red' : ''} rowKey={(i) => i.id} columns={columns} dataSource={tabledata} />
+        <Table id="divtable" scroll={{ y: '25vh' }} size='small' rowClassName={(record, index) => record?.status_warnning !== null && record?.status_warnning !== undefined ? 'table-row-red' : ''} rowKey={(i) => i.id} columns={columns} dataSource={tabledata} />
 
-      </WebScene>
+      </Map>
 
       {/* <div id="viewDiv" style={{height:'70vh'}}></div> */}
 
-      <Modal title="รายละเอียด" onCancel={() => setIsModalVisible(!isModalVisible)} visible={isModalVisible} >
+      <Modal title="รายละเอียด" okButtonProps={{hidden:true}} onCancel={() => setIsModalVisible(!isModalVisible)} visible={isModalVisible} >
         {datamodal && Object.entries(datamodal).map(([key, value]) => (
           <Row key={key}>
             <Col span={12}>
@@ -381,4 +423,4 @@ const Page1 = () => {
   )
 }
 
-export default Page1
+export default Vehicle

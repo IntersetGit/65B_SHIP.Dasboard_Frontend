@@ -8,6 +8,7 @@ import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions'
 import { object } from 'prop-types';
+import Demodata from '../../demodata'
 
 setDefaultOptions({ css: true });
 
@@ -31,7 +32,18 @@ function tagRender(props) {
   );
 }
 
-
+const caricon = {
+  'รถยก': '/ship/assets/iconmap/car/Forklift v1.png',
+  'รถยกwarning': '/ship/assets/iconmap/car/Forklift v1!.png',
+  'รถเครน': '/ship/assets/iconmap/car/Crane v1-01.png',
+  'รถเครนwarning': '/ship/assets/iconmap/car/Crane v1!.png',
+  'รถยนต์': '/ship/assets/iconmap/car/Car-01.png',
+  'รถยนต์warning': '/ship/assets/iconmap/car/Car !-01.png',
+  'รถบรรทุก': '/ship/assets/iconmap/car/Truck-01.png',
+  'รถบรรทุกwarning': '/ship/assets/iconmap/car/Truck v1!.png',
+  'รถเฮี้ยบ': '/ship/assets/iconmap/car/Crane Truck v1.png',
+  'รถเฮี้ยบwarning': '/ship/assets/iconmap/car/Crane Truck v1!.png',
+}
 
 const Vehicle = () => {
   const [stateMap, setStateMap] = useState(null);
@@ -42,28 +54,34 @@ const Vehicle = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [datamodal, setDatamodal] = useState(null);
   const dispatch = useDispatch();
+  const datademo = new Demodata("vehicle");
 
   const columns = [
     {
-      title: 'fullName',
-      dataIndex: 'fullName',
-      key: 'fullName',
+      title: 'work_number',
+      dataIndex: 'work_number',
+      key: 'work_number',
       render: text => <a>{text}</a>,
     },
     {
-      title: 'email',
-      dataIndex: 'email',
-      key: 'email',
+      title: 'name',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
-      title: 'phone',
-      dataIndex: 'phone',
-      key: 'phone',
+      title: 'licensor',
+      dataIndex: 'licensor',
+      key: 'licensor',
     },
     {
-      title: 'state',
-      key: 'state',
-      dataIndex: 'state',
+      title: 'supervisor',
+      dataIndex: 'supervisor',
+      key: 'supervisor',
+    },
+    {
+      title: 'car_registration',
+      key: 'car_registration',
+      dataIndex: 'car_registration',
       render: tags => (
         <>
           <Tag color={'blue'} key={tags}>
@@ -73,12 +91,34 @@ const Vehicle = () => {
       ),
     },
     {
+      title: 'car_type',
+      key: 'car_type',
+      dataIndex: 'car_type',
+      render: tags => (
+        <>
+          <Tag color={'green'} key={tags}>
+            {tags.toUpperCase()}
+          </Tag>
+        </>
+      ),
+    },
+    {
+      title: 'date_time_start',
+      dataIndex: 'date_time_start',
+      key: 'date_time_start',
+    },
+    {
+      title: 'date_time_end',
+      dataIndex: 'date_time_end',
+      key: 'date_time_end',
+    },
+    {
       title: '',
       key: '',
       render: (text, record) => {
         return (
           <Space size="middle">
-            <Button type='primary' onClick={() => { setDatamodal(record), setIsModalVisible(!isModalVisible) }}>Show</Button>
+            <Button type='primary' onClick={() => { setDatamodal(record), setIsModalVisible(!isModalVisible) }}>Detail</Button>
           </Space>
         )
       },
@@ -87,6 +127,7 @@ const Vehicle = () => {
 
   useEffect(() => {
     let isMounted = true;
+    var loopdata;
     const socket = io.connect('http://localhost:3001');
     (async () => {
       const WFSLayer = await loadModules(["esri/layers/WFSLayer"]).then(([WFSLayer]) => WFSLayer);
@@ -114,7 +155,53 @@ const Vehicle = () => {
         id: 'poi'
       });
       stateMap?.add(layerpoi, 99);
-      socket.on("latlng", async (latlng) => {
+      /*  socket.on("latlng", async (latlng) => {
+         Status_cal(latlng);
+         setTabledata(latlng);
+         stateView?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
+         // console.log('latlng :>> ', latlng);
+         layerpoi.removeAll();
+         latlng.map((data) => {
+           const point = {
+             type: "point", // autocasts as new Point()
+             longitude: data.longitude,
+             latitude: data.latitude
+           };
+           const imageicon = {
+             type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
+             url: "https://static.arcgis.com/images/Symbols/Shapes/BlackStarLargeB.png",
+             width: "64px",
+             height: "64px"
+           }
+           const markerSymbol = {
+             type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+             color: data.type == 'warning' ? [255, 128, 0] : [226, 255, 40],
+             outline: {
+               color: [0, 0, 0],
+               width: 1
+             },
+             style: data.type == 'warning' ? 'triangle' : 'circle'
+           };
+           const pointGraphic = new Graphic({
+             geometry: point,
+             symbol: markerSymbol,
+             popupTemplate: {
+               title: data.fullName,
+               content: data.phone
+             },
+             id: 'poi',
+             attributes: {
+               "name": "poi",
+             }
+           });
+           layerpoi.add(pointGraphic);
+           // view?.graphics?.addMany([pointGraphic]);
+         })
+       })
+  */
+
+      loopdata = setInterval(async () => {
+        let latlng = await datademo.getDemodata();
         Status_cal(latlng);
         setTabledata(latlng);
         stateView?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
@@ -126,27 +213,28 @@ const Vehicle = () => {
             longitude: data.longitude,
             latitude: data.latitude
           };
-          const imageicon = {
-            type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
-            url: "https://static.arcgis.com/images/Symbols/Shapes/BlackStarLargeB.png",
-            width: "64px",
-            height: "64px"
-          }
+
           const markerSymbol = {
             type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-            color: data.type == 'warning' ? [255, 128, 0] : [226, 255, 40],
+            color: data.status_work == 'warning' ? [255, 128, 0] : [226, 255, 40],
             outline: {
               color: [0, 0, 0],
               width: 1
             },
-            style: data.type == 'warning' ? 'triangle' : 'circle'
+            style: data.status_work == 'warning' ? 'triangle' : 'circle'
           };
+          const imageicon = {
+            type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
+            url: caricon[`${data.car_type}${data.status_warnning !== null ? 'warning' : ''}`],
+            width: "35px",
+            height: "35px"
+          }
           const pointGraphic = new Graphic({
             geometry: point,
-            symbol: markerSymbol,
+            symbol: imageicon,
             popupTemplate: {
-              title: data.fullName,
-              content: data.phone
+              title: data.work_number,
+              content: data.name
             },
             id: 'poi',
             attributes: {
@@ -154,12 +242,10 @@ const Vehicle = () => {
             }
           });
           layerpoi.add(pointGraphic);
-          // view?.graphics?.addMany([pointGraphic]);
         })
-      })
-
+      }, 5000)
     })();
-    return () => { isMounted = false, socket.disconnect(); };
+    return () => { isMounted = false, socket.disconnect(), clearInterval(loopdata) };
   }, [stateMap, stateView,]);
 
 
@@ -226,10 +312,11 @@ const Vehicle = () => {
   }
 
   const Status_cal = async (data) => {
-    const sum = data.map((data, key) => data.type);
+    let warning = data.filter((data, key) => data.status_warnning !== null);
+    const sum = data.map((data, key) => data.status_work);
     let result = [...new Set(sum)].reduce((acc, curr) => (acc[curr] = (sum.filter(a => a == curr)).length, acc), {});
     // console.log('result :>> ', result);
-    dispatch(setStatus({ ...result, total: sum.length }));
+    dispatch(setStatus({ ...result, warning: warning.length, total: sum.length }));
   }
 
   const Onload = async (map, view) => {
@@ -318,42 +405,33 @@ const Vehicle = () => {
         </div>
         <div ref={refdetail} className="menuserchslide detailemo esri-widget">
           <Row>
-            <Col span={8}>
-              <p>ใช้ 8 สีแทนประเภท</p>
+            <Col span={12}>
+              <p>ใช้ {Object.keys(caricon).filter(i => !i.includes("warning")).length} รูปแบบแทนประเภท</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridGap: '5px' }}>
-                <span>🔴</span>
-                <span>🟠</span>
-                <span>🟡</span>
-                <span>🟢</span>
-                <span>🔵</span>
+                {Object.keys(caricon).map((icon) =>
+                  !icon.includes("warning") &&
+                  <span key={icon}> <img src={caricon[(icon)]} width={30} /></span>
+                )}
               </div>
             </Col>
-            <Col span={8}>
-              <p>ใช้ 2 สีแทนประเภท</p>
+            <Col span={12}>
+              <p>ใช้แทนการแจ้งเตือน</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridGap: '5px' }}>
-                <span>🟢</span>
-                <span>🔵</span>
-              </div>
-            </Col>
-            <Col span={8}>
-              <p>ใช้สัญลักษณ์แทนการแจ้งเตือน</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gridGap: '5px' }}>
-                <span>🚸</span>
-                <span>⛔</span>
-                <span>✅</span>
-                <span>🛑</span>
-                <span>🚯</span>
+                {Object.keys(caricon).map((icon) =>
+                  icon.includes("warning") &&
+                  <span key={icon}> <img src={caricon[(icon)]} width={30} /></span>
+                )}
               </div>
             </Col>
           </Row>
         </div>
-        <Table id="divtable" size='small' rowClassName={(record, index) => record.type === 'warning' ? 'table-row-red' : ''} rowKey={(i) => i.id} columns={columns} dataSource={tabledata} />
+        <Table id="divtable" scroll={{ y: '25vh' }} size='small' rowClassName={(record, index) => record?.status_warnning !== null && record?.status_warnning !== undefined ? 'table-row-red' : ''} rowKey={(i) => i.id} columns={columns} dataSource={tabledata} />
 
       </Map>
 
       {/* <div id="viewDiv" style={{height:'70vh'}}></div> */}
 
-      <Modal title="รายละเอียด" onCancel={() => setIsModalVisible(!isModalVisible)} visible={isModalVisible} >
+      <Modal title="รายละเอียด" okButtonProps={{ hidden: true }} onCancel={() => setIsModalVisible(!isModalVisible)} visible={isModalVisible} >
         {datamodal && Object.entries(datamodal).map(([key, value]) => (
           <Row key={key}>
             <Col span={12}>
