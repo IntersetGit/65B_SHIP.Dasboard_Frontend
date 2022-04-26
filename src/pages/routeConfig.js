@@ -22,7 +22,7 @@ const routesConfig = [
         title: 'workpermit',
         messageId: 'sidebar.sample.page1',
         type: 'item',
-        icon: <Icon component={() => (<img src={WorkpermistIcon} width="20" />)} />,
+        icon: <Icon component={() => (<img src={WorkpermistIcon} width="20" style={{marginTop:-10}} />)} />,
         path: '/workpermit',
       },
       {
@@ -30,7 +30,7 @@ const routesConfig = [
         title: 'vehicle',
         messageId: 'sidebar.sample.page2',
         type: 'item',
-        icon: <Icon component={() => (<img src={VechicleIcon} width="20" />)} />,
+        icon: <Icon component={() => (<img src={VechicleIcon} width="20" style={{marginTop:-10}} />)} />,
         path: '/vehicle',
       },
       {
@@ -38,7 +38,7 @@ const routesConfig = [
         title: 'equipment',
         messageId: 'sidebar.sample.page3',
         type: 'item',
-        icon: <Icon component={() => (<img src={EquipmentIcon} width="20" />)} />,
+        icon: <Icon component={() => (<img src={EquipmentIcon} width="20" style={{marginTop:-10}} />)} />,
         path: '/equipment',
       },
       {
@@ -46,7 +46,7 @@ const routesConfig = [
         title: 'scaffolding',
         messageId: 'sidebar.sample.page4',
         type: 'item',
-        icon: <Icon component={() => (<img src={ScaffoldingIcon} width="20" />)} />,
+        icon: <Icon component={() => (<img src={ScaffoldingIcon} width="20" style={{marginTop:-10}} />)} />,
         path: '/scaffolding',
       },
       {
@@ -54,7 +54,7 @@ const routesConfig = [
         title: 'peopleTracking',
         messageId: 'sidebar.sample.page5',
         type: 'item',
-        icon: <Icon component={() => (<img src={PeopleTrackingIcon} width="20" />)} />,
+        icon: <Icon component={() => (<img src={PeopleTrackingIcon} width="20" style={{marginTop:-10}} />)} />,
         path: '/peopleTracking',
       },
       {
@@ -62,7 +62,7 @@ const routesConfig = [
         title: 'acesscontrol',
         messageId: 'sidebar.sample.page6',
         type: 'item',
-        icon: <Icon component={() => (<img src={AcessIcon} width="20" />)} />,
+        icon: <Icon component={() => (<img src={AcessIcon} width="20" style={{marginTop:-10}} />)} />,
         path: '/acesscontrol',
       },
       // {

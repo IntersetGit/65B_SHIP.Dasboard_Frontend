@@ -26,7 +26,7 @@ export const LightSidebar = {
 };
 export const AunwaSidebar = {
   sidebarBgColor: "#5A63C8",
-  sidebarHeaderColor: "#313541",
+  sidebarHeaderColor: "#31A50",
   sidebarMenuSelectedBgColor: "rgba(126 ,163 ,255,1)",
   sidebarMenuSelectedTextColor: "rgba(45, 15, 15, 0.87)",
   sidebarTextColor: "#fff",

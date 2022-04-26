@@ -18,16 +18,19 @@ const AuthWrapper = ({ children }) => {
         <Card className='auth-card'>
           <div className='auth-wel-action'>
             <div className='auth-wel-content'>
-              <h2>Contractor Management Application</h2>
+              <p>Contractor Management Application</p>
+            </div>
 
+            <div className='auth-main-content '>
+              <span className="ribbon6">@PTT-V.1.0</span>
+              <div className='auth-card-header'>
+                <AppLogo />
+              </div>
+              {children}
             </div>
+
           </div>
-          <div className='auth-main-content'>
-            <div className='auth-card-header'>
-              <AppLogo />
-            </div>
-            {children}
-          </div>
+
 
         </Card>
       </div>

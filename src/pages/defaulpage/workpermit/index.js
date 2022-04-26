@@ -312,11 +312,7 @@ const Page1 = () => {
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <WebScene className="Mapacrgis" onLoad={Onload} mapProperties={{
-        basemap: /*`${'arcgis-light-gray'?? 'arcgis-navigation'}`*/ {
-          portalItem: {
-            id: "8d91bd39e873417ea21673e0fee87604" // nova basemap
-          }
-        },
+        basemap: `${'arcgis-navigation'}`,
         autoResize: false,
         extend: {
           type: "extent",
