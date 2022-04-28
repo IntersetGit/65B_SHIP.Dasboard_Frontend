@@ -46,7 +46,7 @@ const UserProfile = () => {
           key='2'>
           <ChangePassword />
         </TabPane>
-        <TabPane
+        {/* <TabPane
           tab={
             <span className='user-profile-icon'>
               <FaBandcamp className='icon' />
@@ -81,7 +81,7 @@ const UserProfile = () => {
           }
           key='5'>
           <Notification notification={accountData.notification} />
-        </TabPane>
+        </TabPane> */}
       </Tabs>
     </div>
   );

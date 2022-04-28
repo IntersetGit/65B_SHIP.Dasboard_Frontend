@@ -9,8 +9,7 @@ import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
 import { object } from 'prop-types';
 import cars from '../../../../src/assets/iconmap/car/cars.png';
-import Demodata from '../../demodata';
-import WaGeojson from '../../../@crema/utility/WaGeojson';
+import Demodata from '../../demodata'
 
 setDefaultOptions({ css: true });
 
@@ -46,7 +45,7 @@ const Page1 = () => {
   const [datamodal, setDatamodal] = useState(null);
   const dispatch = useDispatch();
   const datademo = new Demodata("workpermit");
-  const Geojson = new WaGeojson();
+
 
   const columns = [
     {
@@ -129,89 +128,94 @@ const Page1 = () => {
       stateMap?.add(layer)
       CreateArea()
 
-      const { FeatureLayer, GeoJSONLayer } = await loadModules(["esri/layers/FeatureLayer",
-        "esri/layers/GeoJSONLayer",]).then(([FeatureLayer, GeoJSONLayer]) => ({ FeatureLayer, GeoJSONLayer }));
+      const { Graphic, GraphicsLayer } = await loadModules(["esri/Graphic", "esri/layers/GraphicsLayer"]).then(([Graphic, GraphicsLayer]) => { return { Graphic, GraphicsLayer } });
 
-      const clusterConfig = {
-        type: "cluster",
-        clusterRadius: "100px",
-        popupTemplate: {
-          title: "Cluster summary",
-          content: "This cluster represents {cluster_count} earthquakes.",
-          fieldInfos: [
-            {
-              fieldName: "cluster_count",
-              format: {
-                places: 0,
-                digitSeparator: true
-              }
-            }
-          ]
-        },
-        clusterMinSize: "24px",
-        clusterMaxSize: "60px",
-        labelingInfo: [
-          {
-            deconflictionStrategy: "none",
-            labelExpressionInfo: {
-              expression: "Text($feature.cluster_count, '#,###')"
-            },
-            symbol: {
-              type: "text",
-              color: "#004a5d",
-              font: {
-                weight: "bold",
-                family: "Noto Sans",
-                size: "12px"
-              }
-            },
-            labelPlacement: "center-center"
-          }
-        ]
-      };
+      let layerpoi = new GraphicsLayer({
+        id: 'poi'
+      });
+      stateMap?.add(layerpoi, 99);
+      /*    socket.on("latlng", async (latlng) => {
+           Status_cal(latlng);
+           setTabledata(latlng);
+           stateView?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
+           // console.log('latlng :>> ', latlng);
+           layerpoi.removeAll();
+           latlng.map((data) => {
+             const point = {
+               type: "point", // autocasts as new Point()
+               longitude: data.longitude,
+               latitude: data.latitude
+             };
+             const imageicon = {
+               type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
+               url: cars,
+               width: "40px",
+               height: "40px"
+             }
+             const markerSymbol = {
+               type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+               color: data.type == 'warning' ? [255, 128, 0] : [226, 255, 40],
+               outline: {
+                 color: [0, 0, 0],
+                 width: 1
+               },
+               style: data.type == 'warning' ? 'triangle' : 'circle'
+             };
+             const pointGraphic = new Graphic({
+               geometry: point,
+               symbol: markerSymbol,
+               popupTemplate: {
+                 title: data.fullName,
+                 content: data.phone
+               },
+               id: 'poi',
+               attributes: {
+                 "name": "poi",
+               }
+             });
+             layerpoi.add(pointGraphic);
+             // view?.graphics?.addMany([pointGraphic]);
+           })
+         }) */
+
       loopdata = setInterval(async () => {
         let latlng = await datademo.getDemodata();
-        let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
         Status_cal(latlng);
         setTabledata(latlng);
         stateView?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
         // console.log('latlng :>> ', latlng);
-        const layerpoint = new GeoJSONLayer({
-          id: 'pointlayer',
-          title: "Earthquakes from the last month",
-          url: datageojson,
-          copyright: "USGS Earthquakes",
-          featureReduction: clusterConfig,
-          popupTemplate: {
-            title: "Magnitude {name}",
-            content: "Magnitude {name}",
-            fieldInfos: [
-              {
-                fieldName: "time",
-                format: {
-                  dateFormat: "short-date-short-time"
-                }
-              }
-            ]
-          },
-          renderer: {
-            type: "simple",
-            field: "status_work",
-            symbol: {
-              type: "simple-marker",
-              size: 15,
-              color: [226, 255, 40] ,
-              outline: {
-                color: "rgba(0, 139, 174, 0.5)",
-                width: 5
-              }
+        layerpoi.removeAll();
+        latlng.map((data) => {
+          const point = {
+            type: "point", // autocasts as new Point()
+            longitude: data.longitude,
+            latitude: data.latitude
+          };
+
+          const markerSymbol = {
+            type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+            color: data.status_warnning !== null && data?.status_warnning !== undefined ? [255, 128, 0] : [226, 255, 40],
+            outline: {
+              color: [0, 0, 0],
+              width: 1
             },
-
-          },
-
-        });
-        await stateMap?.remove(stateMap?.findLayerById('pointlayer'))
-        stateMap?.add(layerpoint)
+            style: data.status_warnning !== null && data?.status_warnning !== undefined ? 'triangle' : 'circle'
+          };
+          const pointGraphic = new Graphic({
+            geometry: point,
+            isAggregate:true,
+            symbol: markerSymbol,
+            popupTemplate: {
+              title: data.work_number,
+              content: data.name
+            },
+            id: 'poi',
+            attributes: {
+              "name": "poi",
+            }
+          });
+          layerpoi.add(pointGraphic);
+        })
       }, 5000)
 
     })();
