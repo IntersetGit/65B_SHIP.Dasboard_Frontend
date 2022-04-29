@@ -8,12 +8,13 @@ class WaGeojson {
             "type": "FeatureCollection",
             "features": []
         };
-        let datafeature = dataarray.map((latlng) => {
+        let datafeature = dataarray.map((latlng, index) => {
             let vb = {
                 "type": "Feature",
                 "geometry": {
                     "type": type,
-                    "coordinates": [latlng.longitude,latlng.latitude]
+                    "id": index,
+                    "coordinates": [latlng.longitude, latlng.latitude]
                 },
                 "properties": latlng
             }

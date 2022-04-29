@@ -175,12 +175,13 @@ const Page1 = () => {
         Status_cal(latlng);
         setTabledata(latlng);
         stateView?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
-        // console.log('latlng :>> ', latlng);
+        // console.log('datageojson :>> ', datageojson);
         const layerpoint = new GeoJSONLayer({
           id: 'pointlayer',
           title: "Earthquakes from the last month",
           url: datageojson,
           copyright: "USGS Earthquakes",
+          field: "status_work",
           featureReduction: clusterConfig,
           popupTemplate: {
             title: "Magnitude {name}",
@@ -195,17 +196,59 @@ const Page1 = () => {
             ]
           },
           renderer: {
-            type: "simple",
+            type: "unique-value",
             field: "status_work",
             symbol: {
+              field: "status_work",
               type: "simple-marker",
               size: 15,
               color: [226, 255, 40] ,
               outline: {
-                color: "rgba(0, 139, 174, 0.5)",
-                width: 5
-              }
+                color: "#000",
+                width: 1
+              },
             },
+            uniqueValueInfos: [
+              {
+                value: "open",
+                symbol: {
+                  type: "simple-marker",
+                  size: 15,
+                  color: [226, 255, 40] ,
+                  outline: {
+                    color: "#000",
+                    width: 1
+                  },
+                }
+              }, {
+                value: "close",
+                symbol: {
+                  type: "simple-marker",
+                  size: 15,
+                  color: "rgba(237, 15, 15, 0.5)",
+                  outline: {
+                    color: "#000",
+                    width: 1
+                  },
+                }
+              }
+            ]
+            // visualVariables: [
+            //   {
+            //     type: "size",
+            //     field: "status_work",
+            //     stops: [
+            //       {
+            //         value: 'open',
+            //         size: "4px"
+            //       },
+            //       {
+            //         value: 'close',
+            //         size: "40px"
+            //       },
+            //     ]
+            //   }
+            // ]
 
           },
 
