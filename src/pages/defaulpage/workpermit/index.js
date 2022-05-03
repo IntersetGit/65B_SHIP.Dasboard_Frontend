@@ -134,7 +134,7 @@ const Page1 = () => {
 
       const clusterConfig = {
         type: "cluster",
-        clusterRadius: "100px",
+        clusterRadius: "20px",
         popupTemplate: {
           title: "Cluster summary",
           content: "This cluster represents {cluster_count} earthquakes.",
@@ -148,7 +148,7 @@ const Page1 = () => {
             }
           ]
         },
-        clusterMinSize: "24px",
+        clusterMinSize: "40px",
         clusterMaxSize: "60px",
         labelingInfo: [
           {
@@ -233,22 +233,7 @@ const Page1 = () => {
                 }
               }
             ]
-            // visualVariables: [
-            //   {
-            //     type: "size",
-            //     field: "status_work",
-            //     stops: [
-            //       {
-            //         value: 'open',
-            //         size: "4px"
-            //       },
-            //       {
-            //         value: 'close',
-            //         size: "40px"
-            //       },
-            //     ]
-            //   }
-            // ]
+
 
           },
 
