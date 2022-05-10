@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        node: [ 14, 16 ]
+        node: [14]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -26,6 +26,11 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - name: Prettify code
+      uses: creyD/prettier_action@v4.2
+      with:
+        prettier_options: prettier --write \"src/**/*.+(js|jsx)\"
+        only_changed: True
     - run: npm ci
     - run: npm run build --if-present
   # - run: npm test
