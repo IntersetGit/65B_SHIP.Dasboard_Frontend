@@ -27,7 +27,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - name: Prettify code
-      uses: creyD/prettier_action@v2.3.2
+      uses: creyD/prettier_action@v2.3
       with:
         prettier_options:  --write **/*.+{js,jsx} 
         only_changed: True
