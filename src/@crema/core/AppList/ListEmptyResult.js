@@ -36,7 +36,8 @@ const ListEmptyResult = ({
           <Button
             type='primary'
             style={{marginTop: 30, minWidth: 150}}
-            onClick={onClick}>
+            onClick={onClick}
+          >
             {actionTitle}
           </Button>
         ) : null}

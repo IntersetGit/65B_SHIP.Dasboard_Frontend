@@ -17,7 +17,8 @@ const ChangePassword = () => {
       className='user-profile-form'
       initialValues={{remember: true}}
       onFinish={onFinish}
-      onFinishFailed={onFinishFailed}>
+      onFinishFailed={onFinishFailed}
+    >
       <h3 className='user-profile-form-title'>
         <IntlMessages id='userProfile.changePassword' />
       </h3>
@@ -27,7 +28,8 @@ const ChangePassword = () => {
             name='oldPassword'
             rules={[
               {required: true, message: 'Please input your Enter Password'},
-            ]}>
+            ]}
+          >
             <Input.Password placeholder='Enter password' />
           </Form.Item>
         </Col>
@@ -37,7 +39,8 @@ const ChangePassword = () => {
             name='password'
             rules={[
               {required: true, message: 'Please input your New Password!'},
-            ]}>
+            ]}
+          >
             <Input.Password placeholder='Enter new password' />
           </Form.Item>
         </Col>
@@ -56,7 +59,8 @@ const ChangePassword = () => {
                   );
                 },
               }),
-            ]}>
+            ]}
+          >
             <Input.Password placeholder='Confirm new password' />
           </Form.Item>
         </Col>

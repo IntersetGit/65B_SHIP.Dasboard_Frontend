@@ -11,7 +11,8 @@ const AppSelectedIcon = ({backgroundColor, isCenter = true, color}) => {
       style={{
         backgroundColor: backgroundColor || '#333333',
         color: color || '#FFFFFF',
-      }}>
+      }}
+    >
       <CheckOutlined />
     </div>
   );

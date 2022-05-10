@@ -1,15 +1,13 @@
-import { Link, useLocation } from 'react-router-dom';
-import { Menu } from 'antd';
-import {
-  WarningFilled
-} from '@ant-design/icons';
+import {Link, useLocation} from 'react-router-dom';
+import {Menu} from 'antd';
+import {WarningFilled} from '@ant-design/icons';
 import React from 'react';
 import routesConfig from '../../pages/routeConfig';
-import { useIntl } from 'react-intl';
-import { useSidebarContext } from './AppContextProvider/SidebarContextProvider';
+import {useIntl} from 'react-intl';
+import {useSidebarContext} from './AppContextProvider/SidebarContextProvider';
 
 function getStyles(item, sidebarColorSet, isSidebarBgImage, index, isGroup) {
-  const { pathname } = useLocation();
+  const {pathname} = useLocation();
   // const selectedKeys = pathname.substr(1);
   const selectedKeys = pathname;
   const defaultOpenKeys = selectedKeys.split('/');
@@ -27,15 +25,15 @@ function getStyles(item, sidebarColorSet, isSidebarBgImage, index, isGroup) {
       backgroundColor: isActive
         ? sidebarColorSet.sidebarMenuSelectedBgColor
         : isSidebarBgImage
-          ? ''
-          : sidebarColorSet.sidebarBgColor,
+        ? ''
+        : sidebarColorSet.sidebarBgColor,
     };
   }
 }
 
 const renderMenuItemChildren = (item) => {
-  const { icon, messageId, path } = item;
-  const { messages } = useIntl();
+  const {icon, messageId, path} = item;
+  const {messages} = useIntl();
 
   if (path && path.includes('/'))
     return (
@@ -49,8 +47,8 @@ const renderMenuItemChildren = (item) => {
         <span data-testid={messageId.toLowerCase + '-nav'}>
           {messages[messageId]}
         </span>
-        <span style={{ position: 'absolute', right: 5 }}>
-          <WarningFilled style={{ color: '#ff7a0e' }} />
+        <span style={{position: 'absolute', right: 5}}>
+          <WarningFilled style={{color: '#ff7a0e'}} />
         </span>
       </Link>
     );
@@ -76,7 +74,8 @@ const renderMenuItem = (item, sidebarColorSet, isSidebarBgImage, index) => {
     <Menu.SubMenu
       style={getStyles(item, sidebarColorSet, isSidebarBgImage, index, true)}
       key={item.path ? item.path : item.id}
-      title={renderMenuItemChildren(item, sidebarColorSet, isSidebarBgImage)}>
+      title={renderMenuItemChildren(item, sidebarColorSet, isSidebarBgImage)}
+    >
       {item.children.map((item) =>
         renderMenuItem(item, sidebarColorSet, isSidebarBgImage, index + 1),
       )}
@@ -84,7 +83,8 @@ const renderMenuItem = (item, sidebarColorSet, isSidebarBgImage, index) => {
   ) : (
     <Menu.Item
       key={item.id}
-      style={getStyles(item, sidebarColorSet, isSidebarBgImage, index)}>
+      style={getStyles(item, sidebarColorSet, isSidebarBgImage, index)}
+    >
       {item.children
         ? item.children
         : renderMenuItemChildren(item, sidebarColorSet, isSidebarBgImage)}
@@ -97,7 +97,8 @@ const renderMenu = (item, sidebarColorSet, isSidebarBgImage, index) => {
     <Menu.ItemGroup
       style={getStyles(item, sidebarColorSet, isSidebarBgImage, index, true)}
       key={item.path ? item.path : item.id}
-      title={renderMenuItemChildren(item, sidebarColorSet, isSidebarBgImage)}>
+      title={renderMenuItemChildren(item, sidebarColorSet, isSidebarBgImage)}
+    >
       {item.children.map((item) =>
         renderMenuItem(item, sidebarColorSet, isSidebarBgImage, index + 1),
       )}
@@ -106,22 +107,23 @@ const renderMenu = (item, sidebarColorSet, isSidebarBgImage, index) => {
     <Menu.Item
       key={item.id}
       exact={item.exact}
-      style={getStyles(item, sidebarColorSet, isSidebarBgImage, index)}>
+      style={getStyles(item, sidebarColorSet, isSidebarBgImage, index)}
+    >
       {item.children
         ? item.children
         : renderMenuItemChildren(
-          item,
-          sidebarColorSet,
-          isSidebarBgImage,
-          index,
-        )}
+            item,
+            sidebarColorSet,
+            isSidebarBgImage,
+            index,
+          )}
     </Menu.Item>
   );
 };
 
 export const getRouteMenus = () => {
-  const { sidebarColorSet } = useSidebarContext();
-  const { isSidebarBgImage } = useSidebarContext();
+  const {sidebarColorSet} = useSidebarContext();
+  const {isSidebarBgImage} = useSidebarContext();
   return routesConfig.map((route) =>
     renderMenu(route, sidebarColorSet, isSidebarBgImage, 0),
   );

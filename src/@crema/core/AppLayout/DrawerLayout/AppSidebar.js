@@ -27,16 +27,19 @@ const AppSidebar = ({visible, onClose}) => {
       placement={direction === ThemeDirection.LTR ? 'left' : 'right'}
       closable={false}
       onClose={onClose}
-      visible={visible}>
+      visible={visible}
+    >
       <MainSidebar
         className={clsx('app-DrawerLayout-sidebar', {
           'drawerLayout-sidebar-img-background': isSidebarBgImage,
         })}
-        collapsible>
+        collapsible
+      >
         <UserInfo hasColor />
         <AppScrollbar
           className='app-DrawerLayout-sidebar-scrollbar'
-          scrollToTop={false}>
+          scrollToTop={false}
+        >
           <AppVerticalMenu />
         </AppScrollbar>
       </MainSidebar>

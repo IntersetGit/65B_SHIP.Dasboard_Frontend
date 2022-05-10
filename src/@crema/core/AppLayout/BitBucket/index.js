@@ -27,7 +27,8 @@ const BitBucket = () => {
       className={clsx('app-BitBucket-layout', {
         appMainFooter: footer && footerType === FooterType.FLUID,
         appMainFixedFooter: footer && footerType === FooterType.FIXED,
-      })}>
+      })}
+    >
       <AppSidebar visible={isVisible} onClose={onClose} />
       <Layout className='app-BitBucket-layout-main'>
         <AppHeader showDrawer={showDrawer} />

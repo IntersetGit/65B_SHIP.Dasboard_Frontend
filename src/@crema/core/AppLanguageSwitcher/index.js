@@ -44,10 +44,12 @@ const AppLanguageSwitcher = () => {
       <Dropdown
         overlay={menu}
         trigger={['click']}
-        overlayStyle={{zIndex: 1052}}>
+        overlayStyle={{zIndex: 1052}}
+      >
         <a
           className='ant-dropdown-link langBtn'
-          onClick={(e) => e.preventDefault()}>
+          onClick={(e) => e.preventDefault()}
+        >
           <span className='lang-icon'>
             <IoLanguageOutline />
           </span>

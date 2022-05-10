@@ -22,7 +22,8 @@ const AppCard = ({
       cover={cover}
       actions={actions}
       bordered={false}
-      {...rest}>
+      {...rest}
+    >
       {children}
     </Card>
   );

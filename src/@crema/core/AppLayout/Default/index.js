@@ -38,7 +38,8 @@ const Default = () => {
       className={clsx('app-layout', {
         appMainFooter: footer && footerType === FooterType.FLUID,
         appMainFixedFooter: footer && footerType === FooterType.FIXED,
-      })}>
+      })}
+    >
       <AppSidebar isCollapsed={isCollapsed} />
       <Layout className='app-layout-main'>
         <AppHeader

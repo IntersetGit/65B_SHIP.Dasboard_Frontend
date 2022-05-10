@@ -54,7 +54,8 @@ const AppHeader = ({showDrawer}) => {
               <Dropdown overlay={menuMobile} trigger={['click']}>
                 <a
                   className='ant-dropdown-link'
-                  onClick={(e) => e.preventDefault()}>
+                  onClick={(e) => e.preventDefault()}
+                >
                   <FiMoreVertical />
                 </a>
               </Dropdown>
@@ -68,7 +69,8 @@ const AppHeader = ({showDrawer}) => {
         style={{
           backgroundColor: sidebarColorSet.sidebarBgColor,
           color: sidebarColorSet.sidebarTextColor,
-        }}>
+        }}
+      >
         <div className='container'>
           <AppHorizontalNav className='app-main-hor-menu' />
         </div>

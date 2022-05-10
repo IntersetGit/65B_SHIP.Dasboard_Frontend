@@ -17,7 +17,8 @@ const AppSidebar = () => {
       className={clsx('mini-sidebar', {
         'mini-sidebar-img-background': isSidebarBgImage,
       })}
-      collapsed={collapseMotion}>
+      collapsed={collapseMotion}
+    >
       <UserInfo hasColor />
       <AppScrollbar className='app-sidebar-mini-scrollbar' scrollToTop={false}>
         <AppVerticalMenu />

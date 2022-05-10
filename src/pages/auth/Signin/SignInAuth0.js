@@ -13,7 +13,8 @@ const SignInAuth0 = () => {
         <Button
           type='primary'
           className='sign-btn sign-btn-full'
-          onClick={() => signInUser()}>
+          onClick={() => signInUser()}
+        >
           <IntlMessages id='auth.loginWithAuth0' />
         </Button>
       </div>

@@ -5,11 +5,11 @@ import UserInfo from '../components/UserInfo';
 import AppScrollbar from '../../AppScrollbar';
 import clsx from 'clsx';
 import AppVerticalMenu from '../components/AppVerticalNav';
-import { useSidebarContext } from '../../../utility/AppContextProvider/SidebarContextProvider';
+import {useSidebarContext} from '../../../utility/AppContextProvider/SidebarContextProvider';
 import MainSidebar from '../components/MainSidebar';
 
-const AppSidebar = ({ isCollapsed, onToggleSidebar }) => {
-  const { isSidebarBgImage } = useSidebarContext();
+const AppSidebar = ({isCollapsed, onToggleSidebar}) => {
+  const {isSidebarBgImage} = useSidebarContext();
 
   return (
     <MainSidebar
@@ -19,9 +19,10 @@ const AppSidebar = ({ isCollapsed, onToggleSidebar }) => {
       collapsible
       breakpoint='xl'
       collapsedWidth='0'
-      collapsed={isCollapsed}>
-      <UserInfo hasColor onToggleSidebar={onToggleSidebar} >
-          DashBoard Menu
+      collapsed={isCollapsed}
+    >
+      <UserInfo hasColor onToggleSidebar={onToggleSidebar}>
+        DashBoard Menu
       </UserInfo>
       <AppScrollbar className='app-mini-sidebar-scrollbar' scrollToTop={false}>
         <AppVerticalMenu />

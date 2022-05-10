@@ -16,11 +16,13 @@ const ThemeContextProvider = ({children}) => {
     <ThemeContext.Provider
       value={{
         themeMode,
-      }}>
+      }}
+    >
       <ThemeActionsContext.Provider
         value={{
           updateThemeMode,
-        }}>
+        }}
+      >
         {children}
       </ThemeActionsContext.Provider>
     </ThemeContext.Provider>

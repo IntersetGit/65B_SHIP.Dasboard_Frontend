@@ -34,7 +34,8 @@ const SidebarContextProvider = ({children}) => {
         isSidebarBgImage,
         sidebarBgImage,
         sidebarMenuSelectedColor,
-      }}>
+      }}
+    >
       <SidebarActionsContext.Provider
         value={{
           updateMenuStyle,
@@ -42,7 +43,8 @@ const SidebarContextProvider = ({children}) => {
           setSidebarBgImage,
           updateSidebarBgImage,
           updateSidebarMenuSelectedColor,
-        }}>
+        }}
+      >
         {children}
       </SidebarActionsContext.Provider>
     </SidebarContext.Provider>

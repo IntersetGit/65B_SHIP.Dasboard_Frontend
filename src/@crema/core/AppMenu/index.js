@@ -18,7 +18,8 @@ const AppMenu = () => {
     <Dropdown overlay={menu} trigger={['click']}>
       <a
         className='ant-dropdown-link cr-dropdown-link'
-        onClick={(e) => e.preventDefault()}>
+        onClick={(e) => e.preventDefault()}
+      >
         <FiMoreVertical />
       </a>
     </Dropdown>

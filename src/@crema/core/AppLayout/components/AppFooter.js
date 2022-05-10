@@ -1,12 +1,12 @@
 import React from 'react';
-import { Button, Layout } from 'antd';
+import {Button, Layout} from 'antd';
 import './AppFooter.style.less';
-import { useLayoutContext } from '../../../utility/AppContextProvider/LayoutContextProvider';
+import {useLayoutContext} from '../../../utility/AppContextProvider/LayoutContextProvider';
 
-const { Footer } = Layout;
+const {Footer} = Layout;
 
 const AppFooter = () => {
-  const { footer } = useLayoutContext();
+  const {footer} = useLayoutContext();
 
   if (footer) {
     return (

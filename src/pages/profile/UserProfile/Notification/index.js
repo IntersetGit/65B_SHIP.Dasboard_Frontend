@@ -22,7 +22,8 @@ const Notification = ({notification}) => {
       className='user-profile-form'
       initialValues={{remember: true}}
       onFinish={onFinish}
-      onFinishFailed={onFinishFailed}>
+      onFinishFailed={onFinishFailed}
+    >
       <div className='profile-notification'>
         <h3 className='user-profile-form-title'>
           <IntlMessages id='userProfile.activity' />

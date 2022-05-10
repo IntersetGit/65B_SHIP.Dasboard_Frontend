@@ -17,10 +17,12 @@ const AppSidebar = ({isCollapsed}) => {
       })}
       collapsible
       breakpoint='xl'
-      collapsed={isCollapsed}>
+      collapsed={isCollapsed}
+    >
       <AppScrollbar
         className='app-userHeader-sidebar-scrollbar'
-        scrollToTop={false}>
+        scrollToTop={false}
+      >
         <AppVerticalMenu />
       </AppScrollbar>
     </MainSidebar>

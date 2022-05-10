@@ -65,13 +65,15 @@ const AppMediaViewer = ({index, modalTitle, medias, onClose}) => {
       visible={isOpen}
       footer={null}
       onCancel={onClose}
-      className='app-media-modal'>
+      className='app-media-modal'
+    >
       <div className='media-viewer'>
         {index >= 0 ? (
           <div className='medial-carousel'>
             <Slider
               settings={{...settings, initialSlide: index}}
-              slickGoTo={index}>
+              slickGoTo={index}
+            >
               {medias.map((data, index) => renderItem(data, index))}
             </Slider>
           </div>

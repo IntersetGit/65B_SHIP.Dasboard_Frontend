@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Button, Drawer, Switch } from 'antd';
-import { layoutTypes, navStyles } from '../../services/db/navigationStyle';
+import React, {useState} from 'react';
+import {Button, Drawer, Switch} from 'antd';
+import {layoutTypes, navStyles} from '../../services/db/navigationStyle';
 import clsx from 'clsx';
 import IntlMessages from '../../utility/IntlMessages';
-import { CheckOutlined } from '@ant-design/icons';
-import { LayoutType, ThemeDirection } from '../../../shared/constants/AppEnums';
+import {CheckOutlined} from '@ant-design/icons';
+import {LayoutType, ThemeDirection} from '../../../shared/constants/AppEnums';
 import AppScrollbar from '../AppScrollbar';
 import './index.style.less';
-import { FiSettings } from 'react-icons/fi';
+import {FiSettings} from 'react-icons/fi';
 import {
   useLayoutActionsContext,
   useLayoutContext,
@@ -25,7 +25,7 @@ const AppThemeSetting = () => {
     layoutType,
   } = useLayoutContext();
 
-  const { setFooter, updateDirection, updateNavStyle, updateLayoutType } =
+  const {setFooter, updateDirection, updateNavStyle, updateLayoutType} =
     useLayoutActionsContext();
 
   const onLayoutChange = (layoutType) => {
@@ -43,8 +43,9 @@ const AppThemeSetting = () => {
     <div className='customizer-option'>
       <Button
         className='customizer-btn'
-        onClick={() => setCustomizerStatus(!open)}>
-        <FiSettings className='ant-spin-dot-spin' style={{ fontSize: 20 }} />
+        onClick={() => setCustomizerStatus(!open)}
+      >
+        <FiSettings className='ant-spin-dot-spin' style={{fontSize: 20}} />
       </Button>
       <Drawer
         placement={direction === 'ltr' ? 'right' : 'left'}
@@ -52,7 +53,8 @@ const AppThemeSetting = () => {
           boxedDrawer: layoutType === LayoutType.BOXED,
         })}
         visible={open}
-        onClose={() => setCustomizerStatus(false)}>
+        onClose={() => setCustomizerStatus(false)}
+      >
         <AppScrollbar>
           <div className='customize-header'>
             <h3>
@@ -79,7 +81,7 @@ const AppThemeSetting = () => {
               </div>
             </div>
 
-            <div className='customize-item' style={{ display: 'none' }}>
+            <div className='customize-item' style={{display: 'none'}}>
               <h4>
                 <IntlMessages id='customizer.navigationStyles' />
               </h4>
@@ -88,10 +90,12 @@ const AppThemeSetting = () => {
                   return (
                     <div
                       className='customize-nav-option-item'
-                      key={navLayout.id}>
+                      key={navLayout.id}
+                    >
                       <div
                         className='customize-nav-option-content'
-                        onClick={() => onNavStyleChange(navLayout.alias)}>
+                        onClick={() => onNavStyleChange(navLayout.alias)}
+                      >
                         <img src={navLayout.image} alt='nav' />
                         {navStyle === navLayout.alias ? (
                           <span className='customize-nav-option-right-icon'>
@@ -115,7 +119,8 @@ const AppThemeSetting = () => {
                     <div className='customize-nav-option-item' key={layout.id}>
                       <div
                         className='customize-nav-option-content'
-                        onClick={() => onLayoutChange(layout.alias)}>
+                        onClick={() => onLayoutChange(layout.alias)}
+                      >
                         <img
                           className='layout-img'
                           src={layout.image}

@@ -40,7 +40,8 @@ const AppVerticalNav = () => {
       })}
       openKeys={openKeys}
       onOpenChange={onOpenChange}
-      selectedKeys={[selectedKeys[selectedKeys.length - 1]]}>
+      selectedKeys={[selectedKeys[selectedKeys.length - 1]]}
+    >
       {getRouteMenus(selectedKeys)}
     </Menu>
   );
