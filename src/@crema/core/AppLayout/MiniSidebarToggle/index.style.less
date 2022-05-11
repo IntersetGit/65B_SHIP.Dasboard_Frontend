@@ -64,7 +64,7 @@
     width: 4rem !important;
     .transition(all 200ms linear);
 
-    & + .app-layout-mini-sidebar-main {
+    &+.app-layout-mini-sidebar-main {
       width: calc(100% - 4rem) !important;
       margin-left: 4rem;
       .transition(all 200ms linear);
@@ -121,11 +121,12 @@
 
   & .trigger {
     font-size: 35px;
-      margin-right: 20px;
-      padding: 5.5px;
-      cursor: pointer;
-      color: @text-color;
-      display: block;
+    margin-right: 20px;
+    padding: 5.5px;
+    cursor: pointer;
+    color: @text-color;
+    display: block;
+
     & svg {
       display: block;
     }
@@ -139,9 +140,11 @@
       display: none;
     }
   }
-  & .triggerhide{
+
+  & .triggerhide {
     display: none !important;
   }
+
   // & .trigger {
   //   font-size: 35px;
   //   margin-right: 20px;
@@ -219,7 +222,7 @@
     }
   }
 
-  &.ant-input-search-rtl > .ant-input-group > .ant-input-group-addon:last-child .ant-input-search-button {
+  &.ant-input-search-rtl>.ant-input-group>.ant-input-group-addon:last-child .ant-input-search-button {
     border-radius: @border-radius-base 0 0 @border-radius-base;
   }
 }
@@ -358,12 +361,14 @@
     opacity: 0.5;
   }
 
-  & > div {
+  &>div {
     position: relative;
     z-index: 3;
   }
 
-  & .ant-menu.ant-menu-dark, .ant-menu-dark .ant-menu-sub, .ant-menu.ant-menu-dark .ant-menu-sub {
+  & .ant-menu.ant-menu-dark,
+  .ant-menu-dark .ant-menu-sub,
+  .ant-menu.ant-menu-dark .ant-menu-sub {
     background-color: transparent;
     color: inherit;
   }
@@ -373,30 +378,35 @@
     color: inherit;
   }
 }
+
 // --------------------------------------------------------------------------
-.headerstatus {
-  min-width: 250px;
-  height:100%;
-  // background-color:rgb(157, 163, 225);
-  border-radius: 5px;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  align-content: center;
-  flex-wrap: wrap;
 
-
+.header {
+  .headerstatus {
+    min-width: 250px;
+    height: 100%;
+    // background-color:rgb(157, 163, 225);
+    border-radius: 5px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-content: center;
+    flex-wrap: wrap;
+  }
 }
-.textstatus{
+
+.textstatus {
   // align-self: center;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
   width: 50%;
+
   p {
     margin: 0;
     color: rgb(10, 5, 110);
   }
+
   p:nth-child(2) {
     color: rgb(32, 96, 16);
     font-weight: bolder;
