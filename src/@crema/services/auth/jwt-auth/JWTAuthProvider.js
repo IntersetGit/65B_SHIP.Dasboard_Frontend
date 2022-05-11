@@ -29,7 +29,7 @@ const JWTAuthAuthProvider = ({children}) => {
       const token = localStorage.getItem('token');
 
       if (!token) {
-        console.log('nologin')
+        console.log('nologin');
         setJWTAuthData({
           user: undefined,
           isLoading: false,
@@ -111,13 +111,15 @@ const JWTAuthAuthProvider = ({children}) => {
     <JWTAuthContext.Provider
       value={{
         ...firebaseData,
-      }}>
+      }}
+    >
       <JWTAuthActionsContext.Provider
         value={{
           signUpUser,
           signInUser,
           logout,
-        }}>
+        }}
+      >
         {children}
       </JWTAuthActionsContext.Provider>
     </JWTAuthContext.Provider>

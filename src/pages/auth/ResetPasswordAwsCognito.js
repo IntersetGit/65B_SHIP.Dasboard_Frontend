@@ -37,11 +37,13 @@ const ResetPasswordAwsCognito = () => {
           name='basic'
           initialValues={{remember: true}}
           // onFinish={onFinish}
-          onFinishFailed={onFinishFailed}>
+          onFinishFailed={onFinishFailed}
+        >
           <Form.Item
             name='pin'
             className='form-field'
-            rules={[{required: true, message: 'Please input your Pin!'}]}>
+            rules={[{required: true, message: 'Please input your Pin!'}]}
+          >
             <p>
               <IntlMessages id='common.verificationMessage' />
             </p>
@@ -54,7 +56,8 @@ const ResetPasswordAwsCognito = () => {
             className='form-field'
             rules={[
               {required: true, message: 'Please input your New Password!'},
-            ]}>
+            ]}
+          >
             <Input
               type='password'
               placeholder={messages['common.newPassword']}
@@ -69,7 +72,8 @@ const ResetPasswordAwsCognito = () => {
                 required: true,
                 message: 'Please input your Retype Password!',
               },
-            ]}>
+            ]}
+          >
             <Input
               type='password'
               placeholder={messages['common.retypePassword']}

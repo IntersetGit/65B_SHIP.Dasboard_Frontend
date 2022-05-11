@@ -18,7 +18,7 @@ const {Content} = Layout;
 const AppContentView = () => {
   const {user, isAuthenticated} = useAuthUser();
   return (
-    <Content className='main-content-view' >
+    <Content className='main-content-view'>
       <AppSuspense>
         <AppErrorBoundary>
           {generateRoutes({

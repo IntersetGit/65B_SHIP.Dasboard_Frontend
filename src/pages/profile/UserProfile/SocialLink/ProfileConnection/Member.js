@@ -35,7 +35,8 @@ const Member = ({member}) => {
             <Button
               type='primary'
               className='disconnect-btn'
-              onClick={onDisconnect}>
+              onClick={onDisconnect}
+            >
               Disconnect
             </Button>
           </div>

@@ -35,11 +35,13 @@ const ComponentCardWithoutAnim = ({
           <Button
             aria-label='view code'
             shape='circle'
-            onClick={() => setToggleViewSource(!viewSource)}>
+            onClick={() => setToggleViewSource(!viewSource)}
+          >
             <HiOutlineCode className='code-icon' />
           </Button>
         ) : null
-      }>
+      }
+    >
       <Expand open={viewSource}>
         {source ? (
           <AppScrollbar
@@ -48,12 +50,14 @@ const ComponentCardWithoutAnim = ({
               background: '#333333',
               height: 350,
               maxHeight: 400,
-            }}>
+            }}
+          >
             <Highlight
               {...defaultProps}
               code={source}
               language='jsx'
-              theme={highlightTheme}>
+              theme={highlightTheme}
+            >
               {({style, tokens, getLineProps, getTokenProps}) => (
                 <pre className='pre-tag' style={{...style, maxHeight: 500}}>
                   {tokens.map((line, i) => (

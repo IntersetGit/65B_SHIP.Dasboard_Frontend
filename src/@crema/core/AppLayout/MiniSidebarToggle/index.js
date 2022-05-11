@@ -23,7 +23,8 @@ const MiniSidebarToggle = () => {
       className={clsx('app-layout-mini-sidebar', {
         appMainFooter: footer && footerType === FooterType.FLUID,
         appMainFixedFooter: footer && footerType === FooterType.FIXED,
-      })}>
+      })}
+    >
       <AppSidebar isCollapsed={isCollapsed} onToggleSidebar={onToggleSidebar} />
       <Layout className='app-layout-mini-sidebar-main'>
         <AppHeader

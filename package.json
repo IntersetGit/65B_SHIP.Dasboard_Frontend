@@ -1,7 +1,7 @@
 {
   "name": "PTTMORNITOR",
   "version": "0.1.0",
-  "homepage": "https://hrconnext.co/ship/",
+  "homepage": "https://hrconnext.co/",
   "private": true,
   "dependencies": {
     "@ant-design/colors": "^6.0.0",
@@ -90,7 +90,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build": "CI=false && craco build",
     "test": "craco test",
     "lint": "eslint \"src/**/*.+(js|jsx)\"",
     "lint:fix": "eslint --fix \"src/**/*.+(js|jsx)\"",

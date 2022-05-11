@@ -13,7 +13,8 @@ const AppsContent = (props) => {
         'apps-content-container',
         {isDetailView: isDetailView},
         {fullView: fullView},
-      )}>
+      )}
+    >
       {children}
     </AppScrollbar>
   );

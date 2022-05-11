@@ -35,14 +35,18 @@ const MenuColorCell = ({sidebarColors}) => {
             ? `solid 2px ${defaultConfig.sidebar.borderColor}`
             : `solid 2px ${sidebarColors.sidebarBgColor}`,
       }}
-      onClick={() =>{console.log(sidebarColors), updateSidebarColorSet(sidebarColors)}}>
+      onClick={() => {
+        console.log(sidebarColors), updateSidebarColorSet(sidebarColors);
+      }}
+    >
       {navStyle === NavStyle.DEFAULT ? (
         <div
           className='menu-color-cell-header'
           style={{
             backgroundColor: sidebarColors.sidebarHeaderColor,
             borderBottom: `solid 1px ${sidebarColors.sidebarTextColor}`,
-          }}>
+          }}
+        >
           <div
             className='menu-color-cell-header-avatar'
             style={{
@@ -69,19 +73,22 @@ const MenuColorCell = ({sidebarColors}) => {
         className='menu-color-cell-content'
         style={{
           backgroundColor: sidebarColors.sidebarBgColor,
-        }}>
+        }}
+      >
         <div
           className='menu-color-cell-menu-item'
           style={{
             color: sidebarColors.sidebarTextColor,
-          }}>
+          }}
+        >
           Menu-1
         </div>
         <div
           className='menu-color-cell-menu-item'
           style={{
             color: sidebarColors.sidebarTextColor,
-          }}>
+          }}
+        >
           Menu-2
         </div>
         <div
@@ -98,14 +105,16 @@ const MenuColorCell = ({sidebarColors}) => {
           style={{
             backgroundColor: sidebarColors.sidebarMenuSelectedBgColor,
             color: sidebarColors.sidebarMenuSelectedTextColor,
-          }}>
+          }}
+        >
           Selected Menu
         </div>
         <div
           className='menu-color-cell-menu-item'
           style={{
             color: sidebarColors.sidebarTextColor,
-          }}>
+          }}
+        >
           Menu-4
         </div>
       </div>

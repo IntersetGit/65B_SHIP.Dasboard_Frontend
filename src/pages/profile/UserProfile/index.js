@@ -21,7 +21,8 @@ const UserProfile = () => {
       <Tabs
         className='user-profile-tabs'
         defaultActiveKey='1'
-        tabPosition='left'>
+        tabPosition='left'
+      >
         <TabPane
           tab={
             <span className='user-profile-icon'>
@@ -31,7 +32,8 @@ const UserProfile = () => {
               </span>
             </span>
           }
-          key='1'>
+          key='1'
+        >
           <PersonalInfo />
         </TabPane>
         <TabPane
@@ -43,7 +45,8 @@ const UserProfile = () => {
               </span>
             </span>
           }
-          key='2'>
+          key='2'
+        >
           <ChangePassword />
         </TabPane>
         {/* <TabPane

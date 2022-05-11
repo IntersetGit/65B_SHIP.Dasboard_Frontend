@@ -50,7 +50,8 @@ const SidebarSettings = () => {
                 <div className='customize-nav-option-item' key={imagesObj.id}>
                   <div
                     className='customize-nav-option-content'
-                    onClick={() => onUpdateSidebarBgImage(imagesObj.id)}>
+                    onClick={() => onUpdateSidebarBgImage(imagesObj.id)}
+                  >
                     <img src={imagesObj.image} alt='nav' />
                     {sidebarBgImage === imagesObj.id ? (
                       <span className='customize-nav-option-right-icon'>

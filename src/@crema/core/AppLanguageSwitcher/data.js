@@ -1,5 +1,4 @@
 const languageData = [
-
   {
     languageId: 'Thailand',
     locale: 'th',
@@ -12,6 +11,5 @@ const languageData = [
     name: 'English',
     icon: 'us',
   },
-
 ];
 export default languageData;

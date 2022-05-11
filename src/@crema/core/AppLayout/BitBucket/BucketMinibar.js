@@ -20,14 +20,15 @@ const BucketMinibar = () => {
       style={{
         backgroundColor: sidebarColorSet.sidebarBgColor,
         color: sidebarColorSet.sidebarTextColor,
-      }}>
+      }}
+    >
       <div className='bucket-minibar-inner'>
         <a className='bucket-minibar-logo' onClick={(e) => e.preventDefault()}>
           <img
             src={
               sidebarColorSet.mode === 'dark'
-                ? '/ship/assets/images/logo-white.png'
-                : '/ship/assets/images/logo.png'
+                ? '/assets/images/logo-white.png'
+                : '/assets/images/logo.png'
             }
             alt='crema-logo'
           />
@@ -37,7 +38,8 @@ const BucketMinibar = () => {
           <div className='bucket-minibar-main'>
             <a
               className='bucket-minibar-link'
-              onClick={(e) => e.preventDefault()}>
+              onClick={(e) => e.preventDefault()}
+            >
               <AiOutlineSearch />
             </a>
 
@@ -45,19 +47,22 @@ const BucketMinibar = () => {
 
             <a
               className='bucket-minibar-link'
-              onClick={(e) => e.preventDefault()}>
+              onClick={(e) => e.preventDefault()}
+            >
               <IoChatboxOutline />
             </a>
             <a
               className='bucket-minibar-link bucket-minibar-notify-link'
-              onClick={(e) => e.preventDefault()}>
+              onClick={(e) => e.preventDefault()}
+            >
               <IoIosNotificationsOutline />
             </a>
           </div>
           <div className='bucket-minibar-setting'>
             <a
               className='bucket-minibar-link'
-              onClick={(e) => e.preventDefault()}>
+              onClick={(e) => e.preventDefault()}
+            >
               <FiSettings />
             </a>
           </div>

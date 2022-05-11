@@ -163,14 +163,16 @@ const FirebaseAuthProvider = ({children}) => {
     <FirebaseContext.Provider
       value={{
         ...firebaseData,
-      }}>
+      }}
+    >
       <FirebaseActionsContext.Provider
         value={{
           signInWithEmailAndPassword,
           createUserWithEmailAndPassword,
           signInWithPopup,
           logout,
-        }}>
+        }}
+      >
         {children}
       </FirebaseActionsContext.Provider>
     </FirebaseContext.Provider>

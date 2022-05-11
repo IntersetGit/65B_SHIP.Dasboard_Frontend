@@ -33,7 +33,8 @@ const AppHeader = ({showDrawer}) => {
       style={{
         backgroundColor: sidebarColorSet.sidebarBgColor,
         color: sidebarColorSet.sidebarTextColor,
-      }}>
+      }}
+    >
       <div className='header-hor-header-fixed-main'>
         <div className='container'>
           <div className='header-hor-header-fixed-main-flex'>
@@ -57,7 +58,8 @@ const AppHeader = ({showDrawer}) => {
               <Dropdown overlay={menuMobile} trigger={['click']}>
                 <a
                   className='ant-dropdown-link'
-                  onClick={(e) => e.preventDefault()}>
+                  onClick={(e) => e.preventDefault()}
+                >
                   <FiMoreVertical />
                 </a>
               </Dropdown>

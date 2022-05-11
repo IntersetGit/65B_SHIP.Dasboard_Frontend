@@ -38,7 +38,8 @@ const Standard = () => {
       className={clsx('app-layout-standard', {
         appMainFooter: footer && footerType === FooterType.FLUID,
         appMainFixedFooter: footer && footerType === FooterType.FIXED,
-      })}>
+      })}
+    >
       <AppHeader isCollapsed={isCollapsed} onToggleSidebar={onToggleSidebar} />
       <Layout className='app-layout-standard-row'>
         <AppSidebar isCollapsed={isCollapsed} />

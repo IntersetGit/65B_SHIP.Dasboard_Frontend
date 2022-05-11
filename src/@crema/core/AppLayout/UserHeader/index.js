@@ -38,7 +38,8 @@ const UserHeader = () => {
       className={clsx('app-layout-userHeader', {
         appMainFooter: footer && footerType === FooterType.FLUID,
         appMainFixedFooter: footer && footerType === FooterType.FIXED,
-      })}>
+      })}
+    >
       <AppSidebar isCollapsed={isCollapsed} />
       <Layout className='app-layout-userHeader-main'>
         <AppHeader

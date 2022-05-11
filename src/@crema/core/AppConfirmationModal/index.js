@@ -16,7 +16,8 @@ const AppConfirmationModal = ({
       title={modalTitle}
       visible={open}
       onOk={onConfirm}
-      onCancel={() => onDeny(false)}>
+      onCancel={() => onDeny(false)}
+    >
       <p className='para-text'>{paragraph}</p>
     </Modal>
   );

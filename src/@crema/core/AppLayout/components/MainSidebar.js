@@ -21,11 +21,12 @@ const MainSidebar = ({children, className, collapsed = false, ...props}) => {
         backgroundColor: sidebarColorSet.sidebarBgColor,
         color: sidebarColorSet.sidebarTextColor,
         backgroundImage: isSidebarBgImage
-          ? `url(/ship/assets/images/sidebar/images/${sidebarBgImage}.png)`
+          ? `url(/assets/images/sidebar/images/${sidebarBgImage}.png)`
           : '',
       }}
       collapsed={collapsed}
-      {...props}>
+      {...props}
+    >
       {children}
     </Sider>
   );

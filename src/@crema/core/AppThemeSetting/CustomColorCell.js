@@ -12,10 +12,12 @@ const CustomColorCell = ({
       className='color-option-list-item'
       onClick={() => {
         updateThemeColors(themeColorSet.color);
-      }}>
+      }}
+    >
       <div
         style={{backgroundColor: themeColorSet.color}}
-        className='custom-color-option'>
+        className='custom-color-option'
+      >
         {themeColorSet.color === sidebarBGColor ? (
           <span className='custom-color-option-right-icon'>
             <CheckOutlined />

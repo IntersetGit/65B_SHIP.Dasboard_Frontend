@@ -1,29 +1,29 @@
 import React from 'react';
-import { Dropdown, Input, Layout, Menu } from 'antd';
+import {Dropdown, Input, Layout, Menu} from 'antd';
 import './index.style.less';
-import { AiOutlineMenuFold, AiOutlineMenuUnfold } from 'react-icons/ai';
+import {AiOutlineMenuFold, AiOutlineMenuUnfold} from 'react-icons/ai';
 import PropTypes from 'prop-types';
 import AppLogo from '../components/AppLogo';
-import { useIntl } from 'react-intl';
+import {useIntl} from 'react-intl';
 import AppLanguageSwitcher from '../../AppLanguageSwitcher';
 import AppHeaderMessages from '../../AppHeaderMessages';
 import AppNotifications from '../../AppNotifications';
-import { useAuthMethod, useAuthUser } from '../../../utility/AuthHooks';
-import { Avatar, List, Comment } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { useThemeContext } from '../../../utility/AppContextProvider/ThemeContextProvider';
-import { useSelector } from 'react-redux'
+import {useAuthMethod, useAuthUser} from '../../../utility/AuthHooks';
+import {Avatar, List, Comment} from 'antd';
+import {useNavigate} from 'react-router-dom';
+import {useThemeContext} from '../../../utility/AppContextProvider/ThemeContextProvider';
+import {useSelector} from 'react-redux';
 
 import UserInfo from '../../../core/AppLayout/components/UserInfo';
-const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
-  const { Header } = Layout;
-  const { Search } = Input;
-  const { messages } = useIntl();
-  const { user } = useAuthUser();
+const AppHeader = ({isCollapsed, onToggleSidebar}) => {
+  const {Header} = Layout;
+  const {Search} = Input;
+  const {messages} = useIntl();
+  const {user} = useAuthUser();
   const navigate = useNavigate();
-  const { logout } = useAuthMethod();
-  const { themeMode } = useThemeContext();
-  const StatusMap = useSelector(({ status }) => status);
+  const {logout} = useAuthMethod();
+  const {themeMode} = useThemeContext();
+  const StatusMap = useSelector(({status}) => status);
   const menuMobile = (
     <Menu>
       <AppHeaderMessages />
@@ -49,7 +49,6 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
   };
   return (
     <Header className='app-header-mini-sidebar'>
-
       {React.createElement(
         isCollapsed ? AiOutlineMenuUnfold : AiOutlineMenuFold,
         {
@@ -57,20 +56,18 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
           onClick: onToggleSidebar,
         },
       )}
-      {Object.keys(StatusMap).length > 0 &&
-        <div className='headerstatus' >
-
-          {(Object.keys(StatusMap).map((status) => {
+      {Object.keys(StatusMap).length > 0 && (
+        <div className='headerstatus'>
+          {Object.keys(StatusMap).map((status) => {
             return (
               <div key={status} className='textstatus'>
                 <p>{status}</p>
                 <p>{StatusMap[status]}</p>
               </div>
-            )
-          }))}
-
+            );
+          })}
         </div>
-      }
+      )}
 
       {/* <AppLogo /> */}
 
@@ -84,10 +81,9 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
         <AppHeaderMessages />
         <AppNotifications />
       </div> */}
-      <div style={{ right: 0, position: 'absolute' }}>
+      <div style={{right: 0, position: 'absolute'}}>
         <UserInfo />
       </div>
-
 
       {/* <div className='app-header-mini-sidebar-section-mobile'>
         <Dropdown overlay={menuMobile} trigger={['click']}>

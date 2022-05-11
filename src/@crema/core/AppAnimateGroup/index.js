@@ -12,7 +12,8 @@ const AppAnimateGroup = (props) => {
         height: height,
         ...animateStyle,
       }}
-      {...rest}>
+      {...rest}
+    >
       {props.children}
     </QueueAnim>
   );

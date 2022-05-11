@@ -12,7 +12,8 @@ const AppLocaleProvider = (props) => {
   return (
     <IntlProvider
       locale={currentAppLocale.locale}
-      messages={currentAppLocale.messages}>
+      messages={currentAppLocale.messages}
+    >
       <IntlGlobalProvider>{props.children}</IntlGlobalProvider>
     </IntlProvider>
   );

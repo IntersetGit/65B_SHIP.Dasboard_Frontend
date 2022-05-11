@@ -34,7 +34,8 @@ const AppHeader = ({showDrawer}) => {
       style={{
         backgroundColor: sidebarColorSet.sidebarBgColor,
         color: sidebarColorSet.sidebarTextColor,
-      }}>
+      }}
+    >
       <NotificationBar />
 
       <div
@@ -42,7 +43,8 @@ const AppHeader = ({showDrawer}) => {
         style={{
           backgroundColor: sidebarColorSet.sidebarBgColor,
           color: sidebarColorSet.sidebarTextColor,
-        }}>
+        }}
+      >
         <div className='container'>
           <div className='header-hor-dark-main-flex'>
             <a className='trigger' onClick={showDrawer}>
@@ -64,7 +66,8 @@ const AppHeader = ({showDrawer}) => {
               <Dropdown overlay={menuMobile} trigger={['click']}>
                 <a
                   className='ant-dropdown-link'
-                  onClick={(e) => e.preventDefault()}>
+                  onClick={(e) => e.preventDefault()}
+                >
                   <FiMoreVertical />
                 </a>
               </Dropdown>
@@ -78,7 +81,8 @@ const AppHeader = ({showDrawer}) => {
         style={{
           backgroundColor: sidebarColorSet.sidebarBgColor,
           color: sidebarColorSet.sidebarTextColor,
-        }}>
+        }}
+      >
         <div className='container'>
           <AppHorizontalNav className='app-main-hor-dark-menu' />
         </div>

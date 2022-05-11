@@ -24,25 +24,29 @@ const SignupAwsCognito = () => {
           name='basic'
           initialValues={{remember: true}}
           onFinish={signUpCognitoUser}
-          onFinishFailed={onFinishFailed}>
+          onFinishFailed={onFinishFailed}
+        >
           <Form.Item
             name='name'
             className='form-field'
-            rules={[{required: true, message: 'Please input your Name!'}]}>
+            rules={[{required: true, message: 'Please input your Name!'}]}
+          >
             <Input placeholder={messages['common.name']} />
           </Form.Item>
 
           <Form.Item
             name='email'
             className='form-field'
-            rules={[{required: true, message: 'Please input your Email!'}]}>
+            rules={[{required: true, message: 'Please input your Email!'}]}
+          >
             <Input placeholder={messages['common.email']} />
           </Form.Item>
 
           <Form.Item
             name='password'
             className='form-field'
-            rules={[{required: true, message: 'Please input your Password!'}]}>
+            rules={[{required: true, message: 'Please input your Password!'}]}
+          >
             <Input.Password placeholder={messages['common.password']} />
           </Form.Item>
 
@@ -54,14 +58,16 @@ const SignupAwsCognito = () => {
                 required: true,
                 message: 'Please input your Retype Password!',
               },
-            ]}>
+            ]}
+          >
             <Input.Password placeholder={messages['common.retypePassword']} />
           </Form.Item>
 
           <Form.Item
             className='form-field signup-checkbox'
             name='iAgreeTo'
-            valuePropName='checked'>
+            valuePropName='checked'
+          >
             <Checkbox>
               <IntlMessages id='common.iAgreeTo' />
             </Checkbox>
