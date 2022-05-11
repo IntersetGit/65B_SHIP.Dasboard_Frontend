@@ -117,7 +117,7 @@ const Vehicle = () => {
   useEffect(() => {
     let isMounted = true;
     var loopdata;
-    const socket = io.connect('http://localhost:3001');
+    const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
     (async () => {
       const WFSLayer = await loadModules(["esri/layers/WFSLayer"]).then(([WFSLayer]) => WFSLayer);
       const layer2 = new WFSLayer({
