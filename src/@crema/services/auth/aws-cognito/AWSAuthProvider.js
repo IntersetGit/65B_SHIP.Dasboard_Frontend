@@ -170,7 +170,8 @@ const AwsAuthProvider = ({children}) => {
       value={{
         ...awsCognitoData,
         auth,
-      }}>
+      }}
+    >
       <AwsCognitoActionsContext.Provider
         value={{
           logout,
@@ -178,7 +179,8 @@ const AwsAuthProvider = ({children}) => {
           signUpCognitoUser,
           confirmCognitoUserSignup,
           forgotPassword,
-        }}>
+        }}
+      >
         {children}
       </AwsCognitoActionsContext.Provider>
     </AwsCognitoContext.Provider>

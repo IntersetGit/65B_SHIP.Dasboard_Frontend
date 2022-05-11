@@ -7,7 +7,8 @@ const Auth0Provider = ({children}) => {
     <Auth0
       domain='yogi0823.us.auth0.com'
       clientId='tS3esCQdie5yKbr6FTl7416nLdCzlSgr'
-      redirectUri={window.location.origin}>
+      redirectUri={window.location.origin}
+    >
       {children}
     </Auth0>
   );

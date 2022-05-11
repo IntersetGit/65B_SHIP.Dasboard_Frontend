@@ -17,11 +17,13 @@ const LocaleContextProvider = ({children}) => {
       value={{
         locale,
         rtlLocale: defaultConfig.rtlLocale,
-      }}>
+      }}
+    >
       <LocaleActionsContext.Provider
         value={{
           updateLocale,
-        }}>
+        }}
+      >
         {children}
       </LocaleActionsContext.Provider>
     </LocaleContext.Provider>

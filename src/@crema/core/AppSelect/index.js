@@ -18,12 +18,14 @@ const AppSelect = ({menus, onChange, defaultValue, selectionKey}) => {
       defaultValue={defaultValue}
       value={selectionType}
       onChange={handleSelectionType}
-      className='select-box'>
+      className='select-box'
+    >
       {menus.map((menu, index) => (
         <Option
           key={index}
           value={selectionKey ? menu[selectionKey] : menu}
-          className='select-option'>
+          className='select-option'
+        >
           {selectionKey ? menu[selectionKey] : menu}
         </Option>
       ))}

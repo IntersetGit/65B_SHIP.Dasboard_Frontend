@@ -20,7 +20,8 @@ const UserMiniHeader = () => {
         appMainFooter: footer && footerType === FooterType.FLUID,
         appMainFixedFooter: footer && footerType === FooterType.FIXED,
         boxedLayout: layoutType === LayoutType.BOXED,
-      })}>
+      })}
+    >
       <AppSidebar />
       <Layout className='app-layout-userMiniHeader-main'>
         <AppHeader />

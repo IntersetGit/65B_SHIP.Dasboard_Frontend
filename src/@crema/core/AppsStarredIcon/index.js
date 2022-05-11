@@ -9,7 +9,8 @@ const AppsStarredIcon = ({item, title, onChange}) => {
     <AppIconButton
       icon={
         <span
-          className={item.isStarred ? 'star-filled star-icon' : 'star-icon'}>
+          className={item.isStarred ? 'star-filled star-icon' : 'star-icon'}
+        >
           {item.isStarred ? <StarFilled /> : <StarOutlined />}
         </span>
       }

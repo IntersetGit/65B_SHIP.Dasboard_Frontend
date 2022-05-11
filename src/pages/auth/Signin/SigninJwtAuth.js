@@ -1,29 +1,29 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useIntl } from 'react-intl';
-import { Button, Checkbox, Form, Input, } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import {Link, useNavigate} from 'react-router-dom';
+import {useIntl} from 'react-intl';
+import {Button, Checkbox, Form, Input} from 'antd';
+import {UserOutlined, LockOutlined} from '@ant-design/icons';
 
 import IntlMessages from '../../../@crema/utility/IntlMessages';
-import { useAuthMethod } from '../../../@crema/utility/AuthHooks';
+import {useAuthMethod} from '../../../@crema/utility/AuthHooks';
 
 const SignInJwtAuth = () => {
   const navigate = useNavigate();
-  const { signInUser } = useAuthMethod();
+  const {signInUser} = useAuthMethod();
 
   const onFinishFailed = (errorInfo) => {
     console.log('Failed:', errorInfo);
   };
 
   const onGoToForgetPassword = () => {
-    navigate('/forget-password', { tab: 'jwtAuth' });
+    navigate('/forget-password', {tab: 'jwtAuth'});
   };
 
   function onRememberMe(e) {
     console.log(`checked = ${e.target.checked}`);
   }
 
-  const { messages } = useIntl();
+  const {messages} = useIntl();
 
   return (
     <div className='sign'>
@@ -37,19 +37,38 @@ const SignInJwtAuth = () => {
             password: 'Pass@1!@all',
           }}
           onFinish={signInUser}
-          onFinishFailed={onFinishFailed}>
+          onFinishFailed={onFinishFailed}
+        >
           <Form.Item
             name='email'
             className='form-field'
-            rules={[{ required: true, message: 'Please input your Email!' }]}>
-            <Input prefix={<><UserOutlined /><span>|</span></>} placeholder={messages['common.email']} />
+            rules={[{required: true, message: 'Please input your Email!'}]}
+          >
+            <Input
+              prefix={
+                <>
+                  <UserOutlined />
+                  <span>|</span>
+                </>
+              }
+              placeholder={messages['common.email']}
+            />
           </Form.Item>
 
           <Form.Item
             name='password'
             className='form-field'
-            rules={[{ required: true, message: 'Please input your Password!' }]}>
-            <Input.Password prefix={<><LockOutlined /><span>|</span></>} placeholder={messages['common.password']} />
+            rules={[{required: true, message: 'Please input your Password!'}]}
+          >
+            <Input.Password
+              prefix={
+                <>
+                  <LockOutlined />
+                  <span>|</span>
+                </>
+              }
+              placeholder={messages['common.password']}
+            />
           </Form.Item>
 
           <div className='rememberMe'>

@@ -20,7 +20,8 @@ const Information = () => {
       className='user-profile-form'
       initialValues={{remember: true}}
       onFinish={onFinish}
-      onFinishFailed={onFinishFailed}>
+      onFinishFailed={onFinishFailed}
+    >
       <h3 className='user-profile-form-title'>
         <IntlMessages id='userProfile.information' />
       </h3>
@@ -28,21 +29,24 @@ const Information = () => {
         <Col xs={24} md={24}>
           <Form.Item
             name='bio'
-            rules={[{required: true, message: 'Please input your Bio Data'}]}>
+            rules={[{required: true, message: 'Please input your Bio Data'}]}
+          >
             <TextArea rows={4} placeholder='Your Bio data here...' />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
           <Form.Item
             name='birthdate'
-            rules={[{required: true, message: 'Please input Date!'}]}>
+            rules={[{required: true, message: 'Please input Date!'}]}
+          >
             <DatePicker style={{width: '100%'}} format='DD M YYYY' />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
           <Form.Item
             name='country'
-            rules={[{required: true, message: 'Please input Your Country!'}]}>
+            rules={[{required: true, message: 'Please input Your Country!'}]}
+          >
             <Select
               showSearch
               style={{width: '100%'}}
@@ -50,7 +54,8 @@ const Information = () => {
               optionFilterProp='children'
               filterOption={(input, option) =>
                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }>
+              }
+            >
               {countryList.map((country, index) => {
                 return (
                   <Option key={index} value={country.name}>
@@ -65,7 +70,8 @@ const Information = () => {
         <Col xs={24} md={12}>
           <Form.Item
             name='website'
-            rules={[{required: true, message: 'Please input your Website!'}]}>
+            rules={[{required: true, message: 'Please input your Website!'}]}
+          >
             <Input placeholder='Website' />
           </Form.Item>
         </Col>
@@ -74,7 +80,8 @@ const Information = () => {
             name='phone'
             rules={[
               {required: true, message: 'Please input your Phone number!'},
-            ]}>
+            ]}
+          >
             <Input placeholder='Phone Number' />
           </Form.Item>
         </Col>

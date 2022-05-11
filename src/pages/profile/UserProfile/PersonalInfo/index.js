@@ -8,7 +8,9 @@ import './index.style.less';
 const PersonalInfo = () => {
   const {user} = useAuthUser();
 
-  const [userImage, setUserImage] = useState('/ship/assets/images/placeholder.jpg');
+  const [userImage, setUserImage] = useState(
+    '/ship/assets/images/placeholder.jpg',
+  );
 
   const {getRootProps, getInputProps} = useDropzone({
     accept: 'image/*',
@@ -33,7 +35,8 @@ const PersonalInfo = () => {
         userImage: user.photoURL
           ? user.photoURL
           : '/ship/assets/images/placeholder.jpg',
-      }}>
+      }}
+    >
       <Form.Item className='info-upload'>
         <Avatar className='info-upload-avatar' src={userImage} />
 
@@ -54,14 +57,16 @@ const PersonalInfo = () => {
         <Col xs={24} md={12}>
           <Form.Item
             name='displayName'
-            rules={[{required: true, message: 'Please input your Full Name!'}]}>
+            rules={[{required: true, message: 'Please input your Full Name!'}]}
+          >
             <Input placeholder='Full Name' />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
           <Form.Item
             name='username'
-            rules={[{required: true, message: 'Please input your User Name!'}]}>
+            rules={[{required: true, message: 'Please input your User Name!'}]}
+          >
             <Input placeholder='User Name' />
           </Form.Item>
         </Col>
@@ -70,14 +75,16 @@ const PersonalInfo = () => {
             name='email'
             rules={[
               {required: true, message: 'Please input your e-mail address!'},
-            ]}>
+            ]}
+          >
             <Input type='text' placeholder='E-mail' />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
           <Form.Item
             name='company'
-            rules={[{required: true, message: 'Please input your company!'}]}>
+            rules={[{required: true, message: 'Please input your company!'}]}
+          >
             <Input type='text' placeholder='Company' />
           </Form.Item>
         </Col>

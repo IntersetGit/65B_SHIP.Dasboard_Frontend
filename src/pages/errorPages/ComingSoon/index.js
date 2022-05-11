@@ -44,13 +44,15 @@ const ComingSoon = () => {
               name='basic'
               initialValues={{remember: true}}
               onFinish={onFinish}
-              onFinishFailed={onFinishFailed}>
+              onFinishFailed={onFinishFailed}
+            >
               <Form.Item
                 name='email'
                 className='form-field'
                 rules={[
                   {required: true, message: 'Please enter Email Address!'},
-                ]}>
+                ]}
+              >
                 <Input placeholder={messages['common.emailAddress']} />
               </Form.Item>
 

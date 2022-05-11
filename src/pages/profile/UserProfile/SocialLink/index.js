@@ -17,7 +17,8 @@ const SocialLink = ({socialLink}) => {
       className='user-profile-form'
       initialValues={{remember: true}}
       onFinish={onFinish}
-      onFinishFailed={onFinishFailed}>
+      onFinishFailed={onFinishFailed}
+    >
       <h3 className='user-profile-form-title'>
         <IntlMessages id='userProfile.socialLink' />
       </h3>
@@ -25,9 +26,8 @@ const SocialLink = ({socialLink}) => {
         <Col xs={24} md={12}>
           <Form.Item
             name='twitter'
-            rules={[
-              {required: true, message: 'Please Enter your Twitter url'},
-            ]}>
+            rules={[{required: true, message: 'Please Enter your Twitter url'}]}
+          >
             <Input placeholder='Twitter' />
           </Form.Item>
         </Col>
@@ -36,14 +36,16 @@ const SocialLink = ({socialLink}) => {
             name='facebook'
             rules={[
               {required: true, message: 'Please Enter your Facebook url'},
-            ]}>
+            ]}
+          >
             <Input placeholder='Facebook' />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
           <Form.Item
             name='google'
-            rules={[{required: true, message: 'Please Enter your Google url'}]}>
+            rules={[{required: true, message: 'Please Enter your Google url'}]}
+          >
             <Input placeholder='Google' />
           </Form.Item>
         </Col>
@@ -52,7 +54,8 @@ const SocialLink = ({socialLink}) => {
             name='linkedIn'
             rules={[
               {required: true, message: 'Please Enter your LinkedIn url'},
-            ]}>
+            ]}
+          >
             <Input placeholder='LinkedIn' />
           </Form.Item>
         </Col>
@@ -61,14 +64,16 @@ const SocialLink = ({socialLink}) => {
             name='instagram'
             rules={[
               {required: true, message: 'Please Enter your Instagram url'},
-            ]}>
+            ]}
+          >
             <Input placeholder='Instagram' />
           </Form.Item>
         </Col>
         <Col xs={24} md={12}>
           <Form.Item
             name='quora'
-            rules={[{required: true, message: 'Please Enter your Quora url'}]}>
+            rules={[{required: true, message: 'Please Enter your Quora url'}]}
+          >
             <Input placeholder='Quora' />
           </Form.Item>
         </Col>

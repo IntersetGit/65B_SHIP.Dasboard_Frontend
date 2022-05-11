@@ -15,7 +15,8 @@ const AppHorizontalNav = ({className}) => {
       mode='horizontal'
       className={className}
       defaultOpenKeys={[defaultOpenKeys]}
-      selectedKeys={[selectedKeys.replaceAll('/', ':')]}>
+      selectedKeys={[selectedKeys.replaceAll('/', ':')]}
+    >
       {getRouteHorMenus()}
     </Menu>
   );

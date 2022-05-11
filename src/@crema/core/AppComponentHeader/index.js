@@ -28,7 +28,8 @@ const AppComponentHeader = ({title, description, refUrl}) => {
               ghost
               href={refUrl}
               icon={<LinkOutlined />}
-              target='_blank'>
+              target='_blank'
+            >
               Reference
             </Button>
           </div>

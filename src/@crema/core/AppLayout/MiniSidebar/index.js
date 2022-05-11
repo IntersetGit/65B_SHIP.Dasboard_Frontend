@@ -20,7 +20,8 @@ const MiniSidebar = () => {
         appMainFooter: footer && footerType === FooterType.FLUID,
         appMainFixedFooter: footer && footerType === FooterType.FIXED,
         boxedLayout: layoutType === LayoutType.BOXED,
-      })}>
+      })}
+    >
       <AppSidebar />
       <Layout className='app-layout-mini-main'>
         <AppHeader />

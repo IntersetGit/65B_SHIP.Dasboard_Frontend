@@ -16,10 +16,12 @@ const AppSidebar = () => {
         'userMiniHeader-sidebar-img-background': isSidebarBgImage,
       })}
       breakpoint='lg'
-      collapsed={collapseMotion}>
+      collapsed={collapseMotion}
+    >
       <AppScrollbar
         className='app-sidebar-userMiniHeader-scrollbar'
-        scrollToTop={false}>
+        scrollToTop={false}
+      >
         <AppVerticalMenu />
       </AppScrollbar>
     </MainSidebar>

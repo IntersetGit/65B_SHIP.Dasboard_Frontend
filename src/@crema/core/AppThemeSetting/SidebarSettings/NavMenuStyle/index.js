@@ -31,7 +31,8 @@ const NavMenuStyle = () => {
               <div className='nav-menu-style-item' style={{}} key={menu.id}>
                 <div
                   className='nav-menu-style-item-cur'
-                  onClick={() => onMenuStyleChange(menu.alias)}>
+                  onClick={() => onMenuStyleChange(menu.alias)}
+                >
                   <img src={menu.image} alt='nav' />
                   {menuStyle === menu.alias ? <AppSelectedIcon /> : null}
                 </div>

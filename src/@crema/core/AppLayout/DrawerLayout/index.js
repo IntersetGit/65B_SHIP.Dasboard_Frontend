@@ -28,7 +28,8 @@ const DrawerLayout = () => {
       className={clsx('app-DrawerLayout', {
         appMainFooter: footer && footerType === FooterType.FLUID,
         appMainFixedFooter: footer && footerType === FooterType.FIXED,
-      })}>
+      })}
+    >
       <AppSidebar visible={isVisible} onClose={onClose} />
       <Layout className='app-DrawerLayout-main'>
         <AppHeader showDrawer={showDrawer} />

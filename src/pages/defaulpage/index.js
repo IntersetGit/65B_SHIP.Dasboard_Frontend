@@ -8,7 +8,6 @@ const Scaffolding = React.lazy(() => import('./scaffolding'));
 const People = React.lazy(() => import('./people'));
 const Acesscontrol = React.lazy(() => import('./acesscontrol'));
 
-
 export const PagesConfigs = [
   {
     permittedRole: RoutePermittedRole.user,

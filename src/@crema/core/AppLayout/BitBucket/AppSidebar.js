@@ -35,11 +35,13 @@ const AppSidebar = ({visible, onClose}) => {
         className={clsx('app-BitBucket-sidebar', {
           'bitBucket-sidebar-img-background': isSidebarBgImage,
         })}
-        collapsible>
+        collapsible
+      >
         <UserInfo hasColor />
         <AppScrollbar
           className='app-BitBucket-sidebar-scrollbar'
-          scrollToTop={false}>
+          scrollToTop={false}
+        >
           <AppVerticalMenu />
         </AppScrollbar>
       </MainSidebar>
@@ -53,7 +55,8 @@ const AppSidebar = ({visible, onClose}) => {
         placement={direction === ThemeDirection.LTR ? 'left' : 'right'}
         closable={false}
         onClose={onClose}
-        visible={visible}>
+        visible={visible}
+      >
         <div className='app-BitBucket-sidebar-wrapper'>
           <BucketMinibar />
           {sideBarComponent()}
@@ -62,7 +65,8 @@ const AppSidebar = ({visible, onClose}) => {
       <div
         className={clsx('app-BitBucket-sidebar-wrapper', {
           'app-BitBucket-sidebar-wrapper-close': isSidebarClosed,
-        })}>
+        })}
+      >
         <BucketMinibar />
         {sideBarComponent()}
         <a className='bitbucket-btn' onClick={onSidebarClosed}>

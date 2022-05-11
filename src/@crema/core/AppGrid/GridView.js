@@ -115,7 +115,8 @@ const GridView = ({
           height: 'auto',
           ...style,
         }}
-        {...rest}>
+        {...rest}
+      >
         {data.length > 0
           ? data.map((item, index) => (
               <div
@@ -125,7 +126,8 @@ const GridView = ({
                   maxWidth: `${100 / displayColumn}%`,
                   flexBasis: `${100 / displayColumn}%`,
                   padding: itemPadding,
-                }}>
+                }}
+              >
                 {renderItem(item, index)}
               </div>
             ))

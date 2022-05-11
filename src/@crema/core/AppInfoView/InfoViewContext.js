@@ -41,7 +41,8 @@ const InfoViewContextProvider = (props) => {
   return (
     <InfoViewContext.Provider value={state}>
       <InfoViewActionsContext.Provider
-        value={{fetchStart, fetchSuccess, fetchError, showMessage}}>
+        value={{fetchStart, fetchSuccess, fetchError, showMessage}}
+      >
         {props.children}
       </InfoViewActionsContext.Provider>
     </InfoViewContext.Provider>

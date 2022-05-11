@@ -18,11 +18,13 @@ const AppsContainer = (props) => {
       <div
         className={clsx('apps-wrap-header', {
           appsWrapHeaderFull: fullView,
-        })}>
+        })}
+      >
         {fullView ? null : (
           <Button
             className='menu-btn'
-            onClick={() => setAppDrawerOpen(!isAppDrawerOpen)}>
+            onClick={() => setAppDrawerOpen(!isAppDrawerOpen)}
+          >
             <MenuOutlined className='menu-btn-icon' />
           </Button>
         )}
@@ -37,7 +39,8 @@ const AppsContainer = (props) => {
         {sidebarContent ? (
           <QueueAnim
             style={{zIndex: 3}}
-            type={props.type ? props.type : 'left'}>
+            type={props.type ? props.type : 'left'}
+          >
             <AppSidebar
               isAppDrawerOpen={isAppDrawerOpen}
               setAppDrawerOpen={setAppDrawerOpen}
@@ -52,7 +55,8 @@ const AppsContainer = (props) => {
         <div
           className={clsx('apps-main-content', {
             appsMainContentFull: fullView,
-          })}>
+          })}
+        >
           {noContentAnimation ? (
             <Card
               bordered={false}
@@ -60,20 +64,23 @@ const AppsContainer = (props) => {
               className='apps-main-content-card'
               style={{
                 ...props.cardStyle,
-              }}>
+              }}
+            >
               {children}
             </Card>
           ) : (
             <QueueAnim
               type={props.type ? props.type : 'right'}
-              style={{minHeight: '100%'}}>
+              style={{minHeight: '100%'}}
+            >
               <Card
                 bordered={false}
                 key='content'
                 className='apps-main-content-card'
                 style={{
                   ...props.cardStyle,
-                }}>
+                }}
+              >
                 {children}
               </Card>
             </QueueAnim>

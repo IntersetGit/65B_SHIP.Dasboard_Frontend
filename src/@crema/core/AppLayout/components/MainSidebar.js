@@ -25,7 +25,8 @@ const MainSidebar = ({children, className, collapsed = false, ...props}) => {
           : '',
       }}
       collapsed={collapsed}
-      {...props}>
+      {...props}
+    >
       {children}
     </Sider>
   );

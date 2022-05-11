@@ -34,7 +34,8 @@ const HorHeaderFixed = () => {
       className={clsx('app-layout-hor-header-fixed', {
         appMainFooter: footer && footerType === FooterType.FLUID,
         appMainFixedFooter: footer && footerType === FooterType.FIXED,
-      })}>
+      })}
+    >
       <AppSidebar visible={isVisible} onClose={onClose} />
       <AppHeader showDrawer={showDrawer} />
       <Layout className='app-layout-hor-header-fixed-main'>

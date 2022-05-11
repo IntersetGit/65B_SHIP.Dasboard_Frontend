@@ -18,7 +18,8 @@ const AppSidebar = ({isCollapsed}) => {
       })}
       collapsible
       breakpoint='xl'
-      collapsed={isCollapsed}>
+      collapsed={isCollapsed}
+    >
       <UserInfo hasColor />
       <AppScrollbar className='app-sidebar-scrollbar' scrollToTop={false}>
         <AppVerticalMenu />

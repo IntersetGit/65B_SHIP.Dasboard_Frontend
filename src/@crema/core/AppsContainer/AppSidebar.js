@@ -16,7 +16,8 @@ const AppSidebar = (props) => {
         placement={direction === ThemeDirection.LTR ? 'left' : 'right'}
         visible={isAppDrawerOpen}
         onClose={() => setAppDrawerOpen(!isAppDrawerOpen)}
-        className='apps-sidebar-drawer'>
+        className='apps-sidebar-drawer'
+      >
         {sidebarContent}
       </Drawer>
       <Card className='apps-sidebar-card'>{sidebarContent}</Card>

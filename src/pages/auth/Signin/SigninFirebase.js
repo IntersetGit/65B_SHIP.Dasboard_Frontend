@@ -39,18 +39,21 @@ const SignInFirebase = () => {
             password: 'Pass@1!@all',
           }}
           onFinish={signInWithEmailAndPassword}
-          onFinishFailed={onFinishFailed}>
+          onFinishFailed={onFinishFailed}
+        >
           <Form.Item
             name='email'
             className='form-field'
-            rules={[{required: true, message: 'Please input your Email!'}]}>
+            rules={[{required: true, message: 'Please input your Email!'}]}
+          >
             <Input placeholder={messages['common.email']} />
           </Form.Item>
 
           <Form.Item
             name='password'
             className='form-field'
-            rules={[{required: true, message: 'Please input your Password!'}]}>
+            rules={[{required: true, message: 'Please input your Password!'}]}
+          >
             <Input.Password placeholder={messages['common.password']} />
           </Form.Item>
 

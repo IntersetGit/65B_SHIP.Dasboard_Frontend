@@ -25,7 +25,8 @@ const LayoutContextProvider = ({children}) => {
         footer,
         layoutType,
         rtlLocale: defaultConfig.rtlLocale,
-      }}>
+      }}
+    >
       <LayoutActionsContext.Provider
         value={{
           setFooter,
@@ -33,7 +34,8 @@ const LayoutContextProvider = ({children}) => {
           updateDirection,
           updateNavStyle,
           updateLayoutType,
-        }}>
+        }}
+      >
         {children}
       </LayoutActionsContext.Provider>
     </LayoutContext.Provider>

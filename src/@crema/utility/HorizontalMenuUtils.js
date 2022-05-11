@@ -61,7 +61,8 @@ const renderMenuItem = (item, sidebarColorSet, index) => {
     <Menu.SubMenu
       style={getStyles(item, sidebarColorSet, index, true)}
       key={item.path ? item.path : item.id}
-      title={renderMenuItemChildren(item, sidebarColorSet)}>
+      title={renderMenuItemChildren(item, sidebarColorSet)}
+    >
       {item.children.map((item) =>
         renderMenuItem(item, sidebarColorSet, index + 1),
       )}
@@ -80,7 +81,8 @@ const renderHorMenu = (item, sidebarColorSet, index) => {
     <Menu.SubMenu
       style={getStyles(item, sidebarColorSet, index, true)}
       key={item.path ? item.path : item.id}
-      title={renderMenuItemChildren(item, sidebarColorSet)}>
+      title={renderMenuItemChildren(item, sidebarColorSet)}
+    >
       {item.children.map((item) =>
         renderMenuItem(item, sidebarColorSet, index + 1),
       )}
@@ -89,7 +91,8 @@ const renderHorMenu = (item, sidebarColorSet, index) => {
     <Menu.Item
       key={item.id}
       exact={item.exact}
-      style={getStyles(item, sidebarColorSet, index, true)}>
+      style={getStyles(item, sidebarColorSet, index, true)}
+    >
       {item.children
         ? item.children
         : renderMenuItemChildren(item, sidebarColorSet)}

@@ -13,7 +13,8 @@ const AppRowContainer = ({children, ...others}) => {
       ease='easeInOutQuart'
       height='auto'
       gutter={{xs: 16, sm: 16, md: 32}}
-      {...others}>
+      {...others}
+    >
       {children}
     </AppAnimateGroup>
   );

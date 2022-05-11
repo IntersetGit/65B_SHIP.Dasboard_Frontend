@@ -25,11 +25,11 @@ export const LightSidebar = {
   mode: ThemeMode.LIGHT,
 };
 export const AunwaSidebar = {
-  sidebarBgColor: "#5A63C8",
-  sidebarHeaderColor: "#31A50",
-  sidebarMenuSelectedBgColor: "rgba(126 ,163 ,255,1)",
-  sidebarMenuSelectedTextColor: "rgba(45, 15, 15, 0.87)",
-  sidebarTextColor: "#fff",
+  sidebarBgColor: '#5A63C8',
+  sidebarHeaderColor: '#31A50',
+  sidebarMenuSelectedBgColor: 'rgba(126 ,163 ,255,1)',
+  sidebarMenuSelectedTextColor: 'rgba(45, 15, 15, 0.87)',
+  sidebarTextColor: '#fff',
   mode: ThemeMode.DARK,
 };
 
