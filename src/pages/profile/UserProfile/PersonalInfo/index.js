@@ -9,7 +9,7 @@ const PersonalInfo = () => {
   const {user} = useAuthUser();
 
   const [userImage, setUserImage] = useState(
-    '/ship/assets/images/placeholder.jpg',
+    '/assets/images/placeholder.jpg',
   );
 
   const {getRootProps, getInputProps} = useDropzone({
@@ -20,7 +20,7 @@ const PersonalInfo = () => {
   });
 
   const onReset = () => {
-    setUserImage('/ship/assets/images/placeholder.jpg');
+    setUserImage('/assets/images/placeholder.jpg');
   };
 
   const onFinish = (values) => {
@@ -34,7 +34,7 @@ const PersonalInfo = () => {
         ...user,
         userImage: user.photoURL
           ? user.photoURL
-          : '/ship/assets/images/placeholder.jpg',
+          : '/assets/images/placeholder.jpg',
       }}
     >
       <Form.Item className='info-upload'>

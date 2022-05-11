@@ -27,8 +27,8 @@ const BucketMinibar = () => {
           <img
             src={
               sidebarColorSet.mode === 'dark'
-                ? '/ship/assets/images/logo-white.png'
-                : '/ship/assets/images/logo.png'
+                ? '/assets/images/logo-white.png'
+                : '/assets/images/logo.png'
             }
             alt='crema-logo'
           />

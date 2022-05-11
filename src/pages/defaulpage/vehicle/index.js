@@ -50,16 +50,16 @@ function tagRender(props) {
 }
 
 const caricon = {
-  รถยก: '/ship/assets/iconmap/car/Forklift v1.png',
-  รถยกwarning: '/ship/assets/iconmap/car/Forklift v1!.png',
-  รถเครน: '/ship/assets/iconmap/car/Crane v1-01.png',
-  รถเครนwarning: '/ship/assets/iconmap/car/Crane v1!.png',
-  รถยนต์: '/ship/assets/iconmap/car/Car-01.png',
-  รถยนต์warning: '/ship/assets/iconmap/car/Car !-01.png',
-  รถบรรทุก: '/ship/assets/iconmap/car/Truck-01.png',
-  รถบรรทุกwarning: '/ship/assets/iconmap/car/Truck v1!.png',
-  รถเฮี้ยบ: '/ship/assets/iconmap/car/Crane Truck v1.png',
-  รถเฮี้ยบwarning: '/ship/assets/iconmap/car/Crane Truck v1!.png',
+  รถยก: '/assets/iconmap/car/Forklift v1.png',
+  รถยกwarning: '/assets/iconmap/car/Forklift v1!.png',
+  รถเครน: '/assets/iconmap/car/Crane v1-01.png',
+  รถเครนwarning: '/assets/iconmap/car/Crane v1!.png',
+  รถยนต์: '/assets/iconmap/car/Car-01.png',
+  รถยนต์warning: '/assets/iconmap/car/Car !-01.png',
+  รถบรรทุก: '/assets/iconmap/car/Truck-01.png',
+  รถบรรทุกwarning: '/assets/iconmap/car/Truck v1!.png',
+  รถเฮี้ยบ: '/assets/iconmap/car/Crane Truck v1.png',
+  รถเฮี้ยบwarning: '/assets/iconmap/car/Crane Truck v1!.png',
 };
 
 const Vehicle = () => {

@@ -23,7 +23,7 @@ const App = () => (
       <AppThemeProvider>
         <AppLocaleProvider>
           {/* <BrowserRouter basename='/ship'> */}
-          <BrowserRouter></BrowserRouter>
+          <BrowserRouter>
             <JWTAuthProvider>
               <AuthRoutes>
                 <AppLayout />
