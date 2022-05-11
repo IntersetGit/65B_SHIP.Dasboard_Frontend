@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dropdown, Input, Layout, Menu } from 'antd';
+import { Col, Dropdown, Input, Layout, Menu, Row } from 'antd';
 import './index.style.less';
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from 'react-icons/ai';
 import PropTypes from 'prop-types';
@@ -57,18 +57,21 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
         },
       )}
       <div className='header'>
-        {Object.keys(StatusMap).length > 0 && (
-          <div className='headerstatus'>
-            {Object.keys(StatusMap).map((status) => {
-              return (
-                <div key={status} className='textstatus'>
-                  <p>{status}</p>
-                  <p>{StatusMap[status]}</p>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <div className='box'>
+          {Object.keys(StatusMap).length > 0 && (
+            <div className='headerstatus'>
+              <Row >
+                {Object.keys(StatusMap).map((status) => {
+                  return (
+                    <Col key={status} lg={8} md={12} sm={12} xs={24}>
+                      <p>{status} : {StatusMap[status]}</p>
+                    </Col>
+                  );
+                })}
+              </Row>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* <AppLogo /> */}

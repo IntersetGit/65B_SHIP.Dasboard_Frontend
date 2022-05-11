@@ -1,6 +1,15 @@
 @import '../../../../shared/styles/variable';
 @import '../../../../shared/styles/mixin';
 
+#root {
+  z-index: 3147483647;
+}
+
+iframe {
+  z-index: -2147483647 !important;
+}
+
+
 .app-layout-mini-sidebar {
   min-height: 100vh;
   position: relative;
@@ -382,16 +391,91 @@
 // --------------------------------------------------------------------------
 
 .header {
-  .headerstatus {
-    min-width: 250px;
-    height: 100%;
-    // background-color:rgb(157, 163, 225);
-    border-radius: 5px;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-content: center;
-    flex-wrap: wrap;
+  position: relative;
+
+  .box {
+    position: absolute;
+    background: #deebf7;
+    padding: 5px;
+    top: -35px;
+    left: -20px;
+    overflow-y: auto;
+    min-height: 71px;
+    max-height: 71.2px;
+    border-radius: 10px;
+
+    .headerstatus {
+      min-width: 45vw;
+      height: 100%;
+
+      // background-color:rgb(157, 163, 225);
+      // border-radius: 5px;
+      // display: flex;
+      // flex-direction: row;
+      // justify-content: flex-start;
+      // align-content: center;
+      // flex-wrap: wrap;
+      .ant-row {
+        padding: 3px;
+
+        p {
+          margin-top: 0;
+          margin-bottom: 0;
+        }
+      }
+
+    }
+  }
+
+  .ant-row>.ant-col {
+    margin-bottom: 0px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #ebebeb;
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    -webkit-border-radius: 10px;
+    border-radius: 10px;
+    background: #ebebeb;
+  }
+
+}
+
+@media screen and (min-width: 768px) {
+  .header {
+    .ant-row>.ant-col {
+      margin-bottom: 0px;
+    }
+  }
+}
+
+@media (max-width: 912px) {
+  .header {
+    .box {
+      min-height: 63px;
+      max-height: 63.2px;
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  .header {
+    .box {
+      left: -20px;
+
+      .headerstatus {
+        min-width: 60vw;
+        height: 100%;
+      }
+    }
   }
 }
 
