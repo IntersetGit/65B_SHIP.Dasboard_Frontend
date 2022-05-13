@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef, useCallback} from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   Table,
   Tag,
@@ -12,26 +12,26 @@ import {
   Col,
   Modal,
 } from 'antd';
-import {Map, WebScene} from '@esri/react-arcgis';
-import {setDefaultOptions, loadModules, loadCss} from 'esri-loader';
+import { Map, WebScene } from '@esri/react-arcgis';
+import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
 import './index.style.less';
 import io from 'socket.io-client';
 import DaraArea from './dataarea';
-import {useDispatch} from 'react-redux';
-import {setStatus} from '../../../redux/actions';
-import {object} from 'prop-types';
+import { useDispatch } from 'react-redux';
+import { setStatus } from '../../../redux/actions';
+import { object } from 'prop-types';
 import Demodata from '../../demodata';
 
-setDefaultOptions({css: true});
+setDefaultOptions({ css: true });
 
 const options = [
-  {value: 'gold'},
-  {value: 'lime'},
-  {value: 'green'},
-  {value: 'cyan'},
+  { value: 'gold' },
+  { value: 'lime' },
+  { value: 'green' },
+  { value: 'cyan' },
 ];
 function tagRender(props) {
-  const {label, value, closable, onClose} = props;
+  const { label, value, closable, onClose } = props;
   const onPreventMouseDown = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -42,7 +42,7 @@ function tagRender(props) {
       onMouseDown={onPreventMouseDown}
       closable={closable}
       onClose={onClose}
-      style={{marginRight: 3}}
+      style={{ marginRight: 3 }}
     >
       {label}
     </Tag>
@@ -162,17 +162,22 @@ const Vehicle = () => {
       stateMap?.add(layer);
       CreateArea();
 
-      const {Graphic, GraphicsLayer} = await loadModules([
+      const { Graphic, GraphicsLayer } = await loadModules([
         'esri/Graphic',
         'esri/layers/GraphicsLayer',
       ]).then(([Graphic, GraphicsLayer]) => {
-        return {Graphic, GraphicsLayer};
+        return { Graphic, GraphicsLayer };
       });
 
       let layerpoi = new GraphicsLayer({
         id: 'poi',
       });
       stateMap?.add(layerpoi, 99);
+
+      socket.on('test', (data) => {
+        console.log('test', data);
+      });
+
       /*  socket.on("latlng", async (latlng) => {
          Status_cal(latlng);
          setTabledata(latlng);
@@ -293,12 +298,12 @@ const Vehicle = () => {
   });
 
   const CreateArea = async () => {
-    const {Graphic, GraphicsLayer, Polygon} = await loadModules([
+    const { Graphic, GraphicsLayer, Polygon } = await loadModules([
       'esri/Graphic',
       'esri/layers/GraphicsLayer',
       'esri/geometry/Polygon',
     ]).then(([Graphic, GraphicsLayer, Polygon]) => {
-      return {Graphic, GraphicsLayer, Polygon};
+      return { Graphic, GraphicsLayer, Polygon };
     });
     for (const layer in DaraArea) {
       // DaraArea.map( async(layer) => {
@@ -345,18 +350,18 @@ const Vehicle = () => {
     );
     // console.log('result :>> ', result);
     dispatch(
-      setStatus({...result, warning: warning.length, total: sum.length}),
+      setStatus({ ...result, warning: warning.length, total: sum.length }),
     );
   };
 
   const Onload = async (map, view) => {
-    const {Fullscreen, UI, Zoom, Expand} = await loadModules([
+    const { Fullscreen, UI, Zoom, Expand } = await loadModules([
       'esri/widgets/Fullscreen',
       'esri/views/ui/UI',
       'esri/widgets/Zoom',
       'esri/widgets/Expand',
     ]).then(([Fullscreen, UI, Zoom, Expand]) => {
-      return {Fullscreen, UI, Zoom, Expand};
+      return { Fullscreen, UI, Zoom, Expand };
     });
     const fullscreenui = new Fullscreen({
       view: view,
@@ -392,7 +397,7 @@ const Vehicle = () => {
     setStateView(view);
   };
   return (
-    <div style={{position: 'relative', width: '100%', height: '100%'}}>
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <Map
         className='Mapacrgis'
         onLoad={Onload}
@@ -406,7 +411,7 @@ const Vehicle = () => {
         }}
         viewProperties={{
           center: [100.3330867, 14.5548052],
-          ui: {components: ['attribution', 'compass']},
+          ui: { components: ['attribution', 'compass'] },
         }}
       >
         <div id='button-top' className='button-topleft'>
@@ -415,9 +420,9 @@ const Vehicle = () => {
             onClick={() => {
               if (
                 document.querySelector('.esri-ui-bottom-left').style.display ===
-                  'none' ||
+                'none' ||
                 document.querySelector('.esri-ui-bottom-left').style.display ===
-                  ''
+                ''
               ) {
                 document
                   .querySelector('.esri-ui-bottom-left')
@@ -436,28 +441,28 @@ const Vehicle = () => {
           className='menuserchslide esri-widget'
         >
           <Form
-            labelCol={{span: 9}}
-            wrapperCol={{span: 16}}
+            labelCol={{ span: 9 }}
+            wrapperCol={{ span: 16 }}
             name='nest-messages'
           >
             <Form.Item
               name={['user', 'name']}
               label='วันเวลา เริ้มต้น'
-              rules={[{required: true}]}
+              rules={[{ required: true }]}
             >
               <Input size='small' />
             </Form.Item>
             <Form.Item
               name={['user', 'email']}
               label='วันเวลา สิ้นสุด'
-              rules={[{type: 'email'}]}
+              rules={[{ type: 'email' }]}
             >
               <Input size='small' />
             </Form.Item>
             <Form.Item
               name={['user', 'age']}
               label='สถานที่ปฎิบัติงาน'
-              rules={[{type: 'number', min: 0, max: 99}]}
+              rules={[{ type: 'number', min: 0, max: 99 }]}
             >
               <InputNumber size='small' />
             </Form.Item>
@@ -469,14 +474,14 @@ const Vehicle = () => {
                 mode='multiple'
                 showArrow
                 tagRender={tagRender}
-                style={{width: '100%'}}
+                style={{ width: '100%' }}
                 options={options}
               />
             </Form.Item>
             <Form.Item name={['user', 'introduction']} label='Introduction'>
               <Input.TextArea size='ข้อเสนอแนะ' />
             </Form.Item>
-            <Form.Item wrapperCol={{span: 16, offset: 18}}>
+            <Form.Item wrapperCol={{ span: 16, offset: 18 }}>
               <Button type='primary' htmlType='submit'>
                 ค้นหา
               </Button>
@@ -534,11 +539,11 @@ const Vehicle = () => {
         </div>
         <Table
           id='divtable'
-          scroll={{y: '25vh'}}
+          scroll={{ y: '25vh' }}
           size='small'
           rowClassName={(record, index) =>
             record?.status_warnning !== null &&
-            record?.status_warnning !== undefined
+              record?.status_warnning !== undefined
               ? 'table-row-red'
               : ''
           }
@@ -552,7 +557,7 @@ const Vehicle = () => {
 
       <Modal
         title='รายละเอียด'
-        okButtonProps={{hidden: true}}
+        okButtonProps={{ hidden: true }}
         onCancel={() => setIsModalVisible(!isModalVisible)}
         visible={isModalVisible}
       >
