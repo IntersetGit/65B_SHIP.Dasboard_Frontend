@@ -23,7 +23,7 @@ const AuthWrapper = ({children}) => {
             </div>
 
             <div className='auth-main-content '>
-              <span className='ribbon6'>@PTT-V.1.0</span>
+              <span className='ribbon6'>@PTT-V.1.1</span>
               <div className='auth-card-header'>
                 <AppLogo />
               </div>
