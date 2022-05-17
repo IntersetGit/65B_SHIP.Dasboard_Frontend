@@ -17,6 +17,7 @@ jwtAxios.interceptors.response.use(
   },
 );
 export const setAuthToken = (token) => {
+  console.log('token', token)
   if (token) {
     jwtAxios.defaults.headers.common['x-auth-token'] = token;
     localStorage.setItem('token', token);
