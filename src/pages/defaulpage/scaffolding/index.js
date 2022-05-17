@@ -15,7 +15,7 @@ import {
 import { Map, WebScene } from '@esri/react-arcgis';
 import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
 import './index.style.less';
-import io from 'socket.io-client';
+import socket from '../../../util/socket';
 import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
@@ -140,18 +140,20 @@ const ScffoldingPage = () => {
     useEffect(() => {
         let isMounted = true;
         var loopdata;
+
         // const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
-        console.log('1', 1)
-        const socket = io(process.env.REACT_APP_SOCKET_URL, {
-            transportOptions: {
-                polling: {
-                    extraHeaders: {
-                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoic2NhZmZvbGRpbmciLCJpYXQiOjE2NTI3MTM5NDM3NTEsImV4cCI6MTY1MjgwMDM0M30.mtDmilzxz75sXwclDF_DuJ29dTT_ioV-CHZMdZpHhnM',
-                    },
-                },
-            },
-        });
+
+        // const socket = io(process.env.REACT_APP_SOCKET_URL, {
+        //     transportOptions: {
+        //         polling: {
+        //             extraHeaders: {
+        //                 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoic2NhZmZvbGRpbmciLCJpYXQiOjE2NTI3MTM5NDM3NTEsImV4cCI6MTY1MjgwMDM0M30.mtDmilzxz75sXwclDF_DuJ29dTT_ioV-CHZMdZpHhnM',
+        //             },
+        //         },
+        //     },
+        // });
         (async () => {
+            console.log('1')
             const WFSLayer = await loadModules(['esri/layers/WFSLayer']).then(
                 ([WFSLayer]) => WFSLayer,
             );
@@ -188,6 +190,7 @@ const ScffoldingPage = () => {
             var num = 1
             let latlng = await datademo.getDemodata();
             var arr = [...latlng]
+
             socket.on('test', (data) => {
                 console.log('test', data);
                 if (num != 1)
