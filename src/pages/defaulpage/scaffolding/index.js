@@ -59,7 +59,6 @@ const ScffoldingPage = () => {
     const [datamodal, setDatamodal] = useState(null);
     const dispatch = useDispatch();
     const datademo = new Demodata('scaffolding');
-    const [scffoldingList, setScffoldingList] = useState([])
 
     const columns = [
         {
@@ -137,11 +136,18 @@ const ScffoldingPage = () => {
         },
     ];
 
+    const scaffoldingicon = {
+        before_expire: '/assets/iconmap/scaffolding/before-expire.png',
+        broken: '/assets/iconmap/scaffolding/broken.png',
+        booking: '/assets/iconmap/scaffolding/booking.png',
+        expire: '/assets/iconmap/scaffolding/expire.png',
+        processing: '/assets/iconmap/scaffolding/processing.png',
+    };
+
     useEffect(() => {
         let isMounted = true;
         var loopdata;
         // const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
-        console.log('1', 1)
         const socket = io(process.env.REACT_APP_SOCKET_URL, {
             transportOptions: {
                 polling: {
@@ -185,47 +191,73 @@ const ScffoldingPage = () => {
             });
             stateMap?.add(layerpoi, 99);
 
-            var num = 1
+
+            /* temp */
             let latlng = await datademo.getDemodata();
-            var arr = [...latlng]
-            socket.on('test', (data) => {
-                console.log('test', data);
-                if (num != 1)
-                    data.forEach(e => {
-                        arr.push(e)
-                    });
-                // console.log('arr', arr)
-                Status_cal(arr);
-                setTabledata(arr);
+            Status_cal(latlng);
+            setTabledata(latlng);
+            stateView?.ui?.add(
+                ['divtable', document.querySelector('.ant-table-wrapper')],
+                'bottom-left',
+            );
+            // console.log('arr :>> ', arr);
+            layerpoi.removeAll();
+            latlng.map((data) => {
+                const point = {
+                    type: 'point', // autocasts as new Point()
+                    longitude: data.longitude,
+                    latitude: data.latitude,
+                };
+                const imageicon = {
+                    type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                    url: scaffoldingicon.booking,
+                    width: '35px',
+                    height: '35px',
+                };
+                const pointGraphic = new Graphic({
+                    geometry: point,
+                    symbol: imageicon,
+                    popupTemplate: {
+                        title: data.work_number,
+                        content: data.name,
+                    },
+                    id: 'poi',
+                    attributes: {
+                        name: 'poi',
+                    },
+                });
+                layerpoi.add(pointGraphic);
+            });
+
+            socket.on('scffolding', (data) => {
+                console.log('scffolding', data);
+                Status_cal(data);
+                setTabledata(data);
+
                 stateView?.ui?.add(
                     ['divtable', document.querySelector('.ant-table-wrapper')],
                     'bottom-left',
                 );
                 // console.log('arr :>> ', arr);
                 layerpoi.removeAll();
-                arr.map((data) => {
+                data.map((where) => {
                     const point = {
                         type: 'point', // autocasts as new Point()
-                        longitude: data.longitude,
-                        latitude: data.latitude,
+                        longitude: where.longitude,
+                        latitude: where.latitude,
                     };
-
-                    const markerSymbol = {
-                        type: 'simple-marker', // autocasts as new SimpleMarkerSymbol()
-                        color:
-                            data.status_work == 'warning' ? [255, 128, 0] : [226, 255, 40],
-                        outline: {
-                            color: [0, 0, 0],
-                            width: 1,
-                        },
-                        style: data.status_work == 'warning' ? 'triangle' : 'circle',
+                    const imageicon = {
+                        type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                        url: scaffoldingicon[`broken`],
+                        width: '35px',
+                        height: '35px',
                     };
                     const pointGraphic = new Graphic({
                         geometry: point,
-                        symbol: markerSymbol,
+                        symbol: imageicon,
                         popupTemplate: {
-                            title: data.work_number,
-                            content: data.name,
+                            title: where.work_number,
+                            content: where.name,
                         },
                         id: 'poi',
                         attributes: {
@@ -234,57 +266,7 @@ const ScffoldingPage = () => {
                     });
                     layerpoi.add(pointGraphic);
                 });
-                num++
             });
-
-
-
-
-            /*  socket.on("latlng", async (latlng) => {
-               Status_cal(latlng);
-               setTabledata(latlng);
-               stateView?.ui?.add(["divtable", document.querySelector('.ant-table-wrapper')], "bottom-left");
-               // console.log('latlng :>> ', latlng);
-               layerpoi.removeAll();
-               latlng.map((data) => {
-                 const point = {
-                   type: "point", // autocasts as new Point()
-                   longitude: data.longitude,
-                   latitude: data.latitude
-                 };
-                 const imageicon = {
-                   type: "picture-marker",  // autocasts as new PictureMarkerSymbol()
-                   url: "https://static.arcgis.com/images/Symbols/Shapes/BlackStarLargeB.png",
-                   width: "64px",
-                   height: "64px"
-                 }
-                 const markerSymbol = {
-                   type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-                   color: data.type == 'warning' ? [255, 128, 0] : [226, 255, 40],
-                   outline: {
-                     color: [0, 0, 0],
-                     width: 1
-                   },
-                   style: data.type == 'warning' ? 'triangle' : 'circle'
-                 };
-                 const pointGraphic = new Graphic({
-                   geometry: point,
-                   symbol: markerSymbol,
-                   popupTemplate: {
-                     title: data.fullName,
-                     content: data.phone
-                   },
-                   id: 'poi',
-                   attributes: {
-                     "name": "poi",
-                   }
-                 });
-                 layerpoi.add(pointGraphic);
-                 // view?.graphics?.addMany([pointGraphic]);
-               })
-             })
-        */
-
 
 
             //   loopdata = setInterval(async () => {
@@ -465,6 +447,21 @@ const ScffoldingPage = () => {
         setStateMap(map);
         setStateView(view);
     };
+
+    const onFinish = async (value) => {
+        try {
+            console.log('value', value)
+        } catch (error) {
+            console.log('error', error)
+        }
+    }
+
+    const onFinishFailed = (error) => {
+        console.log('error', error)
+    }
+
+
+
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
             <Map
@@ -513,6 +510,8 @@ const ScffoldingPage = () => {
                         labelCol={{ span: 9 }}
                         wrapperCol={{ span: 16 }}
                         name='nest-messages'
+                        onFinish={onFinish}
+                        onFinishFailed={onFinishFailed}
                     >
                         <Form.Item
                             name={['user', 'name']}
