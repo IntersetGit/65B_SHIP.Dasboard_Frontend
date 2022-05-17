@@ -15,7 +15,7 @@ import {
 import { Map, WebScene } from '@esri/react-arcgis';
 import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
 import './index.style.less';
-import io from 'socket.io-client';
+import socket from '../../../util/socket';
 import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
@@ -147,6 +147,7 @@ const ScffoldingPage = () => {
     useEffect(() => {
         let isMounted = true;
         var loopdata;
+
         // const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
         const socket = io(process.env.REACT_APP_SOCKET_URL, {
             transportOptions: {
@@ -158,6 +159,7 @@ const ScffoldingPage = () => {
             },
         });
         (async () => {
+            console.log('1')
             const WFSLayer = await loadModules(['esri/layers/WFSLayer']).then(
                 ([WFSLayer]) => WFSLayer,
             );
