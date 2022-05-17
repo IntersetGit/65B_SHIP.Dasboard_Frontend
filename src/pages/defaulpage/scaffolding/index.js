@@ -149,15 +149,15 @@ const ScffoldingPage = () => {
         var loopdata;
 
         // const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
-        const socket = io(process.env.REACT_APP_SOCKET_URL, {
-            transportOptions: {
-                polling: {
-                    extraHeaders: {
-                        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoic2NhZmZvbGRpbmciLCJpYXQiOjE2NTI3MTM5NDM3NTEsImV4cCI6MTY1MjgwMDM0M30.mtDmilzxz75sXwclDF_DuJ29dTT_ioV-CHZMdZpHhnM',
-                    },
-                },
-            },
-        });
+        // const socket = io(process.env.REACT_APP_SOCKET_URL, {
+        //     transportOptions: {
+        //         polling: {
+        //             extraHeaders: {
+        //                 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoic2NhZmZvbGRpbmciLCJpYXQiOjE2NTI3MTM5NDM3NTEsImV4cCI6MTY1MjgwMDM0M30.mtDmilzxz75sXwclDF_DuJ29dTT_ioV-CHZMdZpHhnM',
+        //             },
+        //         },
+        //     },
+        // });
         (async () => {
             console.log('1')
             const WFSLayer = await loadModules(['esri/layers/WFSLayer']).then(
