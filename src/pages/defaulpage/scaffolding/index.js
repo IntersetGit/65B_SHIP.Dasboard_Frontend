@@ -15,7 +15,8 @@ import {
 import { Map, WebScene } from '@esri/react-arcgis';
 import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
 import './index.style.less';
-import socket from '../../../util/socket';
+import io from 'socket.io-client';
+import socketClient from '../../../util/socket';
 import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
@@ -49,7 +50,7 @@ function tagRender(props) {
     );
 }
 
-const ScffoldingPage = () => {
+const ScaffoldingPage = () => {
     const [stateMap, setStateMap] = useState(null);
     const [stateView, setStateView] = useState(null);
     const refdrawn = useRef();
@@ -145,121 +146,97 @@ const ScffoldingPage = () => {
     };
 
     useEffect(() => {
-        let isMounted = true;
-        scaffoldingSocket()
-        return () => {
-            (isMounted = false), socket.disconnect();
-        };
+        const socketio = new socketClient();
+        const socket = socketio.io();
+        (async () => {
+
+            const WMSLayer = await loadModules(['esri/layers/WMSLayer']).then(
+                ([WMSLayer]) => WMSLayer,
+            );
+            const layer = new WMSLayer({
+                url: 'https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WMSServer?request=GetCapabilities&service=WMS',
+            });
+            layer.load().then(() => {
+                const names = layer.allSublayers
+                    .filter((sublayer) => !sublayer.sublayers) // Non-grouping layers will not have any "sublayers".
+                    .map((sublayer) => sublayer.name);
+                console.log('Names of all child sublayers', names.join());
+            });
+            stateMap?.add(layer);
+            CreateArea();
+
+            const { Graphic, GraphicsLayer } = await loadModules([
+                'esri/Graphic',
+                'esri/layers/GraphicsLayer',
+            ]).then(([Graphic, GraphicsLayer]) => {
+                return { Graphic, GraphicsLayer };
+            });
+
+            let layerpoi = new GraphicsLayer({
+                id: 'poi',
+            });
+            stateMap?.add(layerpoi, 99);
+
+
+            /* get Data */
+            let latlng = await datademo.getDemodata();
+            console.log('latlng =>>>>>>>>>>>>>>>>>', latlng)
+
+
+            socket.on("scaffolding", (res) => {
+
+                if (res.Status == "success") {
+
+                    const data = res.Message.data;
+                    const summary = res.Message.summary;
+
+                    console.log("data =>>>>>>>>>>>>>>>>>", data);
+                    console.log("summary =>>>>>>>>>>>>>>>>>", summary);
+
+                    // Status_cal(data);
+                    // setTabledata(data);
+
+                    // stateView?.ui?.add(
+                    //     ['divtable', document.querySelector('.ant-table-wrapper')],
+                    //     'bottom-left',
+                    // );
+
+                    // layerpoi.removeAll();
+                    // data.map((where) => {
+                    //     const point = {
+                    //         type: 'point', // autocasts as new Point()
+                    //         longitude: where.longitude,
+                    //         latitude: where.latitude,
+                    //     };
+                    //     const imageicon = {
+                    //         type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                    //         url: scaffoldingicon[`broken`],
+                    //         width: '35px',
+                    //         height: '35px',
+                    //     };
+                    //     const pointGraphic = new Graphic({
+                    //         geometry: point,
+                    //         symbol: imageicon,
+                    //         popupTemplate: {
+                    //             title: where.work_number,
+                    //             content: where.name,
+                    //         },
+                    //         id: 'poi',
+                    //         attributes: {
+                    //             name: 'poi',
+                    //         },
+                    //     });
+                    //     layerpoi.add(pointGraphic);
+                    // });
+
+                }
+            });
+
+        })();
+        return () => socket.disconnect();
     }, [stateMap, stateView]);
 
 
-    const scaffoldingSocket = async () => {
-        const WMSLayer = await loadModules(['esri/layers/WMSLayer']).then(
-            ([WMSLayer]) => WMSLayer,
-        );
-        const layer = new WMSLayer({
-            url: 'https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WMSServer?request=GetCapabilities&service=WMS',
-        });
-        layer.load().then(() => {
-            const names = layer.allSublayers
-                .filter((sublayer) => !sublayer.sublayers) // Non-grouping layers will not have any "sublayers".
-                .map((sublayer) => sublayer.name);
-            console.log('Names of all child sublayers', names.join());
-        });
-        stateMap?.add(layer);
-        CreateArea();
-
-        const { Graphic, GraphicsLayer } = await loadModules([
-            'esri/Graphic',
-            'esri/layers/GraphicsLayer',
-        ]).then(([Graphic, GraphicsLayer]) => {
-            return { Graphic, GraphicsLayer };
-        });
-
-        let layerpoi = new GraphicsLayer({
-            id: 'poi',
-        });
-        stateMap?.add(layerpoi, 99);
-
-
-        /* temp */
-        let latlng = await datademo.getDemodata();
-        Status_cal(latlng);
-        setTabledata(latlng);
-        stateView?.ui?.add(
-            ['divtable', document.querySelector('.ant-table-wrapper')],
-            'bottom-left',
-        );
-        // console.log('arr :>> ', arr);
-        layerpoi.removeAll();
-        latlng.map((data) => {
-            const point = {
-                type: 'point', // autocasts as new Point()
-                longitude: data.longitude,
-                latitude: data.latitude,
-            };
-            const imageicon = {
-                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                url: scaffoldingicon.booking,
-                width: '35px',
-                height: '35px',
-            };
-            const pointGraphic = new Graphic({
-                geometry: point,
-                symbol: imageicon,
-                popupTemplate: {
-                    title: data.work_number,
-                    content: data.name,
-                },
-                id: 'poi',
-                attributes: {
-                    name: 'poi',
-                },
-            });
-            layerpoi.add(pointGraphic);
-        });
-
-        socket.on('scffolding', (data) => {
-            console.log('scffolding', data);
-            Status_cal(data);
-            setTabledata(data);
-
-            stateView?.ui?.add(
-                ['divtable', document.querySelector('.ant-table-wrapper')],
-                'bottom-left',
-            );
-            // console.log('arr :>> ', arr);
-            layerpoi.removeAll();
-            data.map((where) => {
-                const point = {
-                    type: 'point', // autocasts as new Point()
-                    longitude: where.longitude,
-                    latitude: where.latitude,
-                };
-                const imageicon = {
-                    type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                    url: scaffoldingicon[`broken`],
-                    width: '35px',
-                    height: '35px',
-                };
-                const pointGraphic = new Graphic({
-                    geometry: point,
-                    symbol: imageicon,
-                    popupTemplate: {
-                        title: where.work_number,
-                        content: where.name,
-                    },
-                    id: 'poi',
-                    attributes: {
-                        name: 'poi',
-                    },
-                });
-                layerpoi.add(pointGraphic);
-            });
-        });
-
-
-    }
 
 
     loadModules([
@@ -583,4 +560,4 @@ const ScffoldingPage = () => {
     );
 };
 
-export default ScffoldingPage;
+export default ScaffoldingPage;
