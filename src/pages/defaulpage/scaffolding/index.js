@@ -15,7 +15,6 @@ import {
 import { Map, WebScene } from '@esri/react-arcgis';
 import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
 import './index.style.less';
-import io from 'socket.io-client';
 import socketClient from '../../../util/socket';
 import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
