@@ -146,73 +146,99 @@ const ScffoldingPage = () => {
 
     useEffect(() => {
         let isMounted = true;
-        var loopdata;
+        scaffoldingSocket()
+        return () => {
+            (isMounted = false), socket.disconnect();
+        };
+    }, [stateMap, stateView]);
 
-        // const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
-        // const socket = io(process.env.REACT_APP_SOCKET_URL, {
-        //     transportOptions: {
-        //         polling: {
-        //             extraHeaders: {
-        //                 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoic2NhZmZvbGRpbmciLCJpYXQiOjE2NTI3MTM5NDM3NTEsImV4cCI6MTY1MjgwMDM0M30.mtDmilzxz75sXwclDF_DuJ29dTT_ioV-CHZMdZpHhnM',
-        //             },
-        //         },
-        //     },
-        // });
-        (async () => {
-            console.log('1')
-            const WFSLayer = await loadModules(['esri/layers/WFSLayer']).then(
-                ([WFSLayer]) => WFSLayer,
-            );
-            const layer2 = new WFSLayer({
-                url: 'https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WFSServer?request=GetCapabilities&service=WFS',
-            });
-            const WMSLayer = await loadModules(['esri/layers/WMSLayer']).then(
-                ([WMSLayer]) => WMSLayer,
-            );
-            const layer = new WMSLayer({
-                url: 'https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WMSServer?request=GetCapabilities&service=WMS',
-            });
-            layer.load().then(() => {
-                const names = layer.allSublayers
-                    .filter((sublayer) => !sublayer.sublayers) // Non-grouping layers will not have any "sublayers".
-                    .map((sublayer) => sublayer.name);
-                console.log('Names of all child sublayers', names.join());
-            });
-            stateMap?.add(layer);
-            CreateArea();
 
-            const { Graphic, GraphicsLayer } = await loadModules([
-                'esri/Graphic',
-                'esri/layers/GraphicsLayer',
-            ]).then(([Graphic, GraphicsLayer]) => {
-                return { Graphic, GraphicsLayer };
-            });
+    const scaffoldingSocket = async () => {
+        const WMSLayer = await loadModules(['esri/layers/WMSLayer']).then(
+            ([WMSLayer]) => WMSLayer,
+        );
+        const layer = new WMSLayer({
+            url: 'https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WMSServer?request=GetCapabilities&service=WMS',
+        });
+        layer.load().then(() => {
+            const names = layer.allSublayers
+                .filter((sublayer) => !sublayer.sublayers) // Non-grouping layers will not have any "sublayers".
+                .map((sublayer) => sublayer.name);
+            console.log('Names of all child sublayers', names.join());
+        });
+        stateMap?.add(layer);
+        CreateArea();
 
-            let layerpoi = new GraphicsLayer({
+        const { Graphic, GraphicsLayer } = await loadModules([
+            'esri/Graphic',
+            'esri/layers/GraphicsLayer',
+        ]).then(([Graphic, GraphicsLayer]) => {
+            return { Graphic, GraphicsLayer };
+        });
+
+        let layerpoi = new GraphicsLayer({
+            id: 'poi',
+        });
+        stateMap?.add(layerpoi, 99);
+
+
+        /* temp */
+        let latlng = await datademo.getDemodata();
+        Status_cal(latlng);
+        setTabledata(latlng);
+        stateView?.ui?.add(
+            ['divtable', document.querySelector('.ant-table-wrapper')],
+            'bottom-left',
+        );
+        // console.log('arr :>> ', arr);
+        layerpoi.removeAll();
+        latlng.map((data) => {
+            const point = {
+                type: 'point', // autocasts as new Point()
+                longitude: data.longitude,
+                latitude: data.latitude,
+            };
+            const imageicon = {
+                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                url: scaffoldingicon.booking,
+                width: '35px',
+                height: '35px',
+            };
+            const pointGraphic = new Graphic({
+                geometry: point,
+                symbol: imageicon,
+                popupTemplate: {
+                    title: data.work_number,
+                    content: data.name,
+                },
                 id: 'poi',
+                attributes: {
+                    name: 'poi',
+                },
             });
-            stateMap?.add(layerpoi, 99);
+            layerpoi.add(pointGraphic);
+        });
 
+        socket.on('scffolding', (data) => {
+            console.log('scffolding', data);
+            Status_cal(data);
+            setTabledata(data);
 
-            /* temp */
-            let latlng = await datademo.getDemodata();
-            Status_cal(latlng);
-            setTabledata(latlng);
             stateView?.ui?.add(
                 ['divtable', document.querySelector('.ant-table-wrapper')],
                 'bottom-left',
             );
             // console.log('arr :>> ', arr);
             layerpoi.removeAll();
-            latlng.map((data) => {
+            data.map((where) => {
                 const point = {
                     type: 'point', // autocasts as new Point()
-                    longitude: data.longitude,
-                    latitude: data.latitude,
+                    longitude: where.longitude,
+                    latitude: where.latitude,
                 };
                 const imageicon = {
                     type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                    url: scaffoldingicon.booking,
+                    url: scaffoldingicon[`broken`],
                     width: '35px',
                     height: '35px',
                 };
@@ -220,8 +246,8 @@ const ScffoldingPage = () => {
                     geometry: point,
                     symbol: imageicon,
                     popupTemplate: {
-                        title: data.work_number,
-                        content: data.name,
+                        title: where.work_number,
+                        content: where.name,
                     },
                     id: 'poi',
                     attributes: {
@@ -230,98 +256,10 @@ const ScffoldingPage = () => {
                 });
                 layerpoi.add(pointGraphic);
             });
-
-            socket.on('scffolding', (data) => {
-                console.log('scffolding', data);
-                Status_cal(data);
-                setTabledata(data);
-
-                stateView?.ui?.add(
-                    ['divtable', document.querySelector('.ant-table-wrapper')],
-                    'bottom-left',
-                );
-                // console.log('arr :>> ', arr);
-                layerpoi.removeAll();
-                data.map((where) => {
-                    const point = {
-                        type: 'point', // autocasts as new Point()
-                        longitude: where.longitude,
-                        latitude: where.latitude,
-                    };
-                    const imageicon = {
-                        type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                        url: scaffoldingicon[`broken`],
-                        width: '35px',
-                        height: '35px',
-                    };
-                    const pointGraphic = new Graphic({
-                        geometry: point,
-                        symbol: imageicon,
-                        popupTemplate: {
-                            title: where.work_number,
-                            content: where.name,
-                        },
-                        id: 'poi',
-                        attributes: {
-                            name: 'poi',
-                        },
-                    });
-                    layerpoi.add(pointGraphic);
-                });
-            });
+        });
 
 
-            //   loopdata = setInterval(async () => {
-            //     let latlng = await datademo.getDemodata();
-            //     Status_cal(latlng);
-            //     setTabledata(latlng);
-            //     stateView?.ui?.add(
-            //       ['divtable', document.querySelector('.ant-table-wrapper')],
-            //       'bottom-left',
-            //     );
-            //     // console.log('latlng :>> ', latlng);
-            //     layerpoi.removeAll();
-            //     latlng.map((data) => {
-            //       const point = {
-            //         type: 'point', // autocasts as new Point()
-            //         longitude: data.longitude,
-            //         latitude: data.latitude,
-            //       };
-
-            //       const markerSymbol = {
-            //         type: 'simple-marker', // autocasts as new SimpleMarkerSymbol()
-            //         color:
-            //           data.status_work == 'warning' ? [255, 128, 0] : [226, 255, 40],
-            //         outline: {
-            //           color: [0, 0, 0],
-            //           width: 1,
-            //         },
-            //         style: data.status_work == 'warning' ? 'triangle' : 'circle',
-            //       };
-            //       const pointGraphic = new Graphic({
-            //         geometry: point,
-            //         symbol: markerSymbol,
-            //         popupTemplate: {
-            //           title: data.work_number,
-            //           content: data.name,
-            //         },
-            //         id: 'poi',
-            //         attributes: {
-            //           name: 'poi',
-            //         },
-            //       });
-            //       layerpoi.add(pointGraphic);
-            //     });
-            //   }, 5000);
-        })();
-        // return () => {
-        //   (isMounted = false), socket.disconnect(), clearInterval(loopdata);
-        // };
-        return () => {
-            (isMounted = false), socket.disconnect();
-        };
-    }, [stateMap, stateView]);
-
+    }
 
 
     loadModules([
