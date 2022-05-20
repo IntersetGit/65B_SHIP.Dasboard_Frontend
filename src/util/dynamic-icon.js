@@ -1,7 +1,10 @@
+function CreateIcon(color = "red", type = "none") {
 
-async function CreateIcon(color = "red", type = "warning") {
-
-    const drawer = new Promise(async (resolve, reject) => {
+    const drawer = new Promise((resolve, reject) => {
+        var element = document.getElementById("canvas");
+        if (element) {
+            element.remove();
+        }
         var canvas = document.createElement("canvas");
         canvas.id = "canvas";
         canvas.width = 300;
@@ -55,29 +58,31 @@ async function CreateIcon(color = "red", type = "warning") {
         };
         image.src = imgicon[type];
 
-        /*
-   ctx.beginPath();
-   ctx.globalCompositeOperation = ct[9];
-   ctx.fillStyle = "#FFF";
-   ctx.arc(200,60,50,0,2*Math.PI);
-   ctx.fill();   */
 
-        await ctx.beginPath();
+        // ctx.beginPath();
+        // ctx.globalCompositeOperation = ct[9];
+        // ctx.fillStyle = "#FFF";
+        // ctx.arc(200, 60, 50, 0, 2 * Math.PI);
+        // ctx.fill();
+
+        ctx.beginPath();
         ctx.globalCompositeOperation = ct[4];
         ctx.fillStyle = color;
-        await ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, 2 * Math.PI);
-        await ctx.fill();
+        ctx.strokeStyle = "#000000";
+        ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.stroke()
 
-        await ctx.beginPath();
-        ctx.globalCompositeOperation = ct[4];
-        await ctx.rect(0, 0, 300, 300);
-        ctx.fillStyle = "#000";
+        // ctx.beginPath();
+        // ctx.globalCompositeOperation = ct[4];
+        // ctx.rect(0, 0, 300, 300);
+        // ctx.fillStyle = "#000";
         // ctx.fill();
     });
 
     return drawer.then(async () => {
         var canvas = document.querySelector("#canvas");
-        var dataURL = await canvas.toDataURL("image/jpeg", 2.0);
+        var dataURL = await canvas.toDataURL("image/png", 2.0);
         return dataURL;
     });
 }
@@ -94,7 +99,6 @@ async function DownloadIcon(
     document.body.appendChild(a);
     a.click();
 }
-
 
 export {
     CreateIcon,

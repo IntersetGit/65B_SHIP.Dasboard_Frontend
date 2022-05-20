@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useRef, useCallback} from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   Table,
   Tag,
@@ -12,28 +12,30 @@ import {
   Col,
   Modal,
 } from 'antd';
-import {Map, WebScene} from '@esri/react-arcgis';
-import {setDefaultOptions, loadModules, loadCss} from 'esri-loader';
+import { Map, WebScene } from '@esri/react-arcgis';
+import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
 import './index.style.less';
 import io from 'socket.io-client';
 import DaraArea from './dataarea';
-import {useDispatch} from 'react-redux';
-import {setStatus} from '../../../redux/actions';
-import {object} from 'prop-types';
+import { useDispatch } from 'react-redux';
+import { setStatus } from '../../../redux/actions';
+import { object } from 'prop-types';
 import cars from '../../../../src/assets/iconmap/car/cars.png';
 import Demodata from '../../demodata';
-import WaGeojson from '../../../@crema/utility/WaGeojson';
+import WaGeojson from '../../../util/WaGeojson';
+import { CreateIcon } from '../../../util/dynamic-icon'
 
-setDefaultOptions({css: true});
+
+setDefaultOptions({ css: true });
 
 const options = [
-  {value: 'gold'},
-  {value: 'lime'},
-  {value: 'green'},
-  {value: 'cyan'},
+  { value: 'gold' },
+  { value: 'lime' },
+  { value: 'green' },
+  { value: 'cyan' },
 ];
 function tagRender(props) {
-  const {label, value, closable, onClose} = props;
+  const { label, value, closable, onClose } = props;
   const onPreventMouseDown = (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -44,7 +46,7 @@ function tagRender(props) {
       onMouseDown={onPreventMouseDown}
       closable={closable}
       onClose={onClose}
-      style={{marginRight: 3}}
+      style={{ marginRight: 3 }}
     >
       {label}
     </Tag>
@@ -153,10 +155,10 @@ const Page1 = () => {
       stateMap?.add(layer);
       CreateArea();
 
-      const {FeatureLayer, GeoJSONLayer} = await loadModules([
+      const { FeatureLayer, GeoJSONLayer } = await loadModules([
         'esri/layers/FeatureLayer',
         'esri/layers/GeoJSONLayer',
-      ]).then(([FeatureLayer, GeoJSONLayer]) => ({FeatureLayer, GeoJSONLayer}));
+      ]).then(([FeatureLayer, GeoJSONLayer]) => ({ FeatureLayer, GeoJSONLayer }));
 
       const clusterConfig = {
         type: "cluster",
@@ -198,6 +200,7 @@ const Page1 = () => {
       loopdata = setInterval(async () => {
         let latlng = await datademo.getDemodata();
         let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
+
         Status_cal(latlng);
         setTabledata(latlng);
         stateView?.ui?.add(
@@ -241,27 +244,21 @@ const Page1 = () => {
               {
                 value: 'open',
                 symbol: {
-                  type: 'simple-marker',
-                  size: 15,
-                  color: [226, 255, 40],
-                  outline: {
-                    color: '#000',
-                    width: 1,
-                  },
+                  type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                  url: await CreateIcon('#ff7c44','warning'),
+                  width: '35px',
+                  height: '35px',
                 },
               },
               {
                 value: 'close',
                 symbol: {
-                  type: 'simple-marker',
-                  size: 15,
-                  color: 'rgba(237, 15, 15, 0.5)',
-                  outline: {
-                    color: '#000',
-                    width: 1,
-                  },
-                }
-              }
+                  type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                  url: await CreateIcon('#4460ff','warningGas'),
+                  width: '35px',
+                  height: '35px',
+                },
+              },
             ]
 
 
@@ -287,12 +284,12 @@ const Page1 = () => {
   });
 
   const CreateArea = async () => {
-    const {Graphic, GraphicsLayer, Polygon} = await loadModules([
+    const { Graphic, GraphicsLayer, Polygon } = await loadModules([
       'esri/Graphic',
       'esri/layers/GraphicsLayer',
       'esri/geometry/Polygon',
     ]).then(([Graphic, GraphicsLayer, Polygon]) => {
-      return {Graphic, GraphicsLayer, Polygon};
+      return { Graphic, GraphicsLayer, Polygon };
     });
     for (const layer in DaraArea) {
       // DaraArea.map( async(layer) => {
@@ -340,19 +337,19 @@ const Page1 = () => {
     );
     // console.log('result :>> ', result);
     dispatch(
-      setStatus({...result, warning: warning.length, total: sum.length}),
+      setStatus({ ...result, warning: warning.length, total: sum.length }),
     );
   };
 
   const Onload = async (map, view) => {
-    const {Fullscreen, UI, Zoom, Expand, Extent} = await loadModules([
+    const { Fullscreen, UI, Zoom, Expand, Extent } = await loadModules([
       'esri/widgets/Fullscreen',
       'esri/views/ui/UI',
       'esri/widgets/Zoom',
       'esri/widgets/Expand',
       'esri/geometry/Extent',
     ]).then(([Fullscreen, UI, Zoom, Expand, Extent]) => {
-      return {Fullscreen, UI, Zoom, Expand, Extent};
+      return { Fullscreen, UI, Zoom, Expand, Extent };
     });
     const fullscreenui = new Fullscreen({
       view: view,
@@ -390,7 +387,7 @@ const Page1 = () => {
     view.watch('updating', function (val) {
       const ext = new Extent({
         type: 'extent',
-        spatialReference: {wkid: 4326},
+        spatialReference: { wkid: 4326 },
         xmax: 100.32800674438477,
         xmin: 100.30938148498534,
         ymax: 13.785986924617411,
@@ -402,7 +399,7 @@ const Page1 = () => {
     });
   };
   return (
-    <div style={{position: 'relative', width: '100%', height: '100%'}}>
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <Map
         className='Mapacrgis'
         onLoad={Onload}
@@ -420,7 +417,7 @@ const Page1 = () => {
         }}
         viewProperties={{
           center: [100.3330867, 14.5548052],
-          ui: {components: ['attribution', 'compass']},
+          ui: { components: ['attribution', 'compass'] },
         }}
       >
         <div id='button-top' className='button-topleft'>
@@ -429,9 +426,9 @@ const Page1 = () => {
             onClick={() => {
               if (
                 document.querySelector('.esri-ui-bottom-left').style.display ===
-                  'none' ||
+                'none' ||
                 document.querySelector('.esri-ui-bottom-left').style.display ===
-                  ''
+                ''
               ) {
                 document
                   .querySelector('.esri-ui-bottom-left')
@@ -450,28 +447,28 @@ const Page1 = () => {
           className='menuserchslide esri-widget'
         >
           <Form
-            labelCol={{span: 9}}
-            wrapperCol={{span: 16}}
+            labelCol={{ span: 9 }}
+            wrapperCol={{ span: 16 }}
             name='nest-messages'
           >
             <Form.Item
               name={['user', 'name']}
               label='วันเวลา เริ้มต้น'
-              rules={[{required: true}]}
+              rules={[{ required: true }]}
             >
               <Input size='small' />
             </Form.Item>
             <Form.Item
               name={['user', 'email']}
               label='วันเวลา สิ้นสุด'
-              rules={[{type: 'email'}]}
+              rules={[{ type: 'email' }]}
             >
               <Input size='small' />
             </Form.Item>
             <Form.Item
               name={['user', 'age']}
               label='สถานที่ปฎิบัติงาน'
-              rules={[{type: 'number', min: 0, max: 99}]}
+              rules={[{ type: 'number', min: 0, max: 99 }]}
             >
               <InputNumber size='small' />
             </Form.Item>
@@ -483,14 +480,14 @@ const Page1 = () => {
                 mode='multiple'
                 showArrow
                 tagRender={tagRender}
-                style={{width: '100%'}}
+                style={{ width: '100%' }}
                 options={options}
               />
             </Form.Item>
             <Form.Item name={['user', 'introduction']} label='Introduction'>
               <Input.TextArea size='ข้อเสนอแนะ' />
             </Form.Item>
-            <Form.Item wrapperCol={{span: 16, offset: 18}}>
+            <Form.Item wrapperCol={{ span: 16, offset: 18 }}>
               <Button type='primary' htmlType='submit'>
                 ค้นหา
               </Button>
@@ -548,11 +545,11 @@ const Page1 = () => {
         </div>
         <Table
           id='divtable'
-          scroll={{y: '25vh'}}
+          scroll={{ y: '25vh' }}
           size='small'
           rowClassName={(record, index) =>
             record?.status_warnning !== null &&
-            record?.status_warnning !== undefined
+              record?.status_warnning !== undefined
               ? 'table-row-red'
               : ''
           }
@@ -566,7 +563,7 @@ const Page1 = () => {
 
       <Modal
         title='รายละเอียด'
-        okButtonProps={{hidden: true}}
+        okButtonProps={{ hidden: true }}
         onCancel={() => setIsModalVisible(!isModalVisible)}
         visible={isModalVisible}
       >
