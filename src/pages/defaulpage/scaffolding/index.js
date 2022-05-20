@@ -15,7 +15,7 @@ import {
 import { Map, WebScene } from '@esri/react-arcgis';
 import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
 import './index.style.less';
-import socket from '../../../util/socket';
+import socketClient from '../../../util/socket';
 import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
@@ -49,7 +49,7 @@ function tagRender(props) {
     );
 }
 
-const ScffoldingPage = () => {
+const ScaffoldingPage = () => {
     const [stateMap, setStateMap] = useState(null);
     const [stateView, setStateView] = useState(null);
     const refdrawn = useRef();
@@ -145,27 +145,10 @@ const ScffoldingPage = () => {
     };
 
     useEffect(() => {
-        let isMounted = true;
-        var loopdata;
-
-        // const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
-        // const socket = io(process.env.REACT_APP_SOCKET_URL, {
-        //     transportOptions: {
-        //         polling: {
-        //             extraHeaders: {
-        //                 'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoic2NhZmZvbGRpbmciLCJpYXQiOjE2NTI3MTM5NDM3NTEsImV4cCI6MTY1MjgwMDM0M30.mtDmilzxz75sXwclDF_DuJ29dTT_ioV-CHZMdZpHhnM',
-        //             },
-        //         },
-        //     },
-        // });
+        const socketio = new socketClient();
+        const socket = socketio.io();
         (async () => {
-            console.log('1')
-            const WFSLayer = await loadModules(['esri/layers/WFSLayer']).then(
-                ([WFSLayer]) => WFSLayer,
-            );
-            const layer2 = new WFSLayer({
-                url: 'https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WFSServer?request=GetCapabilities&service=WFS',
-            });
+
             const WMSLayer = await loadModules(['esri/layers/WMSLayer']).then(
                 ([WMSLayer]) => WMSLayer,
             );
@@ -194,133 +177,64 @@ const ScffoldingPage = () => {
             stateMap?.add(layerpoi, 99);
 
 
-            /* temp */
+            /* get Data */
             let latlng = await datademo.getDemodata();
-            Status_cal(latlng);
-            setTabledata(latlng);
-            stateView?.ui?.add(
-                ['divtable', document.querySelector('.ant-table-wrapper')],
-                'bottom-left',
-            );
-            // console.log('arr :>> ', arr);
-            layerpoi.removeAll();
-            latlng.map((data) => {
-                const point = {
-                    type: 'point', // autocasts as new Point()
-                    longitude: data.longitude,
-                    latitude: data.latitude,
-                };
-                const imageicon = {
-                    type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                    url: scaffoldingicon.booking,
-                    width: '35px',
-                    height: '35px',
-                };
-                const pointGraphic = new Graphic({
-                    geometry: point,
-                    symbol: imageicon,
-                    popupTemplate: {
-                        title: data.work_number,
-                        content: data.name,
-                    },
-                    id: 'poi',
-                    attributes: {
-                        name: 'poi',
-                    },
-                });
-                layerpoi.add(pointGraphic);
+            console.log('latlng =>>>>>>>>>>>>>>>>>', latlng)
+
+
+            socket.on("scaffolding", (res) => {
+
+                if (res.Status == "success") {
+
+                    const data = res.Message.data;
+                    const summary = res.Message.summary;
+
+                    console.log("data =>>>>>>>>>>>>>>>>>", data);
+                    console.log("summary =>>>>>>>>>>>>>>>>>", summary);
+
+                    // Status_cal(data);
+                    // setTabledata(data);
+
+                    // stateView?.ui?.add(
+                    //     ['divtable', document.querySelector('.ant-table-wrapper')],
+                    //     'bottom-left',
+                    // );
+
+                    // layerpoi.removeAll();
+                    // data.map((where) => {
+                    //     const point = {
+                    //         type: 'point', // autocasts as new Point()
+                    //         longitude: where.longitude,
+                    //         latitude: where.latitude,
+                    //     };
+                    //     const imageicon = {
+                    //         type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                    //         url: scaffoldingicon[`broken`],
+                    //         width: '35px',
+                    //         height: '35px',
+                    //     };
+                    //     const pointGraphic = new Graphic({
+                    //         geometry: point,
+                    //         symbol: imageicon,
+                    //         popupTemplate: {
+                    //             title: where.work_number,
+                    //             content: where.name,
+                    //         },
+                    //         id: 'poi',
+                    //         attributes: {
+                    //             name: 'poi',
+                    //         },
+                    //     });
+                    //     layerpoi.add(pointGraphic);
+                    // });
+
+                }
             });
 
-            socket.on('scffolding', (data) => {
-                console.log('scffolding', data);
-                Status_cal(data);
-                setTabledata(data);
-
-                stateView?.ui?.add(
-                    ['divtable', document.querySelector('.ant-table-wrapper')],
-                    'bottom-left',
-                );
-                // console.log('arr :>> ', arr);
-                layerpoi.removeAll();
-                data.map((where) => {
-                    const point = {
-                        type: 'point', // autocasts as new Point()
-                        longitude: where.longitude,
-                        latitude: where.latitude,
-                    };
-                    const imageicon = {
-                        type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                        url: scaffoldingicon[`broken`],
-                        width: '35px',
-                        height: '35px',
-                    };
-                    const pointGraphic = new Graphic({
-                        geometry: point,
-                        symbol: imageicon,
-                        popupTemplate: {
-                            title: where.work_number,
-                            content: where.name,
-                        },
-                        id: 'poi',
-                        attributes: {
-                            name: 'poi',
-                        },
-                    });
-                    layerpoi.add(pointGraphic);
-                });
-            });
-
-
-            //   loopdata = setInterval(async () => {
-            //     let latlng = await datademo.getDemodata();
-            //     Status_cal(latlng);
-            //     setTabledata(latlng);
-            //     stateView?.ui?.add(
-            //       ['divtable', document.querySelector('.ant-table-wrapper')],
-            //       'bottom-left',
-            //     );
-            //     // console.log('latlng :>> ', latlng);
-            //     layerpoi.removeAll();
-            //     latlng.map((data) => {
-            //       const point = {
-            //         type: 'point', // autocasts as new Point()
-            //         longitude: data.longitude,
-            //         latitude: data.latitude,
-            //       };
-
-            //       const markerSymbol = {
-            //         type: 'simple-marker', // autocasts as new SimpleMarkerSymbol()
-            //         color:
-            //           data.status_work == 'warning' ? [255, 128, 0] : [226, 255, 40],
-            //         outline: {
-            //           color: [0, 0, 0],
-            //           width: 1,
-            //         },
-            //         style: data.status_work == 'warning' ? 'triangle' : 'circle',
-            //       };
-            //       const pointGraphic = new Graphic({
-            //         geometry: point,
-            //         symbol: markerSymbol,
-            //         popupTemplate: {
-            //           title: data.work_number,
-            //           content: data.name,
-            //         },
-            //         id: 'poi',
-            //         attributes: {
-            //           name: 'poi',
-            //         },
-            //       });
-            //       layerpoi.add(pointGraphic);
-            //     });
-            //   }, 5000);
         })();
-        // return () => {
-        //   (isMounted = false), socket.disconnect(), clearInterval(loopdata);
-        // };
-        return () => {
-            (isMounted = false), socket.disconnect();
-        };
+        return () => socket.disconnect();
     }, [stateMap, stateView]);
+
 
 
 
@@ -645,4 +559,4 @@ const ScffoldingPage = () => {
     );
 };
 
-export default ScffoldingPage;
+export default ScaffoldingPage;

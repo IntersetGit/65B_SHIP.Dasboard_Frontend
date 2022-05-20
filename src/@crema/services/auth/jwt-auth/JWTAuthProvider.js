@@ -39,22 +39,19 @@ const JWTAuthAuthProvider = ({ children }) => {
         return;
       }
       setAuthToken(token);
-      jwtAxios
-        .get('/auth')
-        .then(({ data }) =>
-          setJWTAuthData({
-            user: data,
-            isLoading: false,
-            isAuthenticated: true,
-          }),
-        )
-        .catch(() =>
-          setJWTAuthData({
-            user: undefined,
-            isLoading: false,
-            isAuthenticated: false,
-          }),
-        );
+      Api.get('/auth/mydata').then((res) =>
+        setJWTAuthData({
+          user: res.data.Message,
+          isLoading: false,
+          isAuthenticated: true,
+        }),
+      ).catch(() =>
+        setJWTAuthData({
+          user: undefined,
+          isLoading: false,
+          isAuthenticated: false,
+        }),
+      );
     };
 
     getAuthUser();
@@ -76,10 +73,20 @@ const JWTAuthAuthProvider = ({ children }) => {
         setAuthToken(access_token);
 
         /* mydata */
-        // const res = await jwtAxios.get('/auth');
-        // console.log('res.data', res.data)
-        setJWTAuthData({ user: data.Message, isAuthenticated: true, isLoading: false });
-        dispatch({ type: FETCH_SUCCESS });
+        const res = await Api.get('/auth/mydata');
+        console.log('res.data', res.data)
+        if (res.data.Status == "success") {
+          setJWTAuthData({ user: res.data.Message, isAuthenticated: true, isLoading: false });
+          dispatch({ type: FETCH_SUCCESS });
+        } else {
+          setJWTAuthData({
+            ...firebaseData,
+            isAuthenticated: false,
+            isLoading: false,
+          });
+          dispatch({ type: FETCH_ERROR, payload: res.data.Message });
+        }
+
       } else {
         setJWTAuthData({
           ...firebaseData,
