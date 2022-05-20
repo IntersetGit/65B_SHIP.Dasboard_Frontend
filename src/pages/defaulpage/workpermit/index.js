@@ -186,7 +186,7 @@ const Page1 = () => {
             },
             symbol: {
               type: 'text',
-              color: '#004a5d',
+              color: '#ffffff',
               font: {
                 weight: 'bold',
                 family: 'Noto Sans',
@@ -216,8 +216,8 @@ const Page1 = () => {
           field: 'status_work',
           featureReduction: clusterConfig,
           popupTemplate: {
-            title: 'Magnitude {name}',
-            content: 'Magnitude {name}',
+            title: 'name {name}',
+            content: 'name {name}',
             fieldInfos: [
               {
                 fieldName: 'time',
@@ -254,7 +254,7 @@ const Page1 = () => {
                 value: 'close',
                 symbol: {
                   type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                  url: await CreateIcon('#4460ff','warningGas'),
+                  url: await CreateIcon('#4460ff',false,2),
                   width: '35px',
                   height: '35px',
                 },

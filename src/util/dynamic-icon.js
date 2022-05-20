@@ -1,5 +1,4 @@
-function CreateIcon(color = "red", type = "none") {
-
+function CreateIcon(color = "red", type = false, isdraw = 1) {
     const drawer = new Promise((resolve, reject) => {
         var element = document.getElementById("canvas");
         if (element) {
@@ -13,6 +12,7 @@ function CreateIcon(color = "red", type = "none") {
         body.appendChild(canvas);
         var ctx = canvas.getContext("2d");
         var imgicon = {
+            none: '',
             warning:
                 "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png",
             warningGas:
@@ -36,29 +36,30 @@ function CreateIcon(color = "red", type = "none") {
             "copy", // 10
             "xor" // 11
         ];
+        if (type) {
+            const image = new Image();
 
-        const image = new Image();
-
-        image.crossOrigin = "anonymous";
-        image.onload = async () => {
-            await ctx.save();
-            await ctx.beginPath();
-            ctx.globalCompositeOperation = ct[0];
-            ctx.fillStyle = "#FFF";
-            /* ctx.arc(150, 150, 130, 0, Math.PI * 2, false) */
-            await ctx.arc(200, 60, 100 /*50*/, 0, 2 * Math.PI);
-            ctx.strokeStyle = "#FFF";
-            //ctx.stroke()
-            await ctx.clip();
-            //ctx.fill();
-            /* ctx.drawImage(image, 50, -50,300,300) */
-            await ctx.drawImage(image, canvas.width / 2, 0, 100, 110);
-            // ctx.restore();
+            image.crossOrigin = "anonymous";
+            image.onload = async () => {
+                await ctx.save();
+                await ctx.beginPath();
+                ctx.globalCompositeOperation = ct[0];
+                ctx.fillStyle = "#FFF";
+                /* ctx.arc(150, 150, 130, 0, Math.PI * 2, false) */
+                await ctx.arc(200, 60, 100 /*50*/, 0, 2 * Math.PI);
+                ctx.strokeStyle = "#FFF";
+                //ctx.stroke()
+                await ctx.clip();
+                //ctx.fill();
+                /* ctx.drawImage(image, 50, -50,300,300) */
+                await ctx.drawImage(image, canvas.width / 2, 0, 100, 110);
+                // ctx.restore();
+                resolve();
+            };
+            image.src = imgicon[type];
+        } else {
             resolve();
-        };
-        image.src = imgicon[type];
-
-
+        }
         // ctx.beginPath();
         // ctx.globalCompositeOperation = ct[9];
         // ctx.fillStyle = "#FFF";
@@ -69,9 +70,14 @@ function CreateIcon(color = "red", type = "none") {
         ctx.globalCompositeOperation = ct[4];
         ctx.fillStyle = color;
         ctx.strokeStyle = "#000000";
-        ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, 2 * Math.PI);
+        if (isdraw == 1) {
+            ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, 2 * Math.PI);
+        } else {
+            ctx.fillRect(20, 20, canvas.width / 1.5, canvas.height / 1.5);
+            ctx.strokeRect(19, 19, canvas.width / 1.49, canvas.height / 1.49);
+        }
         ctx.fill();
-        ctx.stroke()
+        ctx.stroke();
 
         // ctx.beginPath();
         // ctx.globalCompositeOperation = ct[4];
