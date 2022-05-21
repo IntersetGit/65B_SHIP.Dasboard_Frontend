@@ -11,6 +11,7 @@ import {
     Row,
     Col,
     Modal,
+    Drawer
 } from 'antd';
 import { Map, WebScene } from '@esri/react-arcgis';
 import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
@@ -21,6 +22,9 @@ import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
 import { object } from 'prop-types';
 import Demodata from '../../demodata';
+import API from '../../../util/Api'
+import { isArray } from 'lodash';
+import moment from 'moment';
 
 setDefaultOptions({ css: true });
 
@@ -71,6 +75,7 @@ const ScaffoldingPage = () => {
             title: 'name',
             dataIndex: 'name',
             key: 'name',
+
         },
         {
             title: 'licensor',
@@ -86,25 +91,11 @@ const ScaffoldingPage = () => {
             title: 'workmit_type',
             key: 'workmit_type',
             dataIndex: 'workmit_type',
-            render: (tags) => (
-                <>
-                    <Tag color={'blue'} key={tags}>
-                        {tags.toUpperCase()}
-                    </Tag>
-                </>
-            ),
         },
         {
             title: 'scaffolding_type',
             key: 'scaffolding_type',
             dataIndex: 'scaffolding_type',
-            render: (tags) => (
-                <>
-                    <Tag color={'green'} key={tags}>
-                        {tags.toUpperCase()}
-                    </Tag>
-                </>
-            ),
         },
         {
             title: 'date_time_start',
@@ -136,6 +127,91 @@ const ScaffoldingPage = () => {
         },
     ];
 
+    const columns2 = [
+        {
+            title: 'เลข work',
+            dataIndex: 'WorkPermitNo',
+            key: 'WorkPermitNo',
+            render: (text) => <a>{text}</a>,
+            width: 150
+        },
+        {
+            title: 'ผู้รับเหมา',
+            dataIndex: 'VendorName',
+            key: 'VendorName',
+            width: 250
+
+        },
+        {
+            title: 'เจ้าของพื้นที่',
+            dataIndex: 'OwnerName',
+            key: 'OwnerName',
+            width: 200
+        },
+        {
+            title: 'ผู้ควบคุมงาน',
+            dataIndex: 'PTTStaff',
+            key: 'PTTStaff',
+            width: 200
+        },
+        {
+            title: 'ประเภทใบอนุญาต',
+            key: 'WorkpermitType',
+            dataIndex: 'WorkpermitType',
+            width: 150
+        },
+        {
+            title: 'สถานที่ติดตั้ง',
+            key: 'AreaName',
+            dataIndex: 'AreaName',
+            width: 150
+        },
+        {
+            title: 'วัน-เวลา เริ่มต้น',
+            dataIndex: 'date_time_start',
+            key: 'date_time_start',
+            width: 200
+        },
+        {
+            title: 'วัน-เวลา สิ้นสุด',
+            dataIndex: 'date_time_end',
+            key: 'date_time_end',
+            width: 200
+        },
+        {
+            title: 'สถานะ work',
+            dataIndex: 'WorkPermitStatus',
+            key: 'WorkPermitStatus',
+            width: 150
+        },
+        {
+            title: 'สถานะแจ้งเตือน',
+            dataIndex: 'WarningStatus',
+            key: 'WarningStatus',
+            width: 150
+        },
+        {
+            title: '...',
+            key: '',
+            width: 100,
+            render: (text, record) => {
+                return (
+                    <Space size='middle'>
+                        <Button
+                            type='primary'
+                            onClick={() => {
+                                setDatamodal(record), setIsModalVisible(!isModalVisible);
+                            }}
+                        >
+                            Detail
+                        </Button>
+                    </Space>
+                );
+            },
+        },
+    ];
+
+
     const scaffoldingicon = {
         before_expire: '/assets/iconmap/scaffolding/before-expire.png',
         broken: '/assets/iconmap/scaffolding/broken.png',
@@ -143,98 +219,188 @@ const ScaffoldingPage = () => {
         expire: '/assets/iconmap/scaffolding/expire.png',
         processing: '/assets/iconmap/scaffolding/processing.png',
     };
-
     useEffect(() => {
-        const socketio = new socketClient();
-        const socket = socketio.io();
-        (async () => {
+        if (stateMap && stateView) {
+            const socketio = new socketClient();
+            const socket = socketio.io();
+            (async () => {
 
-            const WMSLayer = await loadModules(['esri/layers/WMSLayer']).then(
-                ([WMSLayer]) => WMSLayer,
-            );
-            const layer = new WMSLayer({
-                url: 'https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WMSServer?request=GetCapabilities&service=WMS',
-            });
-            layer.load().then(() => {
-                const names = layer.allSublayers
-                    .filter((sublayer) => !sublayer.sublayers) // Non-grouping layers will not have any "sublayers".
-                    .map((sublayer) => sublayer.name);
-                console.log('Names of all child sublayers', names.join());
-            });
-            stateMap?.add(layer);
-            CreateArea();
+                const WMSLayer = await loadModules(['esri/layers/WMSLayer']).then(
+                    ([WMSLayer]) => WMSLayer,
+                );
+                const layer = new WMSLayer({
+                    url: 'https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WMSServer?request=GetCapabilities&service=WMS',
+                });
+                layer.load().then(() => {
+                    const names = layer.allSublayers
+                        .filter((sublayer) => !sublayer.sublayers) // Non-grouping layers will not have any "sublayers".
+                        .map((sublayer) => sublayer.name);
+                    console.log('Names of all child sublayers', names.join());
+                });
+                stateMap?.add(layer);
+                CreateArea();
 
-            const { Graphic, GraphicsLayer } = await loadModules([
-                'esri/Graphic',
-                'esri/layers/GraphicsLayer',
-            ]).then(([Graphic, GraphicsLayer]) => {
-                return { Graphic, GraphicsLayer };
-            });
+                const { Graphic, GraphicsLayer } = await loadModules([
+                    'esri/Graphic',
+                    'esri/layers/GraphicsLayer',
+                ]).then(([Graphic, GraphicsLayer]) => {
+                    return { Graphic, GraphicsLayer };
+                });
 
-            let layerpoi = new GraphicsLayer({
-                id: 'poi',
-            });
-            stateMap?.add(layerpoi, 99);
-
-
-            /* get Data */
-            let latlng = await datademo.getDemodata();
-            console.log('latlng =>>>>>>>>>>>>>>>>>', latlng)
+                let layerpoi = new GraphicsLayer({
+                    id: 'poi',
+                });
+                stateMap?.add(layerpoi, 99);
 
 
-            socket.on("scaffolding", (res) => {
+                /* get Data */
 
-                if (res.Status == "success") {
+                // socket.emit("scaffolding")
 
-                    const data = res.Message.data;
-                    const summary = res.Message.summary;
+                const resSf = await getScaffolding({});
+                setMap(resSf)
 
-                    console.log("data =>>>>>>>>>>>>>>>>>", data);
-                    console.log("summary =>>>>>>>>>>>>>>>>>", summary);
 
-                    // Status_cal(data);
-                    // setTabledata(data);
+                socket.on("scaffolding", (res) => {
 
-                    // stateView?.ui?.add(
-                    //     ['divtable', document.querySelector('.ant-table-wrapper')],
-                    //     'bottom-left',
-                    // );
+                    if (res.Status == "success") {
+                        setMap(res.Message)
+                    }
+                });
 
-                    // layerpoi.removeAll();
-                    // data.map((where) => {
-                    //     const point = {
-                    //         type: 'point', // autocasts as new Point()
-                    //         longitude: where.longitude,
-                    //         latitude: where.latitude,
-                    //     };
-                    //     const imageicon = {
-                    //         type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                    //         url: scaffoldingicon[`broken`],
-                    //         width: '35px',
-                    //         height: '35px',
-                    //     };
-                    //     const pointGraphic = new Graphic({
-                    //         geometry: point,
-                    //         symbol: imageicon,
-                    //         popupTemplate: {
-                    //             title: where.work_number,
-                    //             content: where.name,
-                    //         },
-                    //         id: 'poi',
-                    //         attributes: {
-                    //             name: 'poi',
-                    //         },
-                    //     });
-                    //     layerpoi.add(pointGraphic);
-                    // });
+                async function setMap(item) {
+                    const _data = item.data;
+                    const _summary = item.summary;
 
+                    // console.log("data =>>>>>>>>>>>>>>>>>", _data);
+                    // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
+
+
+                    _data.forEach(obj => {
+
+                        obj.date_time_end = moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss")
+                        obj.date_time_start = moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss")
+                        obj.id = obj._id
+                        obj.latitude = obj.FeaturesPropertiesCentroid_X
+                        obj.longitude = obj.FeaturesPropertiesCentroid_Y
+                        obj.work_number = obj.WorkName
+                        obj.name = obj.WorkName
+                        obj.status_warnning = null
+                        obj.scaffolding_type = "นั่งร้านแบบเคลื่อนที่ได้"
+
+                    })
+
+                    const data = await datademo.getDemodata();
+                    console.log('data', data)
+                    console.log('_data', _data)
+
+                    /* Set Dedux */
+                    Status_cal(_data);
+
+                    /* Set Table */
+                    setTabledata(_data);
+
+                    /* ------------------ set map ------------------ */
+                    stateView?.ui?.add(
+                        ['divtable', document.querySelector('.ant-table-wrapper')],
+                        'bottom-left',
+                    );
+
+                    layerpoi.removeAll();
+                    _data.map((where) => {
+                        const point = {
+                            type: 'point', // autocasts as new Point()
+                            longitude: where.longitude,
+                            latitude: where.latitude,
+                        };
+                        const imageicon = {
+                            type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                            url: scaffoldingicon[`broken`],
+                            width: '35px',
+                            height: '35px',
+                        };
+                        const clusterConfig = {
+                            type: "cluster",
+                            clusterRadius: "20px",
+                            popupTemplate: {
+                                title: 'Cluster summary',
+                                content: 'This cluster represents {cluster_count} earthquakes.',
+                                fieldInfos: [
+                                    {
+                                        fieldName: 'cluster_count',
+                                        format: {
+                                            places: 0,
+                                            digitSeparator: true,
+                                        },
+                                    },
+                                ],
+                            },
+                            clusterMinSize: "40px",
+                            clusterMaxSize: "60px",
+                            labelingInfo: [
+                                {
+                                    deconflictionStrategy: 'none',
+                                    labelExpressionInfo: {
+                                        expression: "Text($feature.cluster_count, '#,###')",
+                                    },
+                                    symbol: {
+                                        type: 'text',
+                                        color: '#004a5d',
+                                        font: {
+                                            weight: 'bold',
+                                            family: 'Noto Sans',
+                                            size: '12px',
+                                        },
+                                    },
+                                    labelPlacement: 'center-center',
+                                },
+                            ],
+                        };
+                        const pointGraphic = new Graphic({
+                            geometry: point,
+                            symbol: imageicon,
+                            popupTemplate: {
+                                title: where.work_number,
+                                content: where.name,
+                            },
+                            featureReduction: clusterConfig,
+                            id: 'poi',
+                            attributes: {
+                                name: 'poi',
+                            },
+                        });
+                        layerpoi.add(pointGraphic);
+                    });
                 }
-            });
 
-        })();
-        return () => socket.disconnect();
+            })();
+            return () => socket.disconnect();
+        }
     }, [stateMap, stateView]);
 
+
+    const getScaffolding = async (item) => {
+        let url = `/scaffolding/all?`;
+        if (item.PTTStaffCode) url += `&PTTStaffCode=${item.PTTStaffCode}`;
+        if (item.VendorCode) url += `&VendorCode=${item.VendorCode}`;
+        if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
+        if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
+        if (item.AreaID) url += `&AreaID=${item.AreaID}`;
+        if (isArray(item.ScaffoldingType)) {
+            item.ScaffoldingType.forEach(e => {
+                url += `&ScaffoldingType=${e}`;
+            });
+        }
+        const { data } = await API.get(url);
+        return data.Status === 'success' ? data.Message : {
+            data: [],
+            summary: {
+                all: 0,
+                expire: 0,
+                near_expire: 0,
+            }
+        }
+    }
 
 
 
@@ -376,7 +542,7 @@ const ScaffoldingPage = () => {
         console.log('error', error)
     }
 
-
+    const [visible, setVisible] = useState(false);
 
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -400,20 +566,25 @@ const ScaffoldingPage = () => {
                     <div
                         className='esri-widget--button esri-icon-table'
                         onClick={() => {
-                            if (
-                                document.querySelector('.esri-ui-bottom-left').style.display ===
-                                'none' ||
-                                document.querySelector('.esri-ui-bottom-left').style.display ===
-                                ''
-                            ) {
-                                document
-                                    .querySelector('.esri-ui-bottom-left')
-                                    .style.setProperty('display', 'block', 'important');
-                            } else {
-                                document
-                                    .querySelector('.esri-ui-bottom-left')
-                                    .style.setProperty('display', 'none', 'important');
-                            }
+                            // if (
+                            //     document.querySelector('.esri-ui-bottom-left').style.display ===
+                            //     'none' ||
+                            //     document.querySelector('.esri-ui-bottom-left').style.display ===
+                            //     ''
+                            // ) {
+                            //     document
+                            //         .querySelector('.esri-ui-bottom-left')
+                            //         .style.setProperty('display', 'block', 'important');
+                            //     document
+                            //         .querySelector('.esri-ui-bottom-left')
+                            //         .style.setProperty('min-width', '98vw', 'important');
+                            // } else {
+                            //     document
+                            //         .querySelector('.esri-ui-bottom-left')
+                            //         .style.setProperty('display', 'none', 'important');
+                            // }
+
+                            setVisible(true)
                         }}
                     />
                 </div>
@@ -523,7 +694,7 @@ const ScaffoldingPage = () => {
                 </div>
                 <Table
                     id='divtable'
-                    scroll={{ y: '25vh' }}
+                    scroll={{ y: '25vh', x: "100%" }}
                     size='small'
                     rowClassName={(record, index) =>
                         record?.status_warnning !== null &&
@@ -544,6 +715,10 @@ const ScaffoldingPage = () => {
                 okButtonProps={{ hidden: true }}
                 onCancel={() => setIsModalVisible(!isModalVisible)}
                 visible={isModalVisible}
+                bodyStyle={{
+                    maxHeight: "60vh",
+                    overflowX: "auto"
+                }}
             >
                 {datamodal &&
                     Object.entries(datamodal).map(([key, value]) => (
@@ -555,6 +730,17 @@ const ScaffoldingPage = () => {
                         </Row>
                     ))}
             </Modal>
+
+            <Drawer
+                id='divtable'
+                title={false}
+                placement={"bottom"}
+                // closable={false}
+                onClose={() => setVisible(false)}
+                visible={visible}
+            >
+                <Table size='small' dataSource={tabledata} columns={columns2} rowKey={(row) => row.id} scroll={{ x: "100%", y: "30vh" }} />
+            </Drawer>
         </div>
     );
 };
