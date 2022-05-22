@@ -16,20 +16,17 @@ import {
 import { Map, WebScene } from '@esri/react-arcgis';
 import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
 import './index.style.less';
-import io from 'socket.io-client';
 import socketClient from '../../../util/socket';
 import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
-import moment, { isMoment } from 'moment';
+import { object } from 'prop-types';
 import Demodata from '../../demodata';
-import WaGeojson from '../../../util/WaGeojson';
-import { CreateIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
 import { isArray } from 'lodash';
+import moment, { isMoment } from 'moment';
 
 setDefaultOptions({ css: true });
-
 
 const ScaffoldingPage = () => {
     const [stateMap, setStateMap] = useState(null);
@@ -40,76 +37,54 @@ const ScaffoldingPage = () => {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [datamodal, setDatamodal] = useState(null);
     const dispatch = useDispatch();
-    const datademo = new Demodata('workpermit');
-    const Geojson = new WaGeojson();
+    const datademo = new Demodata('scaffolding');
 
     const columns = [
         {
-            title: 'เลข work',
-            dataIndex: 'WorkPermitNo',
-            key: 'WorkPermitNo',
+            title: 'work_number',
+            dataIndex: 'work_number',
+            key: 'work_number',
             render: (text) => <a>{text}</a>,
+        },
+        {
+            title: 'name',
+            dataIndex: 'name',
+            key: 'name',
 
         },
         {
-            title: 'ผู้รับเหมา',
-            dataIndex: 'VendorName',
-            key: 'VendorName',
-
-
+            title: 'licensor',
+            dataIndex: 'licensor',
+            key: 'licensor',
         },
         {
-            title: 'เจ้าของพื้นที่',
-            dataIndex: 'OwnerName',
-            key: 'OwnerName',
-
+            title: 'supervisor',
+            dataIndex: 'supervisor',
+            key: 'supervisor',
         },
         {
-            title: 'ผู้ควบคุมงาน',
-            dataIndex: 'PTTStaff',
-            key: 'PTTStaff',
-
+            title: 'workmit_type',
+            key: 'workmit_type',
+            dataIndex: 'workmit_type',
         },
         {
-            title: 'ประเภทใบอนุญาต',
-            key: 'WorkpermitType',
-            dataIndex: 'WorkpermitType',
-
+            title: 'scaffolding_type',
+            key: 'scaffolding_type',
+            dataIndex: 'scaffolding_type',
         },
         {
-            title: 'สถานที่ติดตั้ง',
-            key: 'AreaName',
-            dataIndex: 'AreaName',
-
-        },
-        {
-            title: 'วัน-เวลา เริ่มต้น',
+            title: 'date_time_start',
             dataIndex: 'date_time_start',
             key: 'date_time_start',
-
         },
         {
-            title: 'วัน-เวลา สิ้นสุด',
+            title: 'date_time_end',
             dataIndex: 'date_time_end',
             key: 'date_time_end',
-
         },
         {
-            title: 'สถานะ work',
-            dataIndex: 'WorkPermitStatus',
-            key: 'WorkPermitStatus',
-
-        },
-        {
-            title: 'สถานะแจ้งเตือน',
-            dataIndex: 'WarningStatus',
-            key: 'WarningStatus',
-
-        },
-        {
-            title: '...',
+            title: '',
             key: '',
-
             render: (text, record) => {
                 return (
                     <Space size='middle'>
@@ -212,97 +187,130 @@ const ScaffoldingPage = () => {
     ];
 
 
+    const scaffoldingicon = {
+        before_expire: '/assets/iconmap/scaffolding/before-expire.png',
+        broken: '/assets/iconmap/scaffolding/broken.png',
+        booking: '/assets/iconmap/scaffolding/booking.png',
+        expire: '/assets/iconmap/scaffolding/expire.png',
+        processing: '/assets/iconmap/scaffolding/processing.png',
+    };
     useEffect(() => {
-        let isMounted = true;
-        const socketio = new socketClient();
-        const socket = socketio.io();
+        if (stateMap && stateView) {
+            const socketio = new socketClient();
+            const socket = socketio.io();
+            (async () => {
 
-        initMap(socket)
+                const WMSLayer = await loadModules(['esri/layers/WMSLayer']).then(
+                    ([WMSLayer]) => WMSLayer,
+                );
+                const layer = new WMSLayer({
+                    url: 'https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WMSServer?request=GetCapabilities&service=WMS',
+                });
+                layer.load().then(() => {
+                    const names = layer.allSublayers
+                        .filter((sublayer) => !sublayer.sublayers) // Non-grouping layers will not have any "sublayers".
+                        .map((sublayer) => sublayer.name);
+                    console.log('Names of all child sublayers', names.join());
+                });
+                stateMap?.add(layer);
+                CreateArea();
 
-        return () => {
-            (isMounted = false), socket.disconnect();
-        };
-    }, [stateMap, stateView]);
+                const { Graphic, GraphicsLayer } = await loadModules([
+                    'esri/Graphic',
+                    'esri/layers/GraphicsLayer',
+                ]).then(([Graphic, GraphicsLayer]) => {
+                    return { Graphic, GraphicsLayer };
+                });
 
-    const initMap = async (socket) => {
-        const WMSLayer = await loadModules(['esri/layers/WMSLayer']).then(
-            ([WMSLayer]) => WMSLayer,
-        );
-        const layer = new WMSLayer({
-            url: 'https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WMSServer?request=GetCapabilities&service=WMS',
-        });
-        layer.load().then(() => {
-            const names = layer.allSublayers
-                .filter((sublayer) => !sublayer.sublayers) // Non-grouping layers will not have any "sublayers".
-                .map((sublayer) => sublayer.name);
-            // console.log('Names of all child sublayers', names.join());
-        });
-        stateMap?.add(layer);
-        CreateArea();
+                let layerpoi = new GraphicsLayer({
+                    id: 'poi',
+                });
+                stateMap?.add(layerpoi, 99);
 
-        /* Layerpoint */
-        const latlng = await datademo.getDemodata();
-        console.log('latlng', latlng)
-        const resSf = await getScaffolding({});
-        setLayerpoint(resSf)
-        socket.on("scaffolding", (res) => {
-            // console.log('socket', res)
-            if (res.Status == "success") {
-                setLayerpoint(res.Message)
-            }
-        });
 
-       
-    }
+                /* get Data */
 
-    const setLayerpoint = async (item) => {
+                // socket.emit("scaffolding")
 
-        if (stateView) {
+                const resSf = await getScaffolding({});
+                setMap(resSf, layerpoi, Graphic)
 
-            // let latlng = item.data;
-            const _summary = item.summary;
 
-            // console.log("data =>>>>>>>>>>>>>>>>>", latlng);
-            // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
-            if (isArray(item.filter)) {
-                const _filter = item.filter.map(e => {
-                    return {
-                        value: e._id
+                socket.on("scaffolding", (res) => {
+
+                    if (res.Status == "success") {
+                        setMap(res.Message, layerpoi, Graphic)
                     }
                 });
-                // console.log('_filter', _filter)
-                setScaffoldingTypeOptions(_filter)
-            }
 
-            let latlng = item.data.map(obj => {
-                // console.log('obj', obj)
+
+
+            })();
+            return () => socket.disconnect();
+        }
+    }, [stateMap, stateView]);
+
+
+    async function setMap(item, layerpoi, Graphic) {
+        // console.log('item', item)
+        const _data = item.data;
+        const _summary = item.summary;
+
+        // console.log("data =>>>>>>>>>>>>>>>>>", _data);
+        // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
+        if (isArray(item.filter)) {
+            const _filter = item.filter.map(e => {
                 return {
-                    "id": obj._id,
-                    "work_number": obj.WorkPermitNo,
-                    "name": obj.Name,
-                    "licensor": obj.PTTStaff,
-                    "supervisor": obj.OwnerName,
-                    "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-                    "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-                    "status_work": obj.WorkPermitStatus.toLowerCase(),
-                    "latitude": obj.FeaturesPropertiesCentroid_X,
-                    "longitude": obj.FeaturesPropertiesCentroid_Y,
-                    "locatoin": obj.SubAreaName,
-                    "work_type": obj.WorkpermitType,
+                    value: e._id
                 }
+            });
+            // console.log('_filter', _filter)
+            setScaffoldingTypeOptions(_filter)
+        }
 
-            })
- 
-            Status_cal(latlng);
-            setTabledata(latlng);
+        _data.forEach(obj => {
 
-            const datageojson = await Geojson.CleateGeojson(latlng, 'Point');
+            obj.date_time_end = moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss")
+            obj.date_time_start = moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss")
+            obj.id = obj._id
+            obj.latitude = obj.FeaturesPropertiesCentroid_X
+            obj.longitude = obj.FeaturesPropertiesCentroid_Y
+            obj.work_number = obj.WorkName
+            obj.name = obj.WorkName
+            obj.status_warnning = null
+            obj.scaffolding_type = "นั่งร้านแบบเคลื่อนที่ได้"
 
-            const { FeatureLayer, GeoJSONLayer } = await loadModules([
-                'esri/layers/FeatureLayer',
-                'esri/layers/GeoJSONLayer',
-            ]).then(([FeatureLayer, GeoJSONLayer]) => ({ FeatureLayer, GeoJSONLayer }));
+        })
 
+        // const data = await datademo.getDemodata();
+        // console.log('data', data)
+        console.log('_data', _data)
+
+        /* Set Dedux */
+        Status_cal(_data);
+
+        /* Set Table */
+        setTabledata(_data);
+
+        /* ------------------ set map ------------------ */
+        stateView?.ui?.add(
+            ['divtable', document.querySelector('.ant-table-wrapper')],
+            'bottom-left',
+        );
+
+        layerpoi.removeAll();
+        _data.map((where) => {
+            const point = {
+                type: 'point', // autocasts as new Point()
+                longitude: where.longitude,
+                latitude: where.latitude,
+            };
+            const imageicon = {
+                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                url: scaffoldingicon[`broken`],
+                width: '35px',
+                height: '35px',
+            };
             const clusterConfig = {
                 type: "cluster",
                 clusterRadius: "20px",
@@ -329,7 +337,7 @@ const ScaffoldingPage = () => {
                         },
                         symbol: {
                             type: 'text',
-                            color: '#ffffff',
+                            color: '#004a5d',
                             font: {
                                 weight: 'bold',
                                 family: 'Noto Sans',
@@ -340,72 +348,44 @@ const ScaffoldingPage = () => {
                     },
                 ],
             };
-
-            stateView?.ui?.add(
-                ['divtable', document.querySelector('.ant-table-wrapper')],
-                'bottom-left',
-            );
-            // console.log('datageojson :>> ', datageojson);
-            const layerpoint = new GeoJSONLayer({
-                id: 'pointlayer',
-                title: 'Earthquakes from the last month',
-                url: datageojson,
-                copyright: 'USGS Earthquakes',
-                field: 'status_work',
-                featureReduction: clusterConfig,
+            const pointGraphic = new Graphic({
+                geometry: point,
+                symbol: imageicon,
                 popupTemplate: {
-                    title: 'name {name}',
-                    content: 'name {name}',
-                    fieldInfos: [
-                        {
-                            fieldName: 'time',
-                            format: {
-                                dateFormat: 'short-date-short-time',
-                            },
-                        },
-                    ],
+                    title: where.work_number,
+                    content: where.name,
                 },
-                renderer: {
-                    type: 'unique-value',
-                    field: 'status_work',
-                    symbol: {
-                        field: 'status_work',
-                        type: 'simple-marker',
-                        size: 15,
-                        color: [226, 255, 40],
-                        outline: {
-                            color: '#000',
-                            width: 1,
-                        },
-                    },
-                    uniqueValueInfos: [
-                        {
-                            value: 'open',
-                            symbol: {
-                                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                                url: await CreateIcon('#ff7c44', 'warning'),
-                                width: '35px',
-                                height: '35px',
-                            },
-                        },
-                        {
-                            value: 'close',
-                            symbol: {
-                                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                                url: await CreateIcon('#4460ff', false, 2),
-                                width: '35px',
-                                height: '35px',
-                            },
-                        },
-                    ]
-
-
+                featureReduction: clusterConfig,
+                id: 'poi',
+                attributes: {
+                    name: 'poi',
                 },
             });
-            await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
-            stateMap?.add(layerpoint);
+            layerpoi.add(pointGraphic);
+        });
+    }
+    const getScaffolding = async (item) => {
+        let url = `/scaffolding/all?`;
+        if (item.PTTStaffCode) url += `&PTTStaffCode=${item.PTTStaffCode}`;
+        if (item.VendorCode) url += `&VendorCode=${item.VendorCode}`;
+        if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
+        if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
+        if (item.AreaID) url += `&AreaID=${item.AreaID}`;
+        if (isArray(item.ScaffoldingType)) {
+            url += `&ScaffoldingType=${item.ScaffoldingType.toString()}`;
+        }
+        const { data } = await API.get(url);
+        return data.Status === 'success' ? data.Message : {
+            data: [],
+            summary: {
+                all: 0,
+                expire: 0,
+                near_expire: 0,
+            }
         }
     }
+
+
 
     loadModules([
         'esri/config',
@@ -415,6 +395,22 @@ const ScaffoldingPage = () => {
     ]).then(async ([esriConfig, Map, MapView, TileLayer]) => {
         esriConfig.apiKey =
             'AAPKf24959e55476492eb12c8cbaa4d1261etdgkaLK718fs8_EuvckemKt2gyRR-8p04PR7mC2G8Oi5oNli_65xV-C8u8BuPQTZ';
+
+        // var map = new Map({
+        //   basemap: "streets"
+        // });
+
+        // var view = new MapView({
+        //   container: "viewDiv",  // Reference to the DOM node that will contain the view
+        //   map: map               // References the map object created in step 3
+        // });
+
+        // const Fullscreen = await loadModules(["esri/widgets/Fullscreen"]).then(([Fullscreen]) => Fullscreen);
+        // const full = new Fullscreen({
+        //   view: view
+        // });
+        // console.log('full :>> ', full);
+        // view.ui.add(full, "top-left");
     });
 
     const CreateArea = async () => {
@@ -456,7 +452,6 @@ const ScaffoldingPage = () => {
             await layerArea.add(polygonGraphic);
 
             await stateView?.goTo(polygon.extent);
-            // console.log('polygon.extent :>> ', polygon.extent.toJSON());
 
             // })
         }
@@ -464,7 +459,7 @@ const ScaffoldingPage = () => {
 
     const Status_cal = async (data) => {
         let warning = data.filter((data, key) => data.status_warnning !== null);
-        const sum = data.map((data, key) => data.status_work);
+        const sum = data.map((data, key) => data.scaffolding_type);
         let result = [...new Set(sum)].reduce(
             (acc, curr) => ((acc[curr] = sum.filter((a) => a == curr).length), acc),
             {},
@@ -476,14 +471,13 @@ const ScaffoldingPage = () => {
     };
 
     const Onload = async (map, view) => {
-        const { Fullscreen, UI, Zoom, Expand, Extent } = await loadModules([
+        const { Fullscreen, UI, Zoom, Expand } = await loadModules([
             'esri/widgets/Fullscreen',
             'esri/views/ui/UI',
             'esri/widgets/Zoom',
             'esri/widgets/Expand',
-            'esri/geometry/Extent',
-        ]).then(([Fullscreen, UI, Zoom, Expand, Extent]) => {
-            return { Fullscreen, UI, Zoom, Expand, Extent };
+        ]).then(([Fullscreen, UI, Zoom, Expand]) => {
+            return { Fullscreen, UI, Zoom, Expand };
         });
         const fullscreenui = new Fullscreen({
             view: view,
@@ -498,6 +492,7 @@ const ScaffoldingPage = () => {
             // collapseIconClass:'esri-icon-search',
             expandIconClass: 'esri-icon-search',
             content: refdrawn.current,
+
         });
         const detaillayer = new Expand({
             view: view,
@@ -517,38 +512,55 @@ const ScaffoldingPage = () => {
 
         setStateMap(map);
         setStateView(view);
-
-        view.watch('updating', function (val) {
-            const ext = new Extent({
-                type: 'extent',
-                spatialReference: { wkid: 4326 },
-                xmax: 100.32800674438477,
-                xmin: 100.30938148498534,
-                ymax: 13.785986924617411,
-                ymin: 13.767647416498118,
-            });
-            if (!view.extent.intersects(ext)) {
-                view.goTo(ext);
-            }
-        });
-
-
-
-
     };
 
     const onFinish = async (value) => {
         try {
-            // console.log('value', value)
+            console.log('value', value)
             const model = {
                 ...value,
-                StartDateTime: isMoment(value.StartDateTime) ? value.StartDateTime.format(`YYYY-MM-DD HH:mm`) : "",
-                EndDateTime: isMoment(value.EndDateTime) ? value.EndDateTime.format(`YYYY-MM-DD HH:mm`) : ""
+                StartDateTime: isMoment(value.StartDateTime) ? value.StartDateTime.format(`YYYY-MM-DD HH:mm`): "",
+                EndDateTime: isMoment(value.EndDateTime) ? value.EndDateTime.format(`YYYY-MM-DD HH:mm`): ""
             }
-            // console.log('model', model)
+            if (stateMap && stateView) {
+                const socketio = new socketClient();
+                const socket = socketio.io();
+                (async () => {
 
-            // console.log('first', getScaffolding(model))
-            setLayerpoint(await getScaffolding(model))
+                    
+                    const { Graphic, GraphicsLayer } = await loadModules([
+                        'esri/Graphic',
+                        'esri/layers/GraphicsLayer',
+                    ]).then(([Graphic, GraphicsLayer]) => {
+                        return { Graphic, GraphicsLayer };
+                    });
+
+                    let layerpoi = new GraphicsLayer({
+                        id: 'poi',
+                    });
+                    stateMap?.add(layerpoi, 99);
+
+
+                    /* get Data */
+
+                    // socket.emit("scaffolding")
+
+                    const resSf = await getScaffolding(model);
+                    setMap(resSf, layerpoi, Graphic)
+
+
+                    socket.on("scaffolding", (res) => {
+
+                        if (res.Status == "success") {
+                            setMap(res.Message, layerpoi, Graphic)
+                        }
+                    });
+
+
+
+                })();
+                return () => socket.disconnect();
+            }
 
         } catch (error) {
             console.log('error', error)
@@ -563,44 +575,18 @@ const ScaffoldingPage = () => {
     const [scaffoldingTypeOptions, setScaffoldingTypeOptions] = useState([]);
     const [form] = Form.useForm()
 
-    const getScaffolding = async (item) => {
-        let url = `/scaffolding/all?`;
-        if (item.PTTStaffCode) url += `&PTTStaffCode=${item.PTTStaffCode}`;
-        if (item.VendorCode) url += `&VendorCode=${item.VendorCode}`;
-        if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
-        if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
-        if (item.AreaID) url += `&AreaID=${item.AreaID}`;
-        if (isArray(item.ScaffoldingType)) {
-            url += `&ScaffoldingType=${item.ScaffoldingType.toString()}`;
-        }
-        const { data } = await API.get(url);
-        return data.Status === 'success' ? data.Message : {
-            data: [],
-            summary: {
-                all: 0,
-                expire: 0,
-                near_expire: 0,
-            }
-        }
-    }
-
-
     return (
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
             <Map
                 className='Mapacrgis'
                 onLoad={Onload}
                 mapProperties={{
-                    basemap: `${'arcgis-navigation'}`,
+                    basemap: /*`${'arcgis-light-gray'?? 'arcgis-navigation'}`*/ {
+                        portalItem: {
+                            id: '8d91bd39e873417ea21673e0fee87604', // nova basemap
+                        },
+                    },
                     autoResize: false,
-                    // extent: {
-                    //   type:'extent',
-                    //   spatialReference: { wkid: 4326 },
-                    //   xmax: 100.32800674438477,
-                    //   xmin: 100.30938148498534,
-                    //   ymax: 13.785986924617411,
-                    //   ymin: 13.767647416498118,
-                    // },
                 }}
                 viewProperties={{
                     center: [100.3330867, 14.5548052],
@@ -620,6 +606,9 @@ const ScaffoldingPage = () => {
                             //     document
                             //         .querySelector('.esri-ui-bottom-left')
                             //         .style.setProperty('display', 'block', 'important');
+                            //     document
+                            //         .querySelector('.esri-ui-bottom-left')
+                            //         .style.setProperty('min-width', '98vw', 'important');
                             // } else {
                             //     document
                             //         .querySelector('.esri-ui-bottom-left')
@@ -759,7 +748,7 @@ const ScaffoldingPage = () => {
                 </div>
                 <Table
                     id='divtable'
-                    scroll={{ y: '25vh' }}
+                    scroll={{ y: '25vh', x: "100%" }}
                     size='small'
                     rowClassName={(record, index) =>
                         record?.status_warnning !== null &&
@@ -780,6 +769,10 @@ const ScaffoldingPage = () => {
                 okButtonProps={{ hidden: true }}
                 onCancel={() => setIsModalVisible(!isModalVisible)}
                 visible={isModalVisible}
+                bodyStyle={{
+                    maxHeight: "60vh",
+                    overflowX: "auto"
+                }}
             >
                 {datamodal &&
                     Object.entries(datamodal).map(([key, value]) => (
@@ -793,6 +786,7 @@ const ScaffoldingPage = () => {
             </Modal>
 
             <Drawer
+
                 // id='divtable'
                 title={false}
                 placement={"bottom"}
