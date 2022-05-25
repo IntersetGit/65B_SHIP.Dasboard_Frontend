@@ -241,8 +241,8 @@ const ScaffoldingPage = () => {
         CreateArea();
 
         /* Layerpoint */
-        const latlng = await datademo.getDemodata();
-        console.log('latlng', latlng)
+        // const latlng = await datademo.getDemodata();
+        // console.log('latlng', latlng)
         const resSf = await getScaffolding({});
         setLayerpoint(resSf)
         socket.on("scaffolding", (res) => {
@@ -297,7 +297,7 @@ const ScaffoldingPage = () => {
             setTabledata(latlng);
 
             const datageojson = await Geojson.CleateGeojson(latlng, 'Point');
-
+            
             const { FeatureLayer, GeoJSONLayer } = await loadModules([
                 'esri/layers/FeatureLayer',
                 'esri/layers/GeoJSONLayer',
