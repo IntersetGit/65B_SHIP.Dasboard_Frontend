@@ -95,9 +95,9 @@ function CreateIcon(color = "red", type = false, isdraw = 1) {
   });
 }
 
-function CreateImgIcon(
+async function CreateImgIcon(
   img = "https://cdn-icons-png.flaticon.com/512/2554/2554936.png",
-  type = "warning"
+  type = "warningGas"
 ) {
   var canvas = document.createElement("canvas");
   canvas.id = "canvas";
@@ -107,29 +107,37 @@ function CreateImgIcon(
   body.appendChild(canvas);
   var ctx = canvas.getContext("2d");
 
-  const image = new Image();
-
-  image.crossOrigin = "anonymous";
-  image.onload = async () => {
-    await ctx.save();
-    await ctx.beginPath();
-    ctx.globalCompositeOperation = "source-over";
-    await ctx.arc(200, 80, 100, 0, 2 * Math.PI);
-    await ctx.drawImage(image, canvas.width / 2, 0, 100, 110);
-  };
-  image.src = imgicon[type];
-
-  const image2 = new Image();
-  image2.crossOrigin = "anonymous";
-  image2.onload = async () => {
-    await ctx.save();
-    await ctx.beginPath();
-    ctx.globalCompositeOperation = "destination-over";
-    await ctx.rect(0, 0, 300, 300);
-    await ctx.clip();
-    await ctx.drawImage(image2, 0, 0, canvas.width, canvas.height);
-  };
-  image2.src = img;
+  const drawer1 = ()=> new Promise((resolve, reject) => {
+    const image = new Image();
+    image.crossOrigin = "anonymous";
+    image.onload = async () => {
+      await ctx.save();
+      await ctx.beginPath();
+      ctx.globalCompositeOperation = "source-over";
+      await ctx.arc(200, 80, 100, 0, 2 * Math.PI);
+      await ctx.drawImage(image, canvas.width / 2, 0, 100, 110);
+      resolve();
+    };
+    image.src = imgicon[type];
+  });
+  const drawer2 = ()=>  new Promise((resolve, reject) => {
+    const image2 = new Image();
+    image2.crossOrigin = "anonymous";
+    image2.onload = async () => {
+      await ctx.save();
+      await ctx.beginPath();
+      ctx.globalCompositeOperation = "destination-over";
+      await ctx.rect(0, 0, 300, 300);
+      await ctx.clip();
+      await ctx.drawImage(image2, 0, 0, canvas.width, canvas.height);
+      resolve();
+    };
+    image2.src = img;
+  });
+  await drawer1();
+  await drawer2();
+  var dataURL = canvas.toDataURL("image/png", 2.0);
+  return dataURL;
 }
 
 async function DownloadIcon(
