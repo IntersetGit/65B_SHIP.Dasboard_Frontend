@@ -24,7 +24,7 @@ import { setStatus } from '../../../redux/actions';
 import moment, { isMoment } from 'moment';
 import Demodata from '../../demodata';
 import WaGeojson from '../../../util/WaGeojson';
-import { CreateIcon } from '../../../util/dynamic-icon'
+import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
 import { isArray } from 'lodash';
 
@@ -241,8 +241,8 @@ const ScaffoldingPage = () => {
         CreateArea();
 
         /* Layerpoint */
-        const latlng = await datademo.getDemodata();
-        console.log('latlng', latlng)
+        // const latlng = await datademo.getDemodata();
+        // console.log('latlng', latlng)
         const resSf = await getScaffolding({});
         setLayerpoint(resSf)
         socket.on("scaffolding", (res) => {
@@ -252,7 +252,7 @@ const ScaffoldingPage = () => {
             }
         });
 
-       
+
     }
 
     const setLayerpoint = async (item) => {
@@ -260,9 +260,9 @@ const ScaffoldingPage = () => {
         if (stateView) {
 
             // let latlng = item.data;
-            const _summary = item.summary;
+            Status_cal(item.summary);
 
-            // console.log("data =>>>>>>>>>>>>>>>>>", latlng);
+            console.log("data =>>>>>>>>>>>>>>>>>", item.data);
             // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
             if (isArray(item.filter)) {
                 const _filter = item.filter.map(e => {
@@ -277,6 +277,7 @@ const ScaffoldingPage = () => {
             let latlng = item.data.map(obj => {
                 // console.log('obj', obj)
                 return {
+                    ...obj,
                     "id": obj._id,
                     "work_number": obj.WorkPermitNo,
                     "name": obj.Name,
@@ -284,7 +285,8 @@ const ScaffoldingPage = () => {
                     "supervisor": obj.OwnerName,
                     "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
                     "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-                    "status_work": obj.WorkPermitStatus.toLowerCase(),
+                    // "status_work": obj.WorkPermitStatus.toLowerCase(),
+                    "status_work": `${obj.ScaffoldingCode.toLowerCase()}_${obj.Status.toLowerCase()}`,
                     "latitude": obj.FeaturesPropertiesCentroid_X,
                     "longitude": obj.FeaturesPropertiesCentroid_Y,
                     "locatoin": obj.SubAreaName,
@@ -292,8 +294,9 @@ const ScaffoldingPage = () => {
                 }
 
             })
- 
-            Status_cal(latlng);
+
+            // latlng = await datademo.getDemodata();
+            // console.log('latlng', latlng)
             setTabledata(latlng);
 
             const datageojson = await Geojson.CleateGeojson(latlng, 'Point');
@@ -333,8 +336,9 @@ const ScaffoldingPage = () => {
                             font: {
                                 weight: 'bold',
                                 family: 'Noto Sans',
-                                size: '12px',
+                                size: '18px',
                             },
+                            url: await CreateIcon('#ff7c44', 'warning'),
                         },
                         labelPlacement: 'center-center',
                     },
@@ -345,7 +349,19 @@ const ScaffoldingPage = () => {
                 ['divtable', document.querySelector('.ant-table-wrapper')],
                 'bottom-left',
             );
+
+            // {
+            //     value: "near_expire", //ใกล้ Exp
+            //     symbol: {
+            //         type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+            //         url: await CreateIcon('#ff7c44', 'warning'),
+            //         width: '35px',
+            //         height: '35px',
+            //     },
+            // },
+
             // console.log('datageojson :>> ', datageojson);
+            // console.log('await CreateImgIcon(false , false)', await CreateImgIcon())
             const layerpoint = new GeoJSONLayer({
                 id: 'pointlayer',
                 title: 'Earthquakes from the last month',
@@ -378,26 +394,7 @@ const ScaffoldingPage = () => {
                             width: 1,
                         },
                     },
-                    uniqueValueInfos: [
-                        {
-                            value: 'open',
-                            symbol: {
-                                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                                url: await CreateIcon('#ff7c44', 'warning'),
-                                width: '35px',
-                                height: '35px',
-                            },
-                        },
-                        {
-                            value: 'close',
-                            symbol: {
-                                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                                url: await CreateIcon('#4460ff', false, 2),
-                                width: '35px',
-                                height: '35px',
-                            },
-                        },
-                    ]
+                    uniqueValueInfos: await gen_uniqueValueInfos()
 
 
                 },
@@ -405,6 +402,71 @@ const ScaffoldingPage = () => {
             await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
             stateMap?.add(layerpoint);
         }
+    }
+
+    const gen_uniqueValueInfos = async () => {
+
+        const uniqueValueInfos = [];
+
+        const scaffoldingIcon = [
+            {
+                name: "001",
+                img: '/assets/iconmap/scaffolding/0001.png'
+            },
+            {
+                name: "002",
+                img: '/assets/iconmap/scaffolding/0002.png'
+            },
+            {
+                name: "003",
+                img: '/assets/iconmap/scaffolding/0003.png'
+            },
+            {
+                name: "004",
+                img: '/assets/iconmap/scaffolding/0004.png'
+            },
+        ]
+        const scaffoldingStatusWork = [
+            {
+                name: "near_expire",
+                status: "warning",
+            },
+            {
+                name: "expire",
+                status: "warningWork",
+            },
+            {
+                name: "normal",
+                status: false,
+            },
+        ]
+
+
+        for (const x in scaffoldingIcon) {
+            if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
+                const a = scaffoldingIcon[x];
+                for (const y in scaffoldingStatusWork) {
+                    if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
+                        const b = scaffoldingStatusWork[y];
+                        uniqueValueInfos.push({
+                            value: `${a.name}_${b.name}`,
+                            symbol: {
+                                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                                url: await CreateImgIcon(a.img , b.status),
+                                width: '35px',
+                                height: '35px',
+                            },
+                        })
+                    }
+                }
+            }
+        }
+
+        console.log("uniqueValueInfos" , uniqueValueInfos)
+
+        return uniqueValueInfos
+
+
     }
 
     loadModules([
@@ -463,15 +525,15 @@ const ScaffoldingPage = () => {
     };
 
     const Status_cal = async (data) => {
-        let warning = data.filter((data, key) => data.status_warnning !== null);
-        const sum = data.map((data, key) => data.status_work);
-        let result = [...new Set(sum)].reduce(
-            (acc, curr) => ((acc[curr] = sum.filter((a) => a == curr).length), acc),
-            {},
-        );
-        // console.log('result :>> ', result);
+
+        // console.log('data', data)
         dispatch(
-            setStatus({ ...result, warning: warning.length, total: sum.length }),
+            setStatus({
+                "จำนวน": data.all,
+                "ปกติ": data.normal,
+                "⚠️ ใกล้ Exp": data.near_expire,
+                "‼️ หมด Exp": data.expire,
+            }),
         );
     };
 

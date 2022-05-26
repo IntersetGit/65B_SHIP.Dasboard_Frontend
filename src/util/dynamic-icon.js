@@ -97,7 +97,7 @@ function CreateIcon(color = "red", type = false, isdraw = 1) {
 
 async function CreateImgIcon(
   img = "https://cdn-icons-png.flaticon.com/512/2554/2554936.png",
-  type = "warningGas"
+  type = false
 ) {
   var canvas = document.createElement("canvas");
   canvas.id = "canvas";
@@ -107,20 +107,24 @@ async function CreateImgIcon(
   body.appendChild(canvas);
   var ctx = canvas.getContext("2d");
 
-  const drawer1 = ()=> new Promise((resolve, reject) => {
-    const image = new Image();
-    image.crossOrigin = "anonymous";
-    image.onload = async () => {
-      await ctx.save();
-      await ctx.beginPath();
-      ctx.globalCompositeOperation = "source-over";
-      await ctx.arc(200, 80, 100, 0, 2 * Math.PI);
-      await ctx.drawImage(image, canvas.width / 2, 0, 100, 110);
-      resolve();
-    };
-    image.src = imgicon[type];
-  });
-  const drawer2 = ()=>  new Promise((resolve, reject) => {
+  if(type) {
+    const drawer1 = () => new Promise((resolve, reject) => {
+      const image = new Image();
+      image.crossOrigin = "anonymous";
+      image.onload = async () => {
+        await ctx.save();
+        await ctx.beginPath();
+        ctx.globalCompositeOperation = "source-over";
+        await ctx.arc(200, 80, 100, 0, 2 * Math.PI);
+        await ctx.drawImage(image, canvas.width / 2, 0, 100, 110);
+        resolve();
+      };
+      image.src = imgicon[type];
+    });
+    await drawer1()
+  }
+  
+  const drawer2 = () => new Promise((resolve, reject) => {
     const image2 = new Image();
     image2.crossOrigin = "anonymous";
     image2.onload = async () => {
@@ -134,27 +138,27 @@ async function CreateImgIcon(
     };
     image2.src = img;
   });
-  await drawer1();
   await drawer2();
+
   var dataURL = canvas.toDataURL("image/png", 2.0);
   return dataURL;
 }
 
 async function DownloadIcon(
-    color = "red",
-    type = "warning",
-    filename = "untitled.png"
+  color = "red",
+  type = "warning",
+  filename = "untitled.png"
 ) {
-    const dataimage = await CreateIcon("orange", "warningGas");
-    var a = document.createElement("a");
-    a.href = dataimage;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
+  const dataimage = await CreateIcon("orange", "warningGas");
+  var a = document.createElement("a");
+  a.href = dataimage;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
 }
 
 export {
-    CreateIcon,
-    CreateImgIcon,
-    DownloadIcon
+  CreateIcon,
+  CreateImgIcon,
+  DownloadIcon
 }
