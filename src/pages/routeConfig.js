@@ -25,11 +25,12 @@ const routesConfig = [
         icon: (
           <Icon
             component={() => (
-              <img src={WorkpermistIcon} width='20' style={{marginTop: -10}} />
+              <img src={WorkpermistIcon} width='20' style={{ marginTop: -10 }} />
             )}
           />
         ),
         path: '/workpermit',
+
       },
       {
         id: 'vehicle',
@@ -39,7 +40,7 @@ const routesConfig = [
         icon: (
           <Icon
             component={() => (
-              <img src={VechicleIcon} width='20' style={{marginTop: -10}} />
+              <img src={VechicleIcon} width='20' style={{ marginTop: -10 }} />
             )}
           />
         ),
@@ -53,7 +54,7 @@ const routesConfig = [
         icon: (
           <Icon
             component={() => (
-              <img src={EquipmentIcon} width='20' style={{marginTop: -10}} />
+              <img src={EquipmentIcon} width='20' style={{ marginTop: -10 }} />
             )}
           />
         ),
@@ -67,7 +68,7 @@ const routesConfig = [
         icon: (
           <Icon
             component={() => (
-              <img src={ScaffoldingIcon} width='20' style={{marginTop: -10}} />
+              <img src={ScaffoldingIcon} width='20' style={{ marginTop: -10 }} />
             )}
           />
         ),
@@ -84,7 +85,7 @@ const routesConfig = [
               <img
                 src={PeopleTrackingIcon}
                 width='20'
-                style={{marginTop: -10}}
+                style={{ marginTop: -10 }}
               />
             )}
           />
@@ -99,7 +100,7 @@ const routesConfig = [
         icon: (
           <Icon
             component={() => (
-              <img src={AcessIcon} width='20' style={{marginTop: -10}} />
+              <img src={AcessIcon} width='20' style={{ marginTop: -10 }} />
             )}
           />
         ),
@@ -112,6 +113,37 @@ const routesConfig = [
       //   type: 'item',
       //   icon: <Icon component={() => (<img src={NotificationIcon} width="20" />)} />,
       //   path: '/notification',
+      // },
+
+      // {
+      //   id: 'equipmentall',
+      //   title: 'equipmentall',
+      //   messageId: 'sidebar.sample.page3',
+      //   type: 'collapse',
+      //   icon: (
+      //     <Icon
+      //       component={() => (
+      //         <img src={EquipmentIcon} width='20' style={{ marginTop: -10 }} />
+      //       )}
+      //     />
+      //   ),
+      //   children: [
+      //     {
+      //       id: 'equipment2',
+      //       title: 'equipment2',
+      //       messageId: 'sidebar.sample.page3',
+      //       type: 'item',
+      //       icon: (
+      //         <Icon
+      //           component={() => (
+      //             <img src={EquipmentIcon} width='20' style={{ marginTop: -10 }} />
+      //           )}
+      //         />
+      //       ),
+      //       path: '/equipment2',
+
+      //     },
+      //   ],
       // },
     ],
   },
