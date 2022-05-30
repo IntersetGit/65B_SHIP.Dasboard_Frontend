@@ -340,9 +340,12 @@ const ScaffoldingPage = () => {
                             },
                             url: await CreateIcon('#ff7c44', 'warning'),
                         },
+
                         labelPlacement: 'center-center',
                     },
+
                 ],
+
             };
 
             stateView?.ui?.add(
