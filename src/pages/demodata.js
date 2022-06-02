@@ -857,7 +857,7 @@ class Demodata {
       let datanew = [];
       for (const key in this.data[this.name]) {
         // console.log('object :>> ', this.data[this.name][key])
-        let latlng = await this.getRandomLocation(13.78288, 100.3229211, 100);
+        let latlng = await this.getRandomLocation(12.71857, 101.14561, 100);
         datanew.push({
           ...this.data[this.name][key],
           ...latlng,

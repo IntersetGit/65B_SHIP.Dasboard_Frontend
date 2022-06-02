@@ -134,26 +134,25 @@ const Page1 = () => {
     var loopdata;
     const socket = io.connect('http://localhost:3001');
     (async () => {
-      const WFSLayer = await loadModules(['esri/layers/WFSLayer']).then(
-        ([WFSLayer]) => WFSLayer,
+      const { WFSLayer, WMSLayer, Extent } = await loadModules(['esri/layers/WFSLayer', 'esri/layers/WMSLayer', "esri/geometry/Extent"]).then(
+        ([WFSLayer, WMSLayer, Extent]) => ({ WFSLayer, WMSLayer, Extent }),
       );
-      const layer2 = new WFSLayer({
-        url: 'https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WFSServer?request=GetCapabilities&service=WFS',
+      var layer = new WMSLayer({
+        url: 'http://45.136.253.221:8080/geoserver/GeoServer_ITS/wms?request=GetCapabilities&service=WMS&version=1.3.0',
+        sublayers: [
+          {
+            name: 'GeoServer_ITS:merge_area'
+          }
+        ],
       });
-      const WMSLayer = await loadModules(['esri/layers/WMSLayer']).then(
-        ([WMSLayer]) => WMSLayer,
-      );
-      const layer = new WMSLayer({
-        url: 'https://pttarcgisserver.pttplc.com/arcgis/services/PTT_LMA/GIS_PatternData/MapServer/WMSServer?request=GetCapabilities&service=WMS',
-      });
-      layer.load().then(() => {
-        const names = layer.allSublayers
-          .filter((sublayer) => !sublayer.sublayers) // Non-grouping layers will not have any "sublayers".
-          .map((sublayer) => sublayer.name);
-        console.log('Names of all child sublayers', names.join());
+      layer.when(async (data) => {
+        console.log('data', data.fullExtent.toJSON())
+        let extent = new Extent(data.fullExtent.toJSON());
+        // console.log('extent :>> ', extent.center);
+        // await stateView?.goTo(extent.center)
       });
       stateMap?.add(layer);
-      CreateArea();
+      // CreateArea();
 
       const { FeatureLayer, GeoJSONLayer } = await loadModules([
         'esri/layers/FeatureLayer',
@@ -245,7 +244,7 @@ const Page1 = () => {
                 value: 'open',
                 symbol: {
                   type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                  url: await CreateIcon('#ff7c44','warning'),
+                  url: await CreateIcon('#ff7c44', 'warning'),
                   width: '35px',
                   height: '35px',
                 },
@@ -254,7 +253,7 @@ const Page1 = () => {
                 value: 'close',
                 symbol: {
                   type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                  url: await CreateIcon('#4460ff',false,2),
+                  url: await CreateIcon('#4460ff', false, 2),
                   width: '35px',
                   height: '35px',
                 },
@@ -342,14 +341,15 @@ const Page1 = () => {
   };
 
   const Onload = async (map, view) => {
-    const { Fullscreen, UI, Zoom, Expand, Extent } = await loadModules([
+    const { Fullscreen, UI, Zoom, Expand, Extent, locator } = await loadModules([
       'esri/widgets/Fullscreen',
       'esri/views/ui/UI',
       'esri/widgets/Zoom',
       'esri/widgets/Expand',
       'esri/geometry/Extent',
-    ]).then(([Fullscreen, UI, Zoom, Expand, Extent]) => {
-      return { Fullscreen, UI, Zoom, Expand, Extent };
+      'esri/rest/locator',
+    ]).then(([Fullscreen, UI, Zoom, Expand, Extent, locator]) => {
+      return { Fullscreen, UI, Zoom, Expand, Extent, locator };
     });
     const fullscreenui = new Fullscreen({
       view: view,
@@ -380,23 +380,38 @@ const Page1 = () => {
       ['divtable', document.querySelector('.ant-table-wrapper')],
       'bottom-left',
     );
+    const geocodingServiceUrl = "https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
+    view.on("click", function (event) {
+      event.stopPropagation(); // overwrite default click-for-popup behavior
+      // console.log('event.mapPoint :>> ', event.mapPoint);
+      var lat = Math.round(event.mapPoint.latitude * 1000) / 1000;
+      var lon = Math.round(event.mapPoint.longitude * 1000) / 1000;
+      view.popup.open({
+        title: "ตำแหน่งที่ตั้ง: [" + lon + ", " + lat + "]",
+        location: event.mapPoint // Set the location of the popup to the clicked location
+      });
+      // Display the popup
+      locator.locationToAddress(geocodingServiceUrl, { location: event.mapPoint }).then((res) => {
+        view.popup.content = res.address;
+      })
+    });
 
     setStateMap(map);
     setStateView(view);
 
-    view.watch('updating', function (val) {
-      const ext = new Extent({
-        type: 'extent',
-        spatialReference: { wkid: 4326 },
-        xmax: 100.32800674438477,
-        xmin: 100.30938148498534,
-        ymax: 13.785986924617411,
-        ymin: 13.767647416498118,
-      });
-      if (!view.extent.intersects(ext)) {
-        view.goTo(ext);
-      }
-    });
+    // view.watch('updating', function (val) {
+    //   const ext = new Extent({
+    //     type: 'extent',
+    //     spatialReference: { wkid: 4326 },
+    //     xmax: 100.32800674438477,
+    //     xmin: 100.30938148498534,
+    //     ymax: 13.785986924617411,
+    //     ymin: 13.767647416498118,
+    //   });
+    //   if (!view.extent.intersects(ext)) {
+    //     view.goTo(ext);
+    //   }
+    // });
   };
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
