@@ -18,6 +18,7 @@ function CreateIcon(color = "red", type = false, isdraw = 1) {
     }
     var canvas = document.createElement("canvas");
     canvas.id = "canvas";
+    canvas.style.display = "none";
     canvas.width = 210;
     canvas.height = 210;
     var body = document.getElementsByTagName("body")[0];
@@ -99,15 +100,20 @@ async function CreateImgIcon(
   img = "https://cdn-icons-png.flaticon.com/512/2554/2554936.png",
   type = false
 ) {
+  var element = document.getElementById("canvas");
+  if (element) {
+    element.remove();
+  }
   var canvas = document.createElement("canvas");
   canvas.id = "canvas";
+  canvas.style.display = "none";
   canvas.width = 210;
   canvas.height = 210;
   var body = document.getElementsByTagName("body")[0];
   body.appendChild(canvas);
   var ctx = canvas.getContext("2d");
 
-  if(type) {
+  if (type) {
     const drawer1 = () => new Promise((resolve, reject) => {
       const image = new Image();
       image.crossOrigin = "anonymous";
@@ -123,7 +129,7 @@ async function CreateImgIcon(
     });
     await drawer1()
   }
-  
+
   const drawer2 = () => new Promise((resolve, reject) => {
     const image2 = new Image();
     image2.crossOrigin = "anonymous";
@@ -141,6 +147,7 @@ async function CreateImgIcon(
   await drawer2();
 
   var dataURL = canvas.toDataURL("image/png", 2.0);
+  console.log(dataURL)
   return dataURL;
 }
 

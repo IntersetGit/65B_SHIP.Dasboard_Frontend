@@ -63,7 +63,7 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
               <Row >
                 {Object.keys(StatusMap).map((status) => {
                   return (
-                    <Col key={status} lg={8} md={12} sm={12} xs={24}>
+                    <Col  key={status} lg={8} md={12} sm={12} xs={24}>
                       <p>{status} : {StatusMap[status]}</p>
                     </Col>
                   );

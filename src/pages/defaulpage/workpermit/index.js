@@ -141,14 +141,14 @@ const Page1 = () => {
         url: 'http://45.136.253.221:8080/geoserver/GeoServer_ITS/wms?request=GetCapabilities&service=WMS&version=1.3.0',
         sublayers: [
           {
-            name: 'GeoServer_ITS:merge_area'
+            name: 'GeoServer_ITS:merge_area_03'
           }
         ],
       });
       layer.when(async (data) => {
         console.log('data', data.fullExtent.toJSON())
         let extent = new Extent(data.fullExtent.toJSON());
-        // console.log('extent :>> ', extent.center);
+        console.log('extent :>> ', extent.center);
         // await stateView?.goTo(extent.center)
       });
       stateMap?.add(layer);
@@ -274,12 +274,16 @@ const Page1 = () => {
 
   loadModules([
     'esri/config',
+    'esri/core/urlUtils',
     'esri/Map',
     'esri/views/MapView',
     'esri/layers/TileLayer',
-  ]).then(async ([esriConfig, Map, MapView, TileLayer]) => {
-    esriConfig.apiKey =
-      'AAPKf24959e55476492eb12c8cbaa4d1261etdgkaLK718fs8_EuvckemKt2gyRR-8p04PR7mC2G8Oi5oNli_65xV-C8u8BuPQTZ';
+  ]).then(async ([esriConfig,urlUtils, Map, MapView, TileLayer]) => {
+    esriConfig.apiKey = 'AAPKf24959e55476492eb12c8cbaa4d1261etdgkaLK718fs8_EuvckemKt2gyRR-8p04PR7mC2G8Oi5oNli_65xV-C8u8BuPQTZ';
+    urlUtils.addProxyRule({
+      urlPrefix:'https://nonpttarcgisserver.pttplc.com/arcgis/rest/services',
+      proxyUrl:'https://nonpttship-gis.pttplc.com/pttship-api/app/dXNlcj12ZWhpY2xlJnN5c3RlbT1tYXA=/api/AppProxy',
+    })
   });
 
   const CreateArea = async () => {
