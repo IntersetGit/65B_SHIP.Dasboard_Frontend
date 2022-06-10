@@ -9,35 +9,36 @@ var imgicon = {
   warningWorkIm:
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1VIaG7eqsvwCbV2YVYjbqkV9irGB44VuHKQ&usqp=CAU"
 };
-
+var ct = [
+  "source-over", //  0
+  "source-in", //  1
+  "source-out", //  2
+  "source-atop", //  3
+  "destination-over", //  4
+  "destination-in", //  5
+  "destination-out", //  6
+  "destination-atop", //  7
+  "lighter", //  8
+  "darker", //  9
+  "copy", // 10
+  "xor" // 11
+];
 function CreateIcon(color = "red", type = false, isdraw = 1) {
   const drawer = new Promise((resolve, reject) => {
-    var element = document.getElementById("canvas");
+    var element = document.getElementById("canvas1");
     if (element) {
       element.remove();
     }
     var canvas = document.createElement("canvas");
-    canvas.id = "canvas";
+    canvas.id = "canvas1";
+    canvas.style.display = 'none';
     canvas.width = 210;
     canvas.height = 210;
     var body = document.getElementsByTagName("body")[0];
     body.appendChild(canvas);
     var ctx = canvas.getContext("2d");
 
-    var ct = [
-      "source-over", //  0
-      "source-in", //  1
-      "source-out", //  2
-      "source-atop", //  3
-      "destination-over", //  4
-      "destination-in", //  5
-      "destination-out", //  6
-      "destination-atop", //  7
-      "lighter", //  8
-      "darker", //  9
-      "copy", // 10
-      "xor" // 11
-    ];
+
     if (type) {
       const image = new Image();
 
@@ -89,7 +90,7 @@ function CreateIcon(color = "red", type = false, isdraw = 1) {
   });
 
   return drawer.then(async () => {
-    var canvas = document.querySelector("#canvas");
+    var canvas = document.querySelector("#canvas1");
     var dataURL = await canvas.toDataURL("image/png", 2.0);
     return dataURL;
   });
@@ -97,7 +98,7 @@ function CreateIcon(color = "red", type = false, isdraw = 1) {
 
 async function CreateImgIcon(
   img = "https://cdn-icons-png.flaticon.com/512/2554/2554936.png",
-  type = false
+  type = "warningGas"
 ) {
   var canvas = document.createElement("canvas");
   canvas.id = "canvas";
@@ -114,7 +115,7 @@ async function CreateImgIcon(
       image.onload = async () => {
         await ctx.save();
         await ctx.beginPath();
-        ctx.globalCompositeOperation = "source-over";
+        ctx.globalCompositeOperation = ct[4];
         await ctx.arc(200, 80, 100, 0, 2 * Math.PI);
         await ctx.drawImage(image, canvas.width / 2, 0, 100, 110);
         resolve();
@@ -123,21 +124,38 @@ async function CreateImgIcon(
     });
     await drawer1()
   }
-  
-  const drawer2 = () => new Promise((resolve, reject) => {
-    const image2 = new Image();
-    image2.crossOrigin = "anonymous";
-    image2.onload = async () => {
-      await ctx.save();
-      await ctx.beginPath();
-      ctx.globalCompositeOperation = "destination-over";
-      await ctx.rect(0, 0, 300, 300);
-      await ctx.clip();
-      await ctx.drawImage(image2, 0, 0, canvas.width, canvas.height);
-      resolve();
-    };
-    image2.src = img;
-  });
+
+  const drawer2 = () =>
+      new Promise((resolve, reject) => {
+        const image2 = new Image();
+        image2.crossOrigin = "anonymous";
+        image2.onload = async () => {
+          await ctx.save();
+          await ctx.beginPath();
+           await ctx.drawImage(image2, 0, 0, canvas.width, canvas.height);
+          ctx.globalCompositeOperation = ct[4];
+          // await ctx.rect(0, 0, 300, 300);
+          // await ctx.clip();
+          ctx.fillStyle = "#000";
+          ctx.strokeStyle = "#FFF";
+          await ctx.arc(
+            canvas.width / 2,
+            canvas.height / 2,
+            100,
+            0,
+            2 * Math.PI
+          );
+          ctx.stroke();
+          ctx.fill();
+          await ctx.clip();
+
+
+
+          resolve();
+        };
+        image2.src = img;
+      });
+
   await drawer2();
 
   var dataURL = canvas.toDataURL("image/png", 2.0);
@@ -156,6 +174,7 @@ async function DownloadIcon(
   document.body.appendChild(a);
   a.click();
 }
+
 
 export {
   CreateIcon,
