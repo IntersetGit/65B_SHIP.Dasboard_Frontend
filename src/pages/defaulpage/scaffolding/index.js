@@ -263,217 +263,217 @@ const ScaffoldingPage = () => {
 
     if (stateView) {
 
-        // let latlng = item.data;
-        Status_cal(item.summary);
+      // let latlng = item.data;
+      Status_cal(item.summary);
 
-        console.log("data =>>>>>>>>>>>>>>>>>", item.data);
-        // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
-        if (isArray(item.filter)) {
-            const _filter = item.filter.map(e => {
-                return {
-                    value: e._id
-                }
-            });
-            // console.log('_filter', _filter)
-            setScaffoldingTypeOptions(_filter)
+      console.log("data =>>>>>>>>>>>>>>>>>", item.data);
+      // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
+      if (isArray(item.filter)) {
+        const _filter = item.filter.map(e => {
+          return {
+            value: e._id
+          }
+        });
+        // console.log('_filter', _filter)
+        setScaffoldingTypeOptions(_filter)
+      }
+
+      let latlng = item.data.map(obj => {
+        // console.log('obj', obj)
+        return {
+          ...obj,
+          "id": obj._id,
+          "work_number": obj.WorkPermitNo,
+          "name": obj.Name,
+          "licensor": obj.PTTStaff,
+          "supervisor": obj.OwnerName,
+          "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
+          "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
+          // "status_work": obj.WorkPermitStatus.toLowerCase(),
+          "status_work": `${obj.ScaffoldingCode.toLowerCase()}_${obj.Status.toLowerCase()}`,
+          "latitude": obj.FeaturesPropertiesCentroid_X,
+          "longitude": obj.FeaturesPropertiesCentroid_Y,
+          "locatoin": obj.SubAreaName,
+          "work_type": obj.WorkpermitType,
         }
 
-        let latlng = item.data.map(obj => {
-            // console.log('obj', obj)
-            return {
-                ...obj,
-                "id": obj._id,
-                "work_number": obj.WorkPermitNo,
-                "name": obj.Name,
-                "licensor": obj.PTTStaff,
-                "supervisor": obj.OwnerName,
-                "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-                "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-                // "status_work": obj.WorkPermitStatus.toLowerCase(),
-                "status_work": `${obj.ScaffoldingCode.toLowerCase()}_${obj.Status.toLowerCase()}`,
-                "latitude": obj.FeaturesPropertiesCentroid_X,
-                "longitude": obj.FeaturesPropertiesCentroid_Y,
-                "locatoin": obj.SubAreaName,
-                "work_type": obj.WorkpermitType,
-            }
+      })
 
-        })
+      // latlng = await datademo.getDemodata();
+      // console.log('latlng', latlng)
+      setTabledata(latlng);
 
-        // latlng = await datademo.getDemodata();
-        // console.log('latlng', latlng)
-        setTabledata(latlng);
+      const datageojson = await Geojson.CleateGeojson(latlng, 'Point');
 
-        const datageojson = await Geojson.CleateGeojson(latlng, 'Point');
+      const { FeatureLayer, GeoJSONLayer } = await loadModules([
+        'esri/layers/FeatureLayer',
+        'esri/layers/GeoJSONLayer',
+      ]).then(([FeatureLayer, GeoJSONLayer]) => ({ FeatureLayer, GeoJSONLayer }));
 
-        const { FeatureLayer, GeoJSONLayer } = await loadModules([
-            'esri/layers/FeatureLayer',
-            'esri/layers/GeoJSONLayer',
-        ]).then(([FeatureLayer, GeoJSONLayer]) => ({ FeatureLayer, GeoJSONLayer }));
-
-        const clusterConfig = {
-            type: "cluster",
-            clusterRadius: "20px",
-            popupTemplate: {
-                title: 'Cluster summary',
-                content: 'This cluster represents {cluster_count} earthquakes.',
-                fieldInfos: [
-                    {
-                        fieldName: 'cluster_count',
-                        format: {
-                            places: 0,
-                            digitSeparator: true,
-                        },
-                    },
-                ],
+      const clusterConfig = {
+        type: "cluster",
+        clusterRadius: "20px",
+        popupTemplate: {
+          title: 'Cluster summary',
+          content: 'This cluster represents {cluster_count} earthquakes.',
+          fieldInfos: [
+            {
+              fieldName: 'cluster_count',
+              format: {
+                places: 0,
+                digitSeparator: true,
+              },
             },
-            clusterMinSize: "40px",
-            clusterMaxSize: "60px",
-            labelingInfo: [
-                {
-                    deconflictionStrategy: 'none',
-                    labelExpressionInfo: {
-                        expression: "Text($feature.cluster_count, '#,###')",
-                    },
-                    symbol: {
-                        type: 'text',
-                        color: '#ffffff',
-                        font: {
-                            weight: 'bold',
-                            family: 'Noto Sans',
-                            size: '18px',
-                        },
-                        url: await CreateIcon('#ff7c44', 'warning'),
-                    },
+          ],
+        },
+        clusterMinSize: "40px",
+        clusterMaxSize: "60px",
+        labelingInfo: [
+          {
+            deconflictionStrategy: 'none',
+            labelExpressionInfo: {
+              expression: "Text($feature.cluster_count, '#,###')",
+            },
+            symbol: {
+              type: 'text',
+              color: '#ffffff',
+              font: {
+                weight: 'bold',
+                family: 'Noto Sans',
+                size: '18px',
+              },
+              url: await CreateIcon('#ff7c44', 'warning'),
+            },
 
-                    labelPlacement: 'center-center',
-                },
+            labelPlacement: 'center-center',
+          },
 
-            ],
+        ],
 
-        };
+      };
 
-        stateView?.ui?.add(
-            ['divtable', document.querySelector('.ant-table-wrapper')],
-            'bottom-left',
-        );
+      stateView?.ui?.add(
+        ['divtable', document.querySelector('.ant-table-wrapper')],
+        'bottom-left',
+      );
 
-        // {
-        //     value: "near_expire", //ใกล้ Exp
-        //     symbol: {
-        //         type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-        //         url: await CreateIcon('#ff7c44', 'warning'),
-        //         width: '35px',
-        //         height: '35px',
-        //     },
-        // },
+      // {
+      //     value: "near_expire", //ใกล้ Exp
+      //     symbol: {
+      //         type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+      //         url: await CreateIcon('#ff7c44', 'warning'),
+      //         width: '35px',
+      //         height: '35px',
+      //     },
+      // },
 
-        // console.log('datageojson :>> ', datageojson);
-        // console.log('await CreateImgIcon(false , false)', await CreateImgIcon())
-        const layerpoint = new GeoJSONLayer({
-            id: 'pointlayer',
-            title: 'Earthquakes from the last month',
-            url: datageojson,
-            copyright: 'USGS Earthquakes',
+      // console.log('datageojson :>> ', datageojson);
+      // console.log('await CreateImgIcon(false , false)', await CreateImgIcon())
+      const layerpoint = new GeoJSONLayer({
+        id: 'pointlayer',
+        title: 'Earthquakes from the last month',
+        url: datageojson,
+        copyright: 'USGS Earthquakes',
+        field: 'status_work',
+        featureReduction: clusterConfig,
+        popupTemplate: {
+          title: 'name {name}',
+          content: 'name {name}',
+          fieldInfos: [
+            {
+              fieldName: 'time',
+              format: {
+                dateFormat: 'short-date-short-time',
+              },
+            },
+          ],
+        },
+        renderer: {
+          type: 'unique-value',
+          field: 'status_work',
+          symbol: {
             field: 'status_work',
-            featureReduction: clusterConfig,
-            popupTemplate: {
-                title: 'name {name}',
-                content: 'name {name}',
-                fieldInfos: [
-                    {
-                        fieldName: 'time',
-                        format: {
-                            dateFormat: 'short-date-short-time',
-                        },
-                    },
-                ],
+            type: 'simple-marker',
+            size: 15,
+            color: [226, 255, 40],
+            outline: {
+              color: '#000',
+              width: 1,
             },
-            renderer: {
-                type: 'unique-value',
-                field: 'status_work',
-                symbol: {
-                    field: 'status_work',
-                    type: 'simple-marker',
-                    size: 15,
-                    color: [226, 255, 40],
-                    outline: {
-                        color: '#000',
-                        width: 1,
-                    },
-                },
-                uniqueValueInfos: await gen_uniqueValueInfos()
+          },
+          uniqueValueInfos: await gen_uniqueValueInfos()
 
 
-            },
-        });
-        await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
-        stateMap?.add(layerpoint);
+        },
+      });
+      await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
+      stateMap?.add(layerpoint);
     }
-}
-
-const gen_uniqueValueInfos = async () => {
-
-  const uniqueValueInfos = [];
-
-  const scaffoldingIcon = [
-      {
-          name: "001",
-          img: '/assets/iconmap/scaffolding/0001.png'
-      },
-      {
-          name: "002",
-          img: '/assets/iconmap/scaffolding/0002.png'
-      },
-      {
-          name: "003",
-          img: '/assets/iconmap/scaffolding/0003.png'
-      },
-      {
-          name: "004",
-          img: '/assets/iconmap/scaffolding/0004.png'
-      },
-  ]
-  const scaffoldingStatusWork = [
-      {
-          name: "near_expire",
-          status: "warning",
-      },
-      {
-          name: "expire",
-          status: "warningWork",
-      },
-      {
-          name: "normal",
-          status: false,
-      },
-  ]
-
-
-  for (const x in scaffoldingIcon) {
-      if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
-          const a = scaffoldingIcon[x];
-          for (const y in scaffoldingStatusWork) {
-              if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
-                  const b = scaffoldingStatusWork[y];
-                  uniqueValueInfos.push({
-                      value: `${a.name}_${b.name}`,
-                      symbol: {
-                          type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                          url: await CreateImgIcon(a.img , b.status),
-                          width: '35px',
-                          height: '35px',
-                      },
-                  })
-              }
-          }
-      }
   }
 
-  console.log("uniqueValueInfos" , uniqueValueInfos)
+  const gen_uniqueValueInfos = async () => {
 
-  return uniqueValueInfos
+    const uniqueValueInfos = [];
 
-}
+    const scaffoldingIcon = [
+      {
+        name: "001",
+        img: '/assets/iconmap/scaffolding/0001.png'
+      },
+      {
+        name: "002",
+        img: '/assets/iconmap/scaffolding/0002.png'
+      },
+      {
+        name: "003",
+        img: '/assets/iconmap/scaffolding/0003.png'
+      },
+      {
+        name: "004",
+        img: '/assets/iconmap/scaffolding/0004.png'
+      },
+    ]
+    const scaffoldingStatusWork = [
+      {
+        name: "near_expire",
+        status: "warning",
+      },
+      {
+        name: "expire",
+        status: "warningWork",
+      },
+      {
+        name: "normal",
+        status: false,
+      },
+    ]
+
+
+    for (const x in scaffoldingIcon) {
+      if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
+        const a = scaffoldingIcon[x];
+        for (const y in scaffoldingStatusWork) {
+          if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
+            const b = scaffoldingStatusWork[y];
+            uniqueValueInfos.push({
+              value: `${a.name}_${b.name}`,
+              symbol: {
+                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                url: await CreateImgIcon(a.img, b.status),
+                width: '35px',
+                height: '35px',
+              },
+            })
+          }
+        }
+      }
+    }
+
+    console.log("uniqueValueInfos", uniqueValueInfos)
+
+    return uniqueValueInfos
+
+  }
 
   loadModules([
     'esri/config',
@@ -616,6 +616,12 @@ const gen_uniqueValueInfos = async () => {
     //   }
     // });
   };
+
+  const reset = () => {
+    form.resetFields()
+    onFinish(form.getFieldValue())
+  }
+  
   const onFinish = async (value) => {
     try {
       // console.log('value', value)
@@ -781,7 +787,7 @@ const gen_uniqueValueInfos = async () => {
                 ค้นหา
               </Button>
               <span style={{ paddingRight: 5 }} />
-              <Button style={{ width: 100 }} onClick={() => form.resetFields()}>
+              <Button style={{ width: 100 }} onClick={reset}>
                 ค่าเริ่มต้น
               </Button>
             </Form.Item>
