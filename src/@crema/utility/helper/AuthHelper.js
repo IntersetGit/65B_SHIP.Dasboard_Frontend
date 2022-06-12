@@ -42,7 +42,7 @@ export const getUserFromAWS = (user) => {
 };
 
 export const getUserFromJwtAuth = (user) => {
-  console.log('getUserFromJwtAuth ---->', user)
+  // console.log('getUserFromJwtAuth ---->', user)
   if (user)
     return {
       id: 1,
