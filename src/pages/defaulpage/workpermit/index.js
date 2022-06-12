@@ -5,55 +5,33 @@ import {
   Space,
   Form,
   Input,
-  InputNumber,
   Button,
   Select,
   Row,
   Col,
   Modal,
+  Drawer,
+  DatePicker
 } from 'antd';
 import { Map, WebScene } from '@esri/react-arcgis';
 import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
 import './index.style.less';
 import io from 'socket.io-client';
+import socketClient from '../../../util/socket';
 import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
-import { object } from 'prop-types';
-import cars from '../../../../src/assets/iconmap/car/cars.png';
+import moment, { isMoment } from 'moment';
 import Demodata from '../../demodata';
 import WaGeojson from '../../../util/WaGeojson';
-import { CreateIcon } from '../../../util/dynamic-icon'
-
+import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
+import API from '../../../util/Api'
+import { isArray } from 'lodash';
 
 setDefaultOptions({ css: true });
 
-const options = [
-  { value: 'gold' },
-  { value: 'lime' },
-  { value: 'green' },
-  { value: 'cyan' },
-];
-function tagRender(props) {
-  const { label, value, closable, onClose } = props;
-  const onPreventMouseDown = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
-  return (
-    <Tag
-      color={value}
-      onMouseDown={onPreventMouseDown}
-      closable={closable}
-      onClose={onClose}
-      style={{ marginRight: 3 }}
-    >
-      {label}
-    </Tag>
-  );
-}
 
-const Page1 = () => {
+const WorkpermitPage = () => {
   const [stateMap, setStateMap] = useState(null);
   const [stateView, setStateView] = useState(null);
   const refdrawn = useRef();
@@ -67,51 +45,71 @@ const Page1 = () => {
 
   const columns = [
     {
-      title: 'work_number',
-      dataIndex: 'work_number',
-      key: 'work_number',
+      title: 'เลข work',
+      dataIndex: 'WorkPermitNo',
+      key: 'WorkPermitNo',
       render: (text) => <a>{text}</a>,
+
     },
     {
-      title: 'name',
-      dataIndex: 'name',
-      key: 'name',
+      title: 'ผู้รับเหมา',
+      dataIndex: 'VendorName',
+      key: 'VendorName',
+
+
     },
     {
-      title: 'licensor',
-      dataIndex: 'licensor',
-      key: 'licensor',
+      title: 'เจ้าของพื้นที่',
+      dataIndex: 'OwnerName',
+      key: 'OwnerName',
+
     },
     {
-      title: 'supervisor',
-      dataIndex: 'supervisor',
-      key: 'supervisor',
+      title: 'ผู้ควบคุมงาน',
+      dataIndex: 'PTTStaff',
+      key: 'PTTStaff',
+
     },
     {
-      title: 'work_type',
-      key: 'work_type',
-      dataIndex: 'work_type',
-      render: (tags) => (
-        <>
-          <Tag color={'blue'} key={tags}>
-            {tags.toUpperCase()}
-          </Tag>
-        </>
-      ),
+      title: 'ประเภทใบอนุญาต',
+      key: 'WorkpermitType',
+      dataIndex: 'WorkpermitType',
+
     },
     {
-      title: 'date_time_start',
+      title: 'สถานที่ติดตั้ง',
+      key: 'AreaName',
+      dataIndex: 'AreaName',
+
+    },
+    {
+      title: 'วัน-เวลา เริ่มต้น',
       dataIndex: 'date_time_start',
       key: 'date_time_start',
+
     },
     {
-      title: 'date_time_end',
+      title: 'วัน-เวลา สิ้นสุด',
       dataIndex: 'date_time_end',
       key: 'date_time_end',
+
     },
     {
-      title: '',
+      title: 'สถานะ work',
+      dataIndex: 'WorkPermitStatus',
+      key: 'WorkPermitStatus',
+
+    },
+    {
+      title: 'สถานะแจ้งเตือน',
+      dataIndex: 'WarningStatus',
+      key: 'WarningStatus',
+
+    },
+    {
+      title: '...',
       key: '',
+
       render: (text, record) => {
         return (
           <Space size='middle'>
@@ -129,30 +127,183 @@ const Page1 = () => {
     },
   ];
 
+  const columns2 = [
+    {
+      title: 'เลข work',
+      dataIndex: 'WorkPermitNo',
+      key: 'WorkPermitNo',
+      render: (text) => <a>{text}</a>,
+      width: 150
+    },
+    {
+      title: 'ผู้รับเหมา',
+      dataIndex: 'VendorName',
+      key: 'VendorName',
+      width: 250
+
+    },
+    {
+      title: 'เจ้าของพื้นที่',
+      dataIndex: 'OwnerName',
+      key: 'OwnerName',
+      width: 200
+    },
+    {
+      title: 'ผู้ควบคุมงาน',
+      dataIndex: 'PTTStaff',
+      key: 'PTTStaff',
+      width: 200
+    },
+    {
+      title: 'ประเภทใบอนุญาต',
+      key: 'WorkpermitType',
+      dataIndex: 'WorkpermitType',
+      width: 150
+    },
+    {
+      title: 'สถานที่ติดตั้ง',
+      key: 'AreaName',
+      dataIndex: 'AreaName',
+      width: 150
+    },
+    {
+      title: 'วัน-เวลา เริ่มต้น',
+      dataIndex: 'date_time_start',
+      key: 'date_time_start',
+      width: 200
+    },
+    {
+      title: 'วัน-เวลา สิ้นสุด',
+      dataIndex: 'date_time_end',
+      key: 'date_time_end',
+      width: 200
+    },
+    {
+      title: 'สถานะ work',
+      dataIndex: 'WorkPermitStatus',
+      key: 'WorkPermitStatus',
+      width: 150
+    },
+    {
+      title: 'สถานะแจ้งเตือน',
+      dataIndex: 'WarningStatus',
+      key: 'WarningStatus',
+      width: 150
+    },
+    {
+      title: '...',
+      key: '',
+      width: 100,
+      render: (text, record) => {
+        return (
+          <Space size='middle'>
+            <Button
+              type='primary'
+              onClick={() => {
+                setDatamodal(record), setIsModalVisible(!isModalVisible);
+              }}
+            >
+              Detail
+            </Button>
+          </Space>
+        );
+      },
+    },
+  ];
+
+
   useEffect(() => {
     let isMounted = true;
-    var loopdata;
-    const socket = io.connect('http://localhost:3001');
-    (async () => {
-      const { WFSLayer, WMSLayer, Extent } = await loadModules(['esri/layers/WFSLayer', 'esri/layers/WMSLayer', "esri/geometry/Extent"]).then(
-        ([WFSLayer, WMSLayer, Extent]) => ({ WFSLayer, WMSLayer, Extent }),
-      );
-      var layer = new WMSLayer({
-        url: 'http://45.136.253.221:8080/geoserver/GeoServer_ITS/wms?request=GetCapabilities&service=WMS&version=1.3.0',
-        sublayers: [
-          {
-            name: 'GeoServer_ITS:merge_area'
+    const socketio = new socketClient();
+    const socket = socketio.io();
+
+    initMap(socket)
+
+    return () => {
+      (isMounted = false), socket.disconnect();
+    };
+  }, [stateMap, stateView]);
+
+  const initMap = async (socket) => {
+
+    const { WFSLayer, WMSLayer, Extent } = await loadModules(['esri/layers/WFSLayer', 'esri/layers/WMSLayer', "esri/geometry/Extent"]).then(
+      ([WFSLayer, WMSLayer, Extent]) => ({ WFSLayer, WMSLayer, Extent }),
+    );
+    const layer = new WMSLayer({
+      url: 'http://45.136.253.221:8080/geoserver/GeoServer_ITS/wms?request=GetCapabilities&service=WMS&version=1.3.0',
+      sublayers: [
+        {
+          name: 'GeoServer_ITS:merge_area'
+        }
+      ],
+    });
+    layer.when(async (data) => {
+      console.log('data', data.fullExtent.toJSON())
+      let extent = new Extent(data.fullExtent.toJSON());
+      // console.log('extent :>> ', extent.center);
+      // await stateView?.goTo(extent.center)
+    });
+    stateMap?.add(layer);
+    // CreateArea();
+
+    /* Layerpoint */
+    const resSf = await getWorkpermit({});
+    setLayerpoint(resSf)
+    socket.on("workpermit", (res) => {
+      // console.log('socket', res)
+      if (res.Status == "success") {
+        setLayerpoint(res.Message)
+      }
+    });
+
+
+  }
+
+  const setLayerpoint = async (item) => {
+
+    if (stateView) {
+
+      // let latlng = item.data;
+      Status_cal(item.summary);
+
+      console.log("data =>>>>>>>>>>>>>>>>>", item.data);
+      // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
+      if (isArray(item.filter)) {
+        const _filter = item.filter.map(e => {
+          return {
+            value: e._id
           }
-        ],
-      });
-      layer.when(async (data) => {
-        console.log('data', data.fullExtent.toJSON())
-        let extent = new Extent(data.fullExtent.toJSON());
-        // console.log('extent :>> ', extent.center);
-        // await stateView?.goTo(extent.center)
-      });
-      stateMap?.add(layer);
-      // CreateArea();
+        });
+        // console.log('_filter', _filter)
+        setScaffoldingTypeOptions(_filter)
+      }
+
+      let latlng = item.data.map(obj => {
+        // console.log('obj', obj)
+        return {
+          ...obj,
+          "id": obj._id,
+          "work_number": obj.WorkPermitNo,
+          "name": obj.Name,
+          "licensor": obj.PTTStaff,
+          "supervisor": obj.OwnerName,
+          "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
+          "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
+          // "status_work": obj.WorkPermitStatus.toLowerCase(),
+          "status_work": `${obj.ScaffoldingCode.toLowerCase()}_${obj.Status.toLowerCase()}`,
+          "latitude": obj.FeaturesPropertiesCentroid_X,
+          "longitude": obj.FeaturesPropertiesCentroid_Y,
+          "locatoin": obj.SubAreaName,
+          "work_type": obj.WorkpermitType,
+        }
+
+      })
+
+      // latlng = await datademo.getDemodata();
+      // console.log('latlng', latlng)
+      setTabledata(latlng);
+
+      const datageojson = await Geojson.CleateGeojson(latlng, 'Point');
 
       const { FeatureLayer, GeoJSONLayer } = await loadModules([
         'esri/layers/FeatureLayer',
@@ -189,88 +340,140 @@ const Page1 = () => {
               font: {
                 weight: 'bold',
                 family: 'Noto Sans',
-                size: '12px',
+                size: '18px',
               },
+              url: await CreateIcon('#ff7c44', 'warning'),
             },
+
             labelPlacement: 'center-center',
           },
-        ],
-      };
-      loopdata = setInterval(async () => {
-        let latlng = await datademo.getDemodata();
-        let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
 
-        Status_cal(latlng);
-        setTabledata(latlng);
-        stateView?.ui?.add(
-          ['divtable', document.querySelector('.ant-table-wrapper')],
-          'bottom-left',
-        );
-        // console.log('datageojson :>> ', datageojson);
-        const layerpoint = new GeoJSONLayer({
-          id: 'pointlayer',
-          title: 'Earthquakes from the last month',
-          url: datageojson,
-          copyright: 'USGS Earthquakes',
-          field: 'status_work',
-          featureReduction: clusterConfig,
-          popupTemplate: {
-            title: 'name {name}',
-            content: 'name {name}',
-            fieldInfos: [
-              {
-                fieldName: 'time',
-                format: {
-                  dateFormat: 'short-date-short-time',
-                },
-              },
-            ],
-          },
-          renderer: {
-            type: 'unique-value',
-            field: 'status_work',
-            symbol: {
-              field: 'status_work',
-              type: 'simple-marker',
-              size: 15,
-              color: [226, 255, 40],
-              outline: {
-                color: '#000',
-                width: 1,
+        ],
+
+      };
+
+      stateView?.ui?.add(
+        ['divtable', document.querySelector('.ant-table-wrapper')],
+        'bottom-left',
+      );
+
+      // {
+      //     value: "near_expire", //ใกล้ Exp
+      //     symbol: {
+      //         type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+      //         url: await CreateIcon('#ff7c44', 'warning'),
+      //         width: '35px',
+      //         height: '35px',
+      //     },
+      // },
+
+      // console.log('datageojson :>> ', datageojson);
+      // console.log('await CreateImgIcon(false , false)', await CreateImgIcon())
+      const layerpoint = new GeoJSONLayer({
+        id: 'pointlayer',
+        title: 'Earthquakes from the last month',
+        url: datageojson,
+        copyright: 'USGS Earthquakes',
+        field: 'status_work',
+        featureReduction: clusterConfig,
+        popupTemplate: {
+          title: 'name {name}',
+          content: 'name {name}',
+          fieldInfos: [
+            {
+              fieldName: 'time',
+              format: {
+                dateFormat: 'short-date-short-time',
               },
             },
-            uniqueValueInfos: [
-              {
-                value: 'open',
-                symbol: {
-                  type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                  url: await CreateIcon('#ff7c44', 'warning'),
-                  width: '35px',
-                  height: '35px',
-                },
-              },
-              {
-                value: 'close',
-                symbol: {
-                  type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                  url: await CreateIcon('#4460ff', false, 2),
-                  width: '35px',
-                  height: '35px',
-                },
-              },
-            ]
-
-
+          ],
+        },
+        renderer: {
+          type: 'unique-value',
+          field: 'status_work',
+          symbol: {
+            field: 'status_work',
+            type: 'simple-marker',
+            size: 15,
+            color: [226, 255, 40],
+            outline: {
+              color: '#000',
+              width: 1,
+            },
           },
-        });
-        await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
-        stateMap?.add(layerpoint);
-      }, 5000);
-    })();
-    return () => {
-      (isMounted = false), socket.disconnect(), clearInterval(loopdata);
-    };
-  }, [stateMap, stateView]);
+          uniqueValueInfos: await gen_uniqueValueInfos()
+
+
+        },
+      });
+      await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
+      stateMap?.add(layerpoint);
+    }
+  }
+
+  const gen_uniqueValueInfos = async () => {
+
+    const uniqueValueInfos = [];
+
+    const scaffoldingIcon = [
+      {
+        name: "001",
+        img: '/assets/iconmap/scaffolding/0001.png'
+      },
+      {
+        name: "002",
+        img: '/assets/iconmap/scaffolding/0002.png'
+      },
+      {
+        name: "003",
+        img: '/assets/iconmap/scaffolding/0003.png'
+      },
+      {
+        name: "004",
+        img: '/assets/iconmap/scaffolding/0004.png'
+      },
+    ]
+    const scaffoldingStatusWork = [
+      {
+        name: "near_expire",
+        status: "warning",
+      },
+      {
+        name: "expire",
+        status: "warningWork",
+      },
+      {
+        name: "normal",
+        status: false,
+      },
+    ]
+
+
+    for (const x in scaffoldingIcon) {
+      if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
+        const a = scaffoldingIcon[x];
+        for (const y in scaffoldingStatusWork) {
+          if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
+            const b = scaffoldingStatusWork[y];
+            uniqueValueInfos.push({
+              value: `${a.name}_${b.name}`,
+              symbol: {
+                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                url: await CreateImgIcon(a.img, b.status),
+                width: '35px',
+                height: '35px',
+              },
+            })
+          }
+        }
+      }
+    }
+
+    console.log("uniqueValueInfos", uniqueValueInfos)
+
+    return uniqueValueInfos
+
+  }
 
   loadModules([
     'esri/config',
@@ -328,15 +531,15 @@ const Page1 = () => {
   };
 
   const Status_cal = async (data) => {
-    let warning = data.filter((data, key) => data.status_warnning !== null);
-    const sum = data.map((data, key) => data.status_work);
-    let result = [...new Set(sum)].reduce(
-      (acc, curr) => ((acc[curr] = sum.filter((a) => a == curr).length), acc),
-      {},
-    );
-    // console.log('result :>> ', result);
+
+    // console.log('data', data)
     dispatch(
-      setStatus({ ...result, warning: warning.length, total: sum.length }),
+      setStatus({
+        "จำนวน": data.all,
+        "ปกติ": data.normal,
+        "⚠️ ใกล้ Exp": data.near_expire,
+        "‼️ หมด Exp": data.expire,
+      }),
     );
   };
 
@@ -413,6 +616,60 @@ const Page1 = () => {
     //   }
     // });
   };
+
+  const reset = () => {
+    form.resetFields()
+    onFinish(form.getFieldValue())
+  }
+
+  const onFinish = async (value) => {
+    try {
+      // console.log('value', value)
+      const model = {
+        ...value,
+        StartDateTime: isMoment(value.StartDateTime) ? value.StartDateTime.format(`YYYY-MM-DD HH:mm`) : "",
+        EndDateTime: isMoment(value.EndDateTime) ? value.EndDateTime.format(`YYYY-MM-DD HH:mm`) : ""
+      }
+      // console.log('model', model)
+
+      // console.log('first', getWorkpermit(model))
+      setLayerpoint(await getWorkpermit(model))
+
+    } catch (error) {
+      console.log('error', error)
+    }
+  }
+
+  const onFinishFailed = (error) => {
+    console.log('error', error)
+  }
+
+  const [visible, setVisible] = useState(false);
+  const [scaffoldingTypeOptions, setScaffoldingTypeOptions] = useState([]);
+  const [form] = Form.useForm()
+
+  const getWorkpermit = async (item) => {
+    let url = `/workpermit/all?`;
+    if (item.PTTStaffCode) url += `&PTTStaffCode=${item.PTTStaffCode}`;
+    if (item.VendorCode) url += `&VendorCode=${item.VendorCode}`;
+    if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
+    if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
+    if (item.AreaID) url += `&AreaID=${item.AreaID}`;
+    if (isArray(item.ScaffoldingType)) {
+      url += `&ScaffoldingType=${item.ScaffoldingType.toString()}`;
+    }
+    const { data } = await API.get(url);
+    return data.Status === 'success' ? data.Message : {
+      data: [],
+      summary: {
+        all: 0,
+        expire: 0,
+        near_expire: 0,
+      }
+    }
+  }
+
+
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <Map
@@ -439,20 +696,22 @@ const Page1 = () => {
           <div
             className='esri-widget--button esri-icon-table'
             onClick={() => {
-              if (
-                document.querySelector('.esri-ui-bottom-left').style.display ===
-                'none' ||
-                document.querySelector('.esri-ui-bottom-left').style.display ===
-                ''
-              ) {
-                document
-                  .querySelector('.esri-ui-bottom-left')
-                  .style.setProperty('display', 'block', 'important');
-              } else {
-                document
-                  .querySelector('.esri-ui-bottom-left')
-                  .style.setProperty('display', 'none', 'important');
-              }
+              // if (
+              //     document.querySelector('.esri-ui-bottom-left').style.display ===
+              //     'none' ||
+              //     document.querySelector('.esri-ui-bottom-left').style.display ===
+              //     ''
+              // ) {
+              //     document
+              //         .querySelector('.esri-ui-bottom-left')
+              //         .style.setProperty('display', 'block', 'important');
+              // } else {
+              //     document
+              //         .querySelector('.esri-ui-bottom-left')
+              //         .style.setProperty('display', 'none', 'important');
+              // }
+
+              setVisible(!visible)
             }}
           />
         </div>
@@ -462,49 +721,86 @@ const Page1 = () => {
           className='menuserchslide esri-widget'
         >
           <Form
-            labelCol={{ span: 9 }}
-            wrapperCol={{ span: 16 }}
+            form={form}
+            labelCol={{ span: 8 }}
+            wrapperCol={{ span: 18 }}
             name='nest-messages'
+            onFinish={onFinish}
+            onFinishFailed={onFinishFailed}
           >
             <Form.Item
-              name={['user', 'name']}
-              label='วันเวลา เริ้มต้น'
-              rules={[{ required: true }]}
+              name="PTTStaffCode"
+              label='รหัสพนักงานผู้ควบคุม'
             >
-              <Input size='small' />
+              <Input />
             </Form.Item>
+
             <Form.Item
-              name={['user', 'email']}
-              label='วันเวลา สิ้นสุด'
-              rules={[{ type: 'email' }]}
+              name="PTTStaffCode"
+              label='หน่วยงานผู้ควบคุม'
             >
-              <Input size='small' />
+              <Input />
             </Form.Item>
+
             <Form.Item
-              name={['user', 'age']}
-              label='สถานที่ปฎิบัติงาน'
-              rules={[{ type: 'number', min: 0, max: 99 }]}
+              name="StartDateTime"
+              label='วัน-เวลา เริ่มต้น'
             >
-              <InputNumber size='small' />
+              <DatePicker
+                showTime={{ format: 'HH:mm' }}
+                format="DD/MM/YYYY HH:mm"
+                style={{ width: '100%' }} />
             </Form.Item>
-            <Form.Item name={['user', 'website']} label='ประเภทใบอนุญาติ'>
-              <Input size='small' />
+
+            <Form.Item
+              name="EndDateTime"
+              label='วัน-เวลา สิ้นสุด'
+            >
+              <DatePicker
+                showTime={{ format: 'HH:mm' }}
+                format="DD/MM/YYYY HH:mm"
+                style={{ width: '100%' }} />
             </Form.Item>
-            <Form.Item name={['user', 'website']} label='หัวข้อการค้นหา'>
+
+            <Form.Item
+              name="AreaID"
+              label='สถานที่ปฏิบัติงาน'
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              name="ScaffoldingType"
+              label='ประเภทใบอนุญาต'
+            >
               <Select
                 mode='multiple'
                 showArrow
-                tagRender={tagRender}
                 style={{ width: '100%' }}
-                options={options}
+                options={scaffoldingTypeOptions}
               />
             </Form.Item>
-            <Form.Item name={['user', 'introduction']} label='Introduction'>
-              <Input.TextArea size='ข้อเสนอแนะ' />
+
+            <Form.Item
+              name="ScaffoldingType"
+              label='หัวหน้าการค้นหา'
+            >
+              <Select
+                mode='multiple'
+                showArrow
+                style={{ width: '100%' }}
+                options={scaffoldingTypeOptions}
+              />
             </Form.Item>
-            <Form.Item wrapperCol={{ span: 16, offset: 18 }}>
-              <Button type='primary' htmlType='submit'>
+
+            <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
+
+              <Button type='primary' htmlType='submit' style={{ width: 100 }}>
                 ค้นหา
+              </Button>
+              <span style={{ paddingRight: 5 }} />
+              <Button style={{ width: 100 }} onClick={reset}>
+                ค่าเริ่มต้น
               </Button>
             </Form.Item>
           </Form>
@@ -512,7 +808,7 @@ const Page1 = () => {
         <div ref={refdetail} className='menuserchslide detailemo esri-widget'>
           <Row>
             <Col span={8}>
-              <p>ใช้ 8 สีแทนประเภท</p>
+              <p>สีแทนประเภท</p>
               <div
                 style={{
                   display: 'grid',
@@ -592,8 +888,19 @@ const Page1 = () => {
             </Row>
           ))}
       </Modal>
+
+      <Drawer
+        // id='divtable'
+        title={false}
+        placement={"bottom"}
+        // closable={false}
+        onClose={() => setVisible(false)}
+        visible={visible}
+      >
+        <Table size='small' dataSource={tabledata} columns={columns2} rowKey={(row) => row.id} scroll={{ x: "100%", y: "30vh" }} />
+      </Drawer>
     </div>
   );
 };
 
-export default Page1;
+export default WorkpermitPage;
