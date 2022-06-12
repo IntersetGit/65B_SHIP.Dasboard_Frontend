@@ -74,8 +74,9 @@ const JWTAuthAuthProvider = ({ children }) => {
 
         /* mydata */
         const res = await Api.get('/auth/mydata');
-        console.log('res.data', res.data)
+        
         if (res.data.Status == "success") {
+          console.log('mydata', res.data.Message)
           setJWTAuthData({ user: res.data.Message, isAuthenticated: true, isLoading: false });
           dispatch({ type: FETCH_SUCCESS });
         } else {

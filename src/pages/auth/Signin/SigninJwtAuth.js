@@ -33,8 +33,8 @@ const SignInJwtAuth = () => {
           name='basic'
           initialValues={{
             remember: true,
-            email: 'scaffolding',
-            password: 'Scaf_Folding%001',
+            email: 'admin',
+            password: 'Admin%001',
           }}
           onFinish={signInUser}
           onFinishFailed={onFinishFailed}

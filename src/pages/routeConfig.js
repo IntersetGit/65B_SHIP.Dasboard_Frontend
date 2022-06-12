@@ -10,6 +10,7 @@ import ScaffoldingIcon from '../assets/icon/Scaffolding.png';
 import VechicleIcon from '../assets/icon/Vechicle.png';
 import WorkpermistIcon from '../assets/icon/Work Permit.png';
 import Icon from '@ant-design/icons';
+
 const routesConfig = [
   {
     id: 'app',
@@ -21,6 +22,7 @@ const routesConfig = [
         id: 'workpermit',
         title: 'workpermit',
         messageId: 'sidebar.sample.page1',
+        message: "Work Permit2",
         type: 'item',
         icon: (
           <Icon
