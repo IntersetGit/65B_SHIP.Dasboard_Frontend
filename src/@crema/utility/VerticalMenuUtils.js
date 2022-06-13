@@ -1,13 +1,15 @@
-import {Link, useLocation} from 'react-router-dom';
-import {Menu} from 'antd';
-import {WarningFilled} from '@ant-design/icons';
+import { Link, useLocation } from 'react-router-dom';
+import { Menu } from 'antd';
+import { WarningFilled } from '@ant-design/icons';
 import React from 'react';
 import routesConfig from '../../pages/routeConfig';
-import {useIntl} from 'react-intl';
-import {useSidebarContext} from './AppContextProvider/SidebarContextProvider';
+import { useIntl } from 'react-intl';
+import { useSidebarContext } from './AppContextProvider/SidebarContextProvider';
+import { useAuthUser } from './AuthHooks';
+import Icon from '@ant-design/icons';
 
 function getStyles(item, sidebarColorSet, isSidebarBgImage, index, isGroup) {
-  const {pathname} = useLocation();
+  const { pathname } = useLocation();
   // const selectedKeys = pathname.substr(1);
   const selectedKeys = pathname;
   const defaultOpenKeys = selectedKeys.split('/');
@@ -25,15 +27,15 @@ function getStyles(item, sidebarColorSet, isSidebarBgImage, index, isGroup) {
       backgroundColor: isActive
         ? sidebarColorSet.sidebarMenuSelectedBgColor
         : isSidebarBgImage
-        ? ''
-        : sidebarColorSet.sidebarBgColor,
+          ? ''
+          : sidebarColorSet.sidebarBgColor,
     };
   }
 }
 
 const renderMenuItemChildren = (item) => {
-  const {icon, messageId, path} = item;
-  const {messages} = useIntl();
+  const { icon, messageId, path, message } = item;
+  const { messages } = useIntl();
 
   if (path && path.includes('/'))
     return (
@@ -45,10 +47,10 @@ const renderMenuItemChildren = (item) => {
             <icon className='ant-menu-item-icon' />
           ))}
         <span data-testid={messageId.toLowerCase + '-nav'}>
-          {messages[messageId]}
+          {message ?? messages[messageId]}
         </span>
-        <span style={{position: 'absolute', right: 5}}>
-          <WarningFilled style={{color: '#ff7a0e'}} />
+        <span style={{ position: 'absolute', right: 5 }}>
+          <WarningFilled style={{ color: '#ff7a0e' }} />
         </span>
       </Link>
     );
@@ -62,7 +64,7 @@ const renderMenuItemChildren = (item) => {
             <icon className='ant-menu-item-icon' />
           ))}
         <span data-testid={messageId.toLowerCase + '-nav'}>
-          {messages[messageId]}
+          {message ?? messages[messageId]}
         </span>
       </>
     );
@@ -112,19 +114,68 @@ const renderMenu = (item, sidebarColorSet, isSidebarBgImage, index) => {
       {item.children
         ? item.children
         : renderMenuItemChildren(
-            item,
-            sidebarColorSet,
-            isSidebarBgImage,
-            index,
-          )}
+          item,
+          sidebarColorSet,
+          isSidebarBgImage,
+          index,
+        )}
     </Menu.Item>
   );
 };
 
 export const getRouteMenus = () => {
-  const {sidebarColorSet} = useSidebarContext();
-  const {isSidebarBgImage} = useSidebarContext();
-  return routesConfig.map((route) =>
+  const { sidebarColorSet } = useSidebarContext();
+  const { isSidebarBgImage } = useSidebarContext();
+  const { user } = useAuthUser()
+
+
+
+  // console.log('  useAuthUser() =>>>>>>>>>;', user)
+  const imgSrc = {
+    "62a4d45011b91829618a4413": "/assets/icon/Work Permit.png",
+    "62a4d4a822bdf92ba30d162b": "/assets/icon/Vechicle.png",
+    "62a4d4b922bdf92ba30d162f": "/assets/icon/Equipment.png",
+    "62a4d4c622bdf92ba30d1633": "/assets/icon/Scaffolding.png",
+    "62a4d4de22bdf92ba30d1637": "/assets/icon/People Tracking.png",
+    "62a4d4fa22bdf92ba30d163b": "/assets/icon/Access Control.png",
+  }
+
+  const children = user.menu.map((item) => {
+    return {
+      id: item.application_name,
+      title: item.application_name,
+      messageId: 'sidebar.sample.page1',
+      message: item.application_name,
+      type: 'item',
+      icon: (
+        <Icon
+          component={() => (
+            <img src={imgSrc[item._id]} width='20' style={{ marginTop: -10 }} />
+          )}
+        />
+      ),
+      path: item.url,
+    }
+
+  })
+
+  const route = [
+    {
+      id: 'app',
+      title: 'Mornitor',
+      messageId: 'sidebar.sample',
+      type: 'group',
+      children,
+    }
+  ]
+
+  //  return routesConfig.map((route) =>
+  //   renderMenu(route, sidebarColorSet, isSidebarBgImage, 0),
+  // );
+
+  return route.map((route) =>
     renderMenu(route, sidebarColorSet, isSidebarBgImage, 0),
   );
+
+
 };
