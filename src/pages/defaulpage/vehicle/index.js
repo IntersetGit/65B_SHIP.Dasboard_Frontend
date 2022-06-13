@@ -22,7 +22,7 @@ import {setStatus} from '../../../redux/actions';
 import {object} from 'prop-types';
 import Demodata from '../../demodata';
 
-setDefaultOptions({css: true});
+setDefaultOptions({css: 'true'});
 
 const options = [
   {value: 'gold'},

@@ -13,20 +13,18 @@ import {
   Modal,
 } from 'antd';
 import { Map, WebScene } from '@esri/react-arcgis';
-import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
+import { loadModules, loadCss } from 'esri-loader';
 import './index.style.less';
 import io from 'socket.io-client';
-import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
-import { object } from 'prop-types';
 import cars from '../../../../src/assets/iconmap/car/cars.png';
 import Demodata from '../../demodata';
 import WaGeojson from '../../../util/WaGeojson';
 import { CreateIcon } from '../../../util/dynamic-icon'
+import PTTlayers from '../../../util/PTTlayer'
 
 
-setDefaultOptions({ css: true });
 
 const options = [
   { value: 'gold' },
@@ -53,6 +51,8 @@ function tagRender(props) {
   );
 }
 
+
+
 const Page1 = () => {
   const [stateMap, setStateMap] = useState(null);
   const [stateView, setStateView] = useState(null);
@@ -64,6 +64,7 @@ const Page1 = () => {
   const dispatch = useDispatch();
   const datademo = new Demodata('workpermit');
   const Geojson = new WaGeojson();
+  const PTTlayer = new PTTlayers();
 
   const columns = [
     {
@@ -134,30 +135,11 @@ const Page1 = () => {
     var loopdata;
     const socket = io.connect('http://localhost:3001');
     (async () => {
-      const { WFSLayer, WMSLayer, Extent } = await loadModules(['esri/layers/WFSLayer', 'esri/layers/WMSLayer', "esri/geometry/Extent"]).then(
-        ([WFSLayer, WMSLayer, Extent]) => ({ WFSLayer, WMSLayer, Extent }),
-      );
-      var layer = new WMSLayer({
-        url: 'http://45.136.253.221:8080/geoserver/GeoServer_ITS/wms?request=GetCapabilities&service=WMS&version=1.3.0',
-        sublayers: [
-          {
-            name: 'GeoServer_ITS:merge_area'
-          }
-        ],
-      });
-      layer.when(async (data) => {
-        console.log('data', data.fullExtent.toJSON())
-        let extent = new Extent(data.fullExtent.toJSON());
-        // console.log('extent :>> ', extent.center);
-        // await stateView?.goTo(extent.center)
-      });
-      stateMap?.add(layer);
-      // CreateArea();
 
-      const { FeatureLayer, GeoJSONLayer } = await loadModules([
+      const [ FeatureLayer, GeoJSONLayer ] = await loadModules([
         'esri/layers/FeatureLayer',
         'esri/layers/GeoJSONLayer',
-      ]).then(([FeatureLayer, GeoJSONLayer]) => ({ FeatureLayer, GeoJSONLayer }));
+      ]);
 
       const clusterConfig = {
         type: "cluster",
@@ -202,14 +184,10 @@ const Page1 = () => {
 
         Status_cal(latlng);
         setTabledata(latlng);
-        stateView?.ui?.add(
-          ['divtable', document.querySelector('.ant-table-wrapper')],
-          'bottom-left',
-        );
-        // console.log('datageojson :>> ', datageojson);
+
         const layerpoint = new GeoJSONLayer({
           id: 'pointlayer',
-          title: 'Earthquakes from the last month',
+          title: 'ใช้สีสัญลักษณ์แทนประเภท',
           url: datageojson,
           copyright: 'USGS Earthquakes',
           field: 'status_work',
@@ -258,6 +236,15 @@ const Page1 = () => {
                   height: '35px',
                 },
               },
+              {
+                value: 'warning',
+                symbol: {
+                  type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                  url: await CreateIcon('#F54', false, 2),
+                  width: '35px',
+                  height: '35px',
+                },
+              },
             ]
 
 
@@ -272,60 +259,7 @@ const Page1 = () => {
     };
   }, [stateMap, stateView]);
 
-  loadModules([
-    'esri/config',
-    'esri/Map',
-    'esri/views/MapView',
-    'esri/layers/TileLayer',
-  ]).then(async ([esriConfig, Map, MapView, TileLayer]) => {
-    esriConfig.apiKey =
-      'AAPKf24959e55476492eb12c8cbaa4d1261etdgkaLK718fs8_EuvckemKt2gyRR-8p04PR7mC2G8Oi5oNli_65xV-C8u8BuPQTZ';
-  });
 
-  const CreateArea = async () => {
-    const { Graphic, GraphicsLayer, Polygon } = await loadModules([
-      'esri/Graphic',
-      'esri/layers/GraphicsLayer',
-      'esri/geometry/Polygon',
-    ]).then(([Graphic, GraphicsLayer, Polygon]) => {
-      return { Graphic, GraphicsLayer, Polygon };
-    });
-    for (const layer in DaraArea) {
-      // DaraArea.map( async(layer) => {
-      let layerArea = new GraphicsLayer({
-        id: DaraArea[layer].name,
-      });
-      stateMap?.add(layerArea, 0);
-
-      const polygon = new Polygon({
-        rings: DaraArea[layer].geomantry,
-      });
-
-      // Create a symbol for rendering the graphic
-      const fillSymbol = {
-        type: 'simple-fill', // autocasts as new SimpleFillSymbol()
-        color: DaraArea[layer].color,
-        outline: {
-          // autocasts as new SimpleLineSymbol()
-          color: [255, 255, 255],
-          width: 1,
-        },
-      };
-
-      // Add the geometry and symbol to a new graphic
-      const polygonGraphic = new Graphic({
-        geometry: polygon,
-        symbol: fillSymbol,
-      });
-      // stateView?.graphics?.addMany([polygonGraphic]);
-      await layerArea.add(polygonGraphic);
-
-      await stateView?.goTo(polygon.extent);
-      // console.log('polygon.extent :>> ', polygon.extent.toJSON());
-
-      // })
-    }
-  };
 
   const Status_cal = async (data) => {
     let warning = data.filter((data, key) => data.status_warnning !== null);
@@ -341,21 +275,27 @@ const Page1 = () => {
   };
 
   const Onload = async (map, view) => {
-    const { Fullscreen, UI, Zoom, Expand, Extent, locator } = await loadModules([
+    const [Fullscreen, UI, Zoom, Expand, Legend, Extent, locator, MapImageLayer ] = await loadModules([
       'esri/widgets/Fullscreen',
       'esri/views/ui/UI',
       'esri/widgets/Zoom',
       'esri/widgets/Expand',
+      "esri/widgets/Legend",
       'esri/geometry/Extent',
       'esri/rest/locator',
-    ]).then(([Fullscreen, UI, Zoom, Expand, Extent, locator]) => {
-      return { Fullscreen, UI, Zoom, Expand, Extent, locator };
-    });
+      "esri/layers/MapImageLayer"
+    ])
     const fullscreenui = new Fullscreen({
       view: view,
+      element:document.querySelector("#pagediv"),
+      id:'fullscreenwiget'
     });
     const zoomui = new Zoom({
       view: view,
+    });
+    const legend = new Legend({
+      view,
+      container: "legendDiv",
     });
     const expand = new Expand({
       expandTooltip: 'ค้นหา',
@@ -376,26 +316,11 @@ const Page1 = () => {
     view.ui.add(fullscreenui, 'top-right');
     view.ui.add(zoomui, 'top-right');
     view.ui.add(detaillayer, 'top-right');
-    view?.ui?.add(
-      ['divtable', document.querySelector('.ant-table-wrapper')],
-      'bottom-left',
-    );
-    const geocodingServiceUrl = "https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
-    view.on("click", function (event) {
-      event.stopPropagation(); // overwrite default click-for-popup behavior
-      // console.log('event.mapPoint :>> ', event.mapPoint);
-      var lat = Math.round(event.mapPoint.latitude * 1000) / 1000;
-      var lon = Math.round(event.mapPoint.longitude * 1000) / 1000;
-      view.popup.open({
-        title: "ตำแหน่งที่ตั้ง: [" + lon + ", " + lat + "]",
-        location: event.mapPoint // Set the location of the popup to the clicked location
-      });
-      // Display the popup
-      locator.locationToAddress(geocodingServiceUrl, { location: event.mapPoint }).then((res) => {
-        view.popup.content = res.address;
-      })
-    });
 
+
+
+    PTTlayer.ADDPTTWMSLAYER(map, view)
+    view.graphics.addMany(await PTTlayer.SHOW_AREALAYERNAME());
     setStateMap(map);
     setStateView(view);
 
@@ -414,7 +339,7 @@ const Page1 = () => {
     // });
   };
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div id="pagediv">
       <Map
         className='Mapacrgis'
         onLoad={Onload}
@@ -440,17 +365,17 @@ const Page1 = () => {
             className='esri-widget--button esri-icon-table'
             onClick={() => {
               if (
-                document.querySelector('.esri-ui-bottom-left').style.display ===
+                document.querySelector('.ant-table-wrapper').style.display ===
                 'none' ||
-                document.querySelector('.esri-ui-bottom-left').style.display ===
+                document.querySelector('.ant-table-wrapper').style.display ===
                 ''
               ) {
                 document
-                  .querySelector('.esri-ui-bottom-left')
+                  .querySelector('.ant-table-wrapper')
                   .style.setProperty('display', 'block', 'important');
               } else {
                 document
-                  .querySelector('.esri-ui-bottom-left')
+                  .querySelector('.ant-table-wrapper')
                   .style.setProperty('display', 'none', 'important');
               }
             }}
@@ -509,89 +434,27 @@ const Page1 = () => {
             </Form.Item>
           </Form>
         </div>
-        <div ref={refdetail} className='menuserchslide detailemo esri-widget'>
-          <Row>
-            <Col span={8}>
-              <p>ใช้ 8 สีแทนประเภท</p>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gridGap: '5px',
-                }}
-              >
-                <span>🔴</span>
-                <span>🟠</span>
-                <span>🟡</span>
-                <span>🟢</span>
-                <span>🔵</span>
-              </div>
-            </Col>
-            <Col span={8}>
-              <p>ใช้ 2 สีแทนประเภท</p>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gridGap: '5px',
-                }}
-              >
-                <span>🟢</span>
-                <span>🔵</span>
-              </div>
-            </Col>
-            <Col span={8}>
-              <p>ใช้สัญลักษณ์แทนการแจ้งเตือน</p>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gridGap: '5px',
-                }}
-              >
-                <span>🚸</span>
-                <span>⛔</span>
-                <span>✅</span>
-                <span>🛑</span>
-                <span>🚯</span>
-              </div>
-            </Col>
-          </Row>
+        <div ref={refdetail} className='esri-widget'>
+          <div id="legendDiv"></div>
         </div>
-        <Table
-          id='divtable'
-          scroll={{ y: '25vh' }}
-          size='small'
-          rowClassName={(record, index) =>
-            record?.status_warnning !== null &&
-              record?.status_warnning !== undefined
-              ? 'table-row-red'
-              : ''
-          }
-          rowKey={(i) => i.id}
-          columns={columns}
-          dataSource={tabledata}
-        />
+
       </Map>
 
-      {/* <div id="viewDiv" style={{height:'70vh'}}></div> */}
-
-      <Modal
-        title='รายละเอียด'
-        okButtonProps={{ hidden: true }}
-        onCancel={() => setIsModalVisible(!isModalVisible)}
-        visible={isModalVisible}
-      >
-        {datamodal &&
-          Object.entries(datamodal).map(([key, value]) => (
-            <Row key={key}>
-              <Col span={12}>
-                <a>{key}</a>
-              </Col>
-              <Col span={12}>{value}</Col>
-            </Row>
-          ))}
-      </Modal>
+      <Table
+        id='divtable'
+        scroll={{ y: '25vh' }}
+        size='small'
+        style={{position:'absolute',bottom:0,backgroundColor:'white',display:'none'}}
+        rowClassName={(record, index) =>
+          record?.status_warnning !== null &&
+            record?.status_warnning !== undefined
+            ? 'table-row-red'
+            : ''
+        }
+        rowKey={(i) => i.id}
+        columns={columns}
+        dataSource={tabledata}
+      />
     </div>
   );
 };
