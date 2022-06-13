@@ -245,27 +245,6 @@ const WorkpermitPage = () => {
 
   const initMap = async (socket) => {
 
-    const { WFSLayer, WMSLayer, Extent } = await loadModules(['esri/layers/WFSLayer', 'esri/layers/WMSLayer', "esri/geometry/Extent"]).then(
-      ([WFSLayer, WMSLayer, Extent]) => ({ WFSLayer, WMSLayer, Extent }),
-    );
-    const layer = new WMSLayer({
-      url: 'http://45.136.253.221:8080/geoserver/GeoServer_ITS/wms?request=GetCapabilities&service=WMS&version=1.3.0',
-      sublayers: [
-        {
-          name: 'GeoServer_ITS:merge_area'
-        }
-      ],
-    });
-    layer.when(async (data) => {
-      console.log('data', data.fullExtent.toJSON())
-      let extent = new Extent(data.fullExtent.toJSON());
-      // console.log('extent :>> ', extent.center);
-      // await stateView?.goTo(extent.center)
-    });
-    stateMap?.add(layer);
-    // CreateArea();
-
-    /* Layerpoint */
     const resSf = await getWorkpermit({});
     setLayerpoint(resSf)
     socket.on("workpermit", (res) => {
@@ -549,19 +528,6 @@ const WorkpermitPage = () => {
     setStateMap(map);
     setStateView(view);
 
-    // view.watch('updating', function (val) {
-    //   const ext = new Extent({
-    //     type: 'extent',
-    //     spatialReference: { wkid: 4326 },
-    //     xmax: 100.32800674438477,
-    //     xmin: 100.30938148498534,
-    //     ymax: 13.785986924617411,
-    //     ymin: 13.767647416498118,
-    //   });
-    //   if (!view.extent.intersects(ext)) {
-    //     view.goTo(ext);
-    //   }
-    // });
   };
 
   const reset = () => {
@@ -603,14 +569,6 @@ const WorkpermitPage = () => {
         mapProperties={{
           basemap: `${'arcgis-navigation'}`,
           autoResize: false,
-          // extent: {
-          //   type:'extent',
-          //   spatialReference: { wkid: 4326 },
-          //   xmax: 100.32800674438477,
-          //   xmin: 100.30938148498534,
-          //   ymax: 13.785986924617411,
-          //   ymin: 13.767647416498118,
-          // },
         }}
         viewProperties={{
           center: [100.3330867, 14.5548052],
