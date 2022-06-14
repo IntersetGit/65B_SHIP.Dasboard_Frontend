@@ -319,11 +319,12 @@ const Vehicle = () => {
         className='Mapacrgis'
         onLoad={Onload}
         mapProperties={{
-          basemap: /*`${'arcgis-light-gray'?? 'arcgis-navigation'}`*/ {
-            portalItem: {
-              id: '8d91bd39e873417ea21673e0fee87604', // nova basemap
-            },
-          },
+          // basemap: /*`${'arcgis-light-gray'?? 'arcgis-navigation'}`*/ {
+          //   portalItem: {
+          //     id: '8d91bd39e873417ea21673e0fee87604', // nova basemap
+          //   },
+          // },
+          basemap: `${'arcgis-navigation'}`,
           autoResize: false,
         }}
         viewProperties={{

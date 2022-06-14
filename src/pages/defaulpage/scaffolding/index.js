@@ -21,7 +21,6 @@ import socketClient from '../../../util/socket';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
 import moment, { isMoment } from 'moment';
-import Demodata from '../../demodata';
 import WaGeojson from '../../../util/WaGeojson';
 import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
