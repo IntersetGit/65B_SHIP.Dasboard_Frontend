@@ -7,7 +7,6 @@ class PTTlayer {
             this.GraphicLayer = await this.ADDAREALAYER();
 
         })();
-
     }
 
     AreaALL = [];
@@ -106,11 +105,11 @@ class PTTlayer {
         return Area;
     }
     SHOW_AREALAYERNAME = async (artibute = false, name = false) => {
-        const layerALl = this.GraphicLayer;
+        const layerALl = this.GraphicLayer ?? this.ADDAREALAYER();
         if (artibute && name) {
             let AREAIS = layerALl.filter((layer) => {
                 let aributename = layer.attributes;
-                console.log('aributename[artibute] :>> ', aributename[artibute]);
+                // console.log('aributename[artibute] :>> ', aributename[artibute]);
                 if (aributename[artibute] == name) {
                     return layer;
                 }

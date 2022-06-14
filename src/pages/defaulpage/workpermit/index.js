@@ -288,7 +288,7 @@ const WorkpermitPage = () => {
           "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
           "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
           // "status_work": obj.WorkPermitStatus.toLowerCase(),
-          "status_work": `${obj.ScaffoldingCode.toLowerCase()}_${obj.Status.toLowerCase()}`,
+          // "status_work": `${obj.ScaffoldingCode.toLowerCase()}_${obj.Status.toLowerCase()}`,
           "latitude": obj.FeaturesPropertiesCentroid_X,
           "longitude": obj.FeaturesPropertiesCentroid_Y,
           "locatoin": obj.SubAreaName,
@@ -301,7 +301,6 @@ const WorkpermitPage = () => {
       // console.log('latlng', latlng)
       setTabledata(latlng);
 
-      const datageojson = await Geojson.CleateGeojson(latlng, 'Point');
 
 
       const [FeatureLayer, GeoJSONLayer] = await loadModules([
@@ -350,8 +349,6 @@ const WorkpermitPage = () => {
         ],
 
       };
-      let loopdata = setInterval(async () => {
-        let latlng = await datademo.getDemodata();
         let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
 
         Status_cal(latlng);
@@ -396,7 +393,6 @@ const WorkpermitPage = () => {
         });
         await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
         stateMap?.add(layerpoint);
-      })
     }
   }
   const gen_uniqueValueInfos = async () => {
@@ -525,6 +521,7 @@ const WorkpermitPage = () => {
 
     PTTlayer.ADDPTTWMSLAYER(map, view)
     view.graphics.addMany(await PTTlayer.SHOW_AREALAYERNAME());
+    console.log('showlayerarea',await PTTlayer.SHOW_AREALAYERNAME())
     setStateMap(map);
     setStateView(view);
 

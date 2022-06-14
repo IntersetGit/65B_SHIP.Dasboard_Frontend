@@ -100,8 +100,13 @@ async function CreateImgIcon(
   img = "https://cdn-icons-png.flaticon.com/512/2554/2554936.png",
   type = "warningGas"
 ) {
+  var element = document.getElementById("canvas2");
+  if (element) {
+    element.remove();
+  }
   var canvas = document.createElement("canvas");
-  canvas.id = "canvas";
+  canvas.id = "canvas2";
+  canvas.style.display = 'none';
   canvas.width = 210;
   canvas.height = 210;
   var body = document.getElementsByTagName("body")[0];
