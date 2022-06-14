@@ -204,8 +204,8 @@ const WorkpermitPage = () => {
           "supervisor": obj.OwnerName,
           "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
           "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-          // "status_work": obj.WorkPermitStatus.toLowerCase(),
-          // "status_work": `${obj.ScaffoldingCode.toLowerCase()}_${obj.Status.toLowerCase()}`,
+          // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
+          "status_work": `${obj.WorkPermitStatus}_normal`,
           "latitude": obj.FeaturesPropertiesCentroid_X,
           "longitude": obj.FeaturesPropertiesCentroid_Y,
           "locatoin": obj.SubAreaName,
@@ -214,9 +214,6 @@ const WorkpermitPage = () => {
 
       })
 
-      // latlng = await datademo.getDemodata();
-      // console.log('latlng', latlng)
-      setTabledata(latlng);
 
 
 
@@ -266,50 +263,49 @@ const WorkpermitPage = () => {
         ],
 
       };
-        let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
+      let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
+      Status_cal(latlng);
+      setTabledata(latlng);
 
-        Status_cal(latlng);
-        setTabledata(latlng);
-
-        const layerpoint = new GeoJSONLayer({
-          id: 'pointlayer',
-          title: 'ใช้สีสัญลักษณ์แทนประเภท',
-          url: datageojson,
-          copyright: 'USGS Earthquakes',
-          field: 'status_work',
-          featureReduction: clusterConfig,
-          popupTemplate: {
-            title: 'name {name}',
-            content: 'name {name}',
-            fieldInfos: [
-              {
-                fieldName: 'time',
-                format: {
-                  dateFormat: 'short-date-short-time',
-                },
-              },
-            ],
-          },
-          renderer: {
-            type: 'unique-value',
-            field: 'status_work',
-            symbol: {
-              field: 'status_work',
-              type: 'simple-marker',
-              size: 15,
-              color: [226, 255, 40],
-              outline: {
-                color: '#000',
-                width: 1,
+      const layerpoint = new GeoJSONLayer({
+        id: 'pointlayer',
+        title: 'ใช้สีสัญลักษณ์แทนประเภท',
+        url: datageojson,
+        copyright: 'USGS Earthquakes',
+        field: 'status_work',
+        featureReduction: clusterConfig,
+        popupTemplate: {
+          title: 'name {name}',
+          content: 'name {name}',
+          fieldInfos: [
+            {
+              fieldName: 'time',
+              format: {
+                dateFormat: 'short-date-short-time',
               },
             },
-            uniqueValueInfos: await gen_uniqueValueInfos()
-
-
+          ],
+        },
+        renderer: {
+          type: 'unique-value',
+          field: 'status_work',
+          symbol: {
+            field: 'status_work',
+            type: 'simple-marker',
+            size: 15,
+            color: [226, 255, 40],
+            outline: {
+              color: '#000',
+              width: 1,
+            },
           },
-        });
-        await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
-        stateMap?.add(layerpoint);
+          uniqueValueInfos: await gen_uniqueValueInfos()
+
+
+        },
+      });
+      await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
+      stateMap?.add(layerpoint);
     }
   }
   const gen_uniqueValueInfos = async () => {
@@ -318,19 +314,19 @@ const WorkpermitPage = () => {
 
     const scaffoldingIcon = [
       {
-        name: "001",
+        name: "Reject by Allower",
         img: '/assets/iconmap/scaffolding/0001.png'
       },
       {
-        name: "002",
+        name: "Waiting for Close (Allower)",
         img: '/assets/iconmap/scaffolding/0002.png'
       },
       {
-        name: "003",
+        name: "Reject by Approver",
         img: '/assets/iconmap/scaffolding/0003.png'
       },
       {
-        name: "004",
+        name: "Waiting for QSHE",
         img: '/assets/iconmap/scaffolding/0004.png'
       },
     ]

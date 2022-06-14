@@ -130,8 +130,7 @@ export const getRouteMenus = () => {
 
 
 
-  console.log('  useAuthUser() =>>>>>>>>>;', user)
-  console.log('routesConfig', routesConfig)
+  // console.log('  useAuthUser() =>>>>>>>>>;', user)
 
   const imgSrc = {
     "62a4d45011b91829618a4413": "/assets/icon/Work Permit.png",
@@ -144,7 +143,6 @@ export const getRouteMenus = () => {
 
   const routesConfigAuth = routesConfig.map((route)=>{
     let groupmenu = route.children.filter((listmenu)=>{
-      console.log('listmenu :>> ', listmenu);
       if(user.menu.some((i)=>i.url == listmenu.path)){
         // console.log(user.menu.some((i)=>i.url == listmenu.path))
         return listmenu

@@ -22,7 +22,7 @@ const routesConfig = [
         id: 'workpermit',
         title: 'workpermit',
         messageId: 'sidebar.sample.page1',
-        message: "Work Permit2",
+        message: "Work Permit",
         type: 'item',
         icon: (
           <Icon
