@@ -17,7 +17,7 @@ export const useJWTAuth = () => useContext(JWTAuthContext);
 export const useJWTAuthActions = () => useContext(JWTAuthActionsContext);
 
 const JWTAuthAuthProvider = ({ children }) => {
-  const [firebaseData, setJWTAuthData] = useState({
+  const [JWTAuthData, setJWTAuthData] = useState({
     user: null,
     isAuthenticated: false,
     isLoading: true,
@@ -74,14 +74,14 @@ const JWTAuthAuthProvider = ({ children }) => {
 
         /* mydata */
         const res = await Api.get('/auth/mydata');
-        
+
         if (res.data.Status == "success") {
           console.log('mydata', res.data.Message)
           setJWTAuthData({ user: res.data.Message, isAuthenticated: true, isLoading: false });
           dispatch({ type: FETCH_SUCCESS });
         } else {
           setJWTAuthData({
-            ...firebaseData,
+            ...JWTAuthData,
             isAuthenticated: false,
             isLoading: false,
           });
@@ -90,7 +90,7 @@ const JWTAuthAuthProvider = ({ children }) => {
 
       } else {
         setJWTAuthData({
-          ...firebaseData,
+          ...JWTAuthData,
           isAuthenticated: false,
           isLoading: false,
         });
@@ -106,7 +106,7 @@ const JWTAuthAuthProvider = ({ children }) => {
       // dispatch({ type: FETCH_SUCCESS });
     } catch (error) {
       setJWTAuthData({
-        ...firebaseData,
+        ...JWTAuthData,
         isAuthenticated: false,
         isLoading: false,
       });
@@ -125,7 +125,7 @@ const JWTAuthAuthProvider = ({ children }) => {
       dispatch({ type: FETCH_SUCCESS });
     } catch (error) {
       setJWTAuthData({
-        ...firebaseData,
+        ...JWTAuthData,
         isAuthenticated: false,
         isLoading: false,
       });
@@ -146,7 +146,7 @@ const JWTAuthAuthProvider = ({ children }) => {
   return (
     <JWTAuthContext.Provider
       value={{
-        ...firebaseData,
+        ...JWTAuthData,
       }}
     >
       <JWTAuthActionsContext.Provider

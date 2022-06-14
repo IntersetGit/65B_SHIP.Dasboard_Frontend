@@ -14,7 +14,7 @@ import {
   DatePicker
 } from 'antd';
 import { Map, WebScene } from '@esri/react-arcgis';
-import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
+import { loadModules } from 'esri-loader';
 import './index.style.less';
 import io from 'socket.io-client';
 import socketClient from '../../../util/socket';
@@ -28,7 +28,6 @@ import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
 import { isArray } from 'lodash';
 
-setDefaultOptions({ css: true });
 
 
 const ScaffoldingPage = () => {
@@ -621,7 +620,7 @@ const ScaffoldingPage = () => {
     form.resetFields()
     onFinish(form.getFieldValue())
   }
-  
+
   const onFinish = async (value) => {
     try {
       // console.log('value', value)
