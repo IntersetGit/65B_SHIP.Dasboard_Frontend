@@ -130,7 +130,9 @@ export const getRouteMenus = () => {
 
 
 
-  // console.log('  useAuthUser() =>>>>>>>>>;', user)
+  console.log('  useAuthUser() =>>>>>>>>>;', user)
+  console.log('routesConfig', routesConfig)
+
   const imgSrc = {
     "62a4d45011b91829618a4413": "/assets/icon/Work Permit.png",
     "62a4d4a822bdf92ba30d162b": "/assets/icon/Vechicle.png",
@@ -140,6 +142,20 @@ export const getRouteMenus = () => {
     "62a4d4fa22bdf92ba30d163b": "/assets/icon/Access Control.png",
   }
 
+  const routesConfigAuth = routesConfig.map((route)=>{
+    let groupmenu = route.children.map((listmenu)=>{
+      console.log('listmenu :>> ', listmenu);
+      if(user.menu.some((i)=>i.url == listmenu.path)){
+        console.log('yes')
+        return listmenu
+      }else{
+        console.log('no')
+      }
+
+    })
+    let setroute =  {...route,children:groupmenu}
+    return setroute
+  })
   const children = user.menu.map((item) => {
     return {
       id: item.application_name,
@@ -169,13 +185,13 @@ export const getRouteMenus = () => {
     }
   ]
 
-  //  return routesConfig.map((route) =>
-  //   renderMenu(route, sidebarColorSet, isSidebarBgImage, 0),
-  // );
-
-  return route.map((route) =>
+   return routesConfig.map((route) =>
     renderMenu(route, sidebarColorSet, isSidebarBgImage, 0),
   );
+
+  // return route.map((route) =>
+  //   renderMenu(route, sidebarColorSet, isSidebarBgImage, 0),
+  // );
 
 
 };

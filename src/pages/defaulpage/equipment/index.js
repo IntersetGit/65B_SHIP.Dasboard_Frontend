@@ -13,7 +13,7 @@ import {
   Modal,
 } from 'antd';
 import {Map, WebScene} from '@esri/react-arcgis';
-import {setDefaultOptions, loadModules, loadCss} from 'esri-loader';
+import {loadModules} from 'esri-loader';
 import './index.style.less';
 import io from 'socket.io-client';
 import DaraArea from './dataarea';
@@ -22,7 +22,6 @@ import {setStatus} from '../../../redux/actions';
 import {object} from 'prop-types';
 import Demodata from '../../demodata';
 
-setDefaultOptions({css: true});
 
 const options = [
   {value: 'gold'},

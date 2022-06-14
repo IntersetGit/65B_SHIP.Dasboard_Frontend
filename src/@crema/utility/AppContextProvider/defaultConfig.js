@@ -25,9 +25,10 @@ export const LightSidebar = {
   mode: ThemeMode.LIGHT,
 };
 export const AunwaSidebar = {
-  sidebarBgColor: '#5A63C8',
+  sidebarBgColor: 'transparent',
   sidebarHeaderColor: '#31A50',
-  sidebarMenuSelectedBgColor: 'rgba(126 ,163 ,255,1)',
+  // sidebarMenuSelectedBgColor: 'rgba(126 ,163 ,255,1)',
+  sidebarMenuSelectedBgColor: '#faad14',
   sidebarMenuSelectedTextColor: 'rgba(45, 15, 15, 0.87)',
   sidebarTextColor: '#fff',
   mode: ThemeMode.DARK,
@@ -37,7 +38,7 @@ const defaultConfig = {
   sidebar: {
     borderColor: '#757575',
     menuStyle: MenuStyle.ROUNDED_REVERSE,
-    isSidebarBgImage: false,
+    isSidebarBgImage: true,
     sidebarBgImage: 1,
     colorSet: AunwaSidebar,
   },
