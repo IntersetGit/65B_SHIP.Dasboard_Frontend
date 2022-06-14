@@ -1,5 +1,6 @@
 import React from 'react';
 import {RoutePermittedRole} from '../../shared/constants/AppEnums';
+import './index.style.less';
 
 const Vehicle = React.lazy(() => import('./vehicle'));
 const Equipment = React.lazy(() => import('./equipment'));
@@ -36,7 +37,7 @@ export const PagesConfigs = [
   },
   {
     permittedRole: RoutePermittedRole.user,
-    path: '/acesscontrol',
+    path: '/accesscontrol',
     element: <Acesscontrol />,
   },
 ];

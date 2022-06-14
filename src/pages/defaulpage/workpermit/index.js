@@ -438,7 +438,7 @@ const WorkpermitPage = () => {
 
     PTTlayer.ADDPTTWMSLAYER(map, view)
     view.graphics.addMany(await PTTlayer.SHOW_AREALAYERNAME());
-    console.log('showlayerarea',await PTTlayer.SHOW_AREALAYERNAME())
+
     setStateMap(map);
     setStateView(view);
 

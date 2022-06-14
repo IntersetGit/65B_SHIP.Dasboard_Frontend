@@ -143,19 +143,20 @@ export const getRouteMenus = () => {
   }
 
   const routesConfigAuth = routesConfig.map((route)=>{
-    let groupmenu = route.children.map((listmenu)=>{
+    let groupmenu = route.children.filter((listmenu)=>{
       console.log('listmenu :>> ', listmenu);
       if(user.menu.some((i)=>i.url == listmenu.path)){
-        console.log('yes')
+        // console.log(user.menu.some((i)=>i.url == listmenu.path))
         return listmenu
       }else{
-        console.log('no')
+        // console.log(user.menu.some((i)=>i.url == listmenu.path))
       }
 
     })
     let setroute =  {...route,children:groupmenu}
     return setroute
   })
+  // console.log('routesConfigAuth', routesConfigAuth)
   const children = user.menu.map((item) => {
     return {
       id: item.application_name,
@@ -185,13 +186,13 @@ export const getRouteMenus = () => {
     }
   ]
 
-   return routesConfig.map((route) =>
-    renderMenu(route, sidebarColorSet, isSidebarBgImage, 0),
-  );
-
-  // return route.map((route) =>
+  //  return routesConfig.map((route) =>
   //   renderMenu(route, sidebarColorSet, isSidebarBgImage, 0),
   // );
+
+  return routesConfigAuth.map((route) =>
+    renderMenu(route, sidebarColorSet, isSidebarBgImage, 0),
+  );
 
 
 };

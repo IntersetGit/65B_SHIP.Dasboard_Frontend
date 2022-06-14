@@ -106,7 +106,7 @@ const routesConfig = [
             )}
           />
         ),
-        path: '/acesscontrol',
+        path: '/accesscontrol',
       },
       // {
       //   id: 'page-7',
