@@ -30,14 +30,14 @@ class PTTlayer {
         return layer;
     }
 
-    ADDAREALAYER = async () => {
+    ADDAREALAYER = async (layername = "PLANT") => {
         const [Graphic,] = await loadModules([
             "esri/Graphic",
         ]);
         const apiArea = await Axios.post(`${process.env.REACT_APP_PTT_PROXY}${btoa("user=dashboard&system=api")}/api/track/attribute`,
             [
                 {
-                    "LAYER_NAME": "AREA",
+                    "LAYER_NAME": layername,
                     "SEARCH_COLUMN": []
                 }
             ],
@@ -101,11 +101,11 @@ class PTTlayer {
         return apiArea
     }
 
-    GET_ALLAREALAYERNAME = async () => {
+    GET_ALLAREALAYERNAME = async (layername = "PLANT") => {
         const apiArea = await Axios.post(`${process.env.REACT_APP_PTT_PROXY}${btoa("user=dashboard&system=api")}/api/track/attribute`,
             [
                 {
-                    "LAYER_NAME": "AREA",
+                    "LAYER_NAME": layername,
                     "SEARCH_COLUMN": []
                 }
             ],

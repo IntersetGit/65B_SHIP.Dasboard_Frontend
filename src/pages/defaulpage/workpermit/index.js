@@ -38,9 +38,10 @@ const WorkpermitPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [datamodal, setDatamodal] = useState(null);
   const dispatch = useDispatch();
-  const demodata  = new Demodata('workpermit');
+  const demodata = new Demodata('workpermit');
   const Geojson = new WaGeojson();
   const PTTlayer = new PTTlayers();
+  const [state_WorkpermitType, setState_WorkpermitType] = useState();
 
   const columns = [
     {
@@ -164,8 +165,8 @@ const WorkpermitPage = () => {
 
     const resSf = await getWorkpermit({});
     setLayerpoint(resSf)
+    console.log('resSf :>> ', resSf);
     socket.on("workpermit", (res) => {
-      // console.log('socket', res)
       if (res.Status == "success") {
         setLayerpoint(res.Message)
       }
@@ -189,12 +190,15 @@ const WorkpermitPage = () => {
             value: e._id
           }
         });
-        // console.log('_filter', _filter)
         setScaffoldingTypeOptions(_filter)
       }
-      console.log('ptt',demodata.getRandomLocation(12.71857, 101.14561, 100))
+
+      let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
+
       let latlng = item.data.map(obj => {
         // console.log('obj', obj)
+        let findeArea = GetAllArea.find((area) => area.attributes.UNITNAME == (obj.AreaName).replace(/#/i, ''));
+        let randomlatlng = demodata.getRandomLocation(findeArea?.geometry?.centroid?.latitude, findeArea?.geometry?.centroid?.longitude,100)
         return {
           ...obj,
           "id": obj._id,
@@ -205,22 +209,14 @@ const WorkpermitPage = () => {
           "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
           "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
           // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
-          "status_work": `${obj.WorkPermitStatus}_normal`,
-          "latitude": demodata.getRandomLocation(12.71857, 101.14561, 100).latitude,
-          "longitude": demodata.getRandomLocation(12.71857, 101.14561, 100).longitude,
+          "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
+          "latitude": randomlatlng.latitude,
+          "longitude": randomlatlng.longitude,
           "locatoin": obj.SubAreaName,
           "work_type": obj.WorkpermitType,
         }
 
       })
-
-
-
-
-      const [FeatureLayer, GeoJSONLayer] = await loadModules([
-        'esri/layers/FeatureLayer',
-        'esri/layers/GeoJSONLayer',
-      ]);
 
       const clusterConfig = {
         type: "cluster",
@@ -262,7 +258,10 @@ const WorkpermitPage = () => {
       let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
       Status_cal(latlng);
       setTabledata(latlng);
-
+      const [FeatureLayer, GeoJSONLayer] = await loadModules([
+        'esri/layers/FeatureLayer',
+        'esri/layers/GeoJSONLayer',
+      ]);
       const layerpoint = new GeoJSONLayer({
         id: 'pointlayer',
         title: 'ใช้สีสัญลักษณ์แทนประเภท',
@@ -271,16 +270,23 @@ const WorkpermitPage = () => {
         field: 'status_work',
         featureReduction: clusterConfig,
         popupTemplate: {
-          title: 'ชื่อ {name}',
-          content: 'ชื่อ {name}',
-          fieldInfos: [
+          title: "{name}",
+          content: [
             {
-              fieldName: 'time',
-              format: {
-                dateFormat: 'short-date-short-time',
-              },
-            },
-          ],
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "VendorName"
+                },
+                {
+                  fieldName: "WorkPermitStatus"
+                },
+                {
+                  fieldName: "AreaName"
+                }
+              ]
+            }
+          ]
         },
         renderer: {
           type: 'unique-value',
@@ -295,7 +301,7 @@ const WorkpermitPage = () => {
               width: 1,
             },
           },
-          uniqueValueInfos: await gen_uniqueValueInfos()
+          uniqueValueInfos: await gen_uniqueValueInfos(item.filter.WorkpermitTypeID, item.filter.WorkPermitStatusID)
 
 
         },
@@ -304,39 +310,42 @@ const WorkpermitPage = () => {
       stateMap?.add(layerpoint);
     }
   }
-  const gen_uniqueValueInfos = async () => {
-
+  const gen_uniqueValueInfos = async (type, status) => {
     const uniqueValueInfos = [];
 
     const scaffoldingIcon = [
       {
-        name: "Reject by Allower",
-        img: '#F54'
+        name: "SF",
+        color: '#3443eb'
       },
       {
-        name: "Waiting for Close (Allower)",
-        img: '#ff9900'
+        name: "CD",
+        color: '#ff9900'
       },
       {
-        name: "Reject by Approver",
-        img: '#00fa9a'
+        name: "HT1",
+        color: '#eb7434'
       },
       {
-        name: "Waiting for QSHE",
-        img: '#ff33ff'
+        name: "RD",
+        color: '#ff33ff'
       },
     ]
+
+    const open = ['W02', 'W03', 'W04', 'W07', 'W08', 'W09', 'W11', 'W12', 'W13', 'W15', 'W18', 'W19']
+    const close = ['W05', 'W06', 'W10']
+
     const scaffoldingStatusWork = [
       {
         name: "near_expire",
         status: "warning",
       },
       {
-        name: "expire",
-        status: "warningWork",
+        name: "Gas",
+        status: "warningGas",
       },
       {
-        name: "normal",
+        name: "",
         status: false,
       },
     ]
@@ -348,15 +357,25 @@ const WorkpermitPage = () => {
         for (const y in scaffoldingStatusWork) {
           if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
             const b = scaffoldingStatusWork[y];
-            uniqueValueInfos.push({
-              value: `${a.name}_${b.name}`,
-              symbol: {
-                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                url: await CreateIcon(a.img, b.status),
-                width: '35px',
-                height: '35px',
-              },
-            })
+            for (const s in status) {
+              let typedraw;
+              if (open.some(i => i == status[s])) {
+                typedraw = 1
+              } else if (close.some(i => i == status[s])) {
+                typedraw = 2
+              } else {
+                typedraw = 1
+              }
+              uniqueValueInfos.push({
+                value: `${a.name}_${status[s]}${b.name !== '' ? '_' + b.name : ''}`,
+                symbol: {
+                  type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                  url: await CreateIcon(a.color, b.status, typedraw),
+                  width: '35px',
+                  height: '35px',
+                },
+              })
+            }
           }
         }
       }
