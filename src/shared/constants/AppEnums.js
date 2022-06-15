@@ -1,11 +1,21 @@
 export const authRole = {
   admin: ['user', 'admin'],
   user: ['user'],
+  ptt_1:['workpermit','vehicle','equipment','scaffolding','peopletracking'],
+  ptt_2:['workpermit','vehicle','equipment','scaffolding','peopletracking'],
+  ptt_3:['vehicle','equipment','peopletracking','accesscontrol'],
+  ptt_4:['workpermit','vehicle','equipment','scaffolding','peopletracking','accesscontrol'],
 };
 
 export const RoutePermittedRole = {
   admin: 'admin',
   user: 'user',
+  workpermit:'workpermit',
+  vehicle:'vehicle',
+  equipment:'equipment',
+  scaffolding:'scaffolding',
+  peopletracking:'peopletracking',
+  accesscontrol:'accesscontrol'
 };
 
 export const ThemeStyle = {

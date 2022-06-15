@@ -5,11 +5,11 @@ class PTTlayer {
     constructor() {
         (async () => {
             this.GraphicLayer = await this.ADDAREALAYER();
-
+            return this.GraphicLayer;
         })();
     }
-
     AreaALL = [];
+
 
     ADDPTTWMSLAYER = async (map = null, view = null) => {
         const [Extent, MapImageLayer] = await loadModules([
@@ -50,8 +50,9 @@ class PTTlayer {
         if (apiArea.status == 200) {
             const { data: { data } } = apiArea;
             const layerArea = data.length > 0 ? data[0].RESULT : null;
-            this.AreaALL = layerArea;
             if (layerArea) {
+                this.AreaALL = layerArea;
+
                 let GraphicAll = layerArea.map((area) => {
                     const fillSymbol = {
                         type: "simple-fill",
@@ -101,8 +102,24 @@ class PTTlayer {
     }
 
     GET_ALLAREALAYERNAME = async () => {
-        let Area = this.AreaALL;
-        return Area;
+        const apiArea = await Axios.post(`${process.env.REACT_APP_PTT_PROXY}${btoa("user=dashboard&system=api")}/api/track/attribute`,
+            [
+                {
+                    "LAYER_NAME": "AREA",
+                    "SEARCH_COLUMN": []
+                }
+            ],
+            {
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+            }
+        );
+        if (apiArea.status == 200) {
+            const { data: { data } } = apiArea;
+            const layerArea = data.length > 0 ? data[0].RESULT : null;
+            return layerArea;
+        }
     }
     SHOW_AREALAYERNAME = async (artibute = false, name = false) => {
         const layerALl = this.GraphicLayer ?? this.ADDAREALAYER();
@@ -121,10 +138,10 @@ class PTTlayer {
 
     }
 
-    CLICK_SHOWLATLONG = async(view) => {
+    CLICK_SHOWLATLONG = async (view) => {
         const [locator] = await loadModules([
             'esri/rest/locator',
-          ])
+        ])
         const geocodingServiceUrl = "https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
         view.on("click", function (event) {
             event.stopPropagation(); // overwrite default click-for-popup behavior

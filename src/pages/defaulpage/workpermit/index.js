@@ -38,7 +38,7 @@ const WorkpermitPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [datamodal, setDatamodal] = useState(null);
   const dispatch = useDispatch();
-  const datademo = new Demodata('workpermit');
+  const demodata  = new Demodata('workpermit');
   const Geojson = new WaGeojson();
   const PTTlayer = new PTTlayers();
 
@@ -192,7 +192,7 @@ const WorkpermitPage = () => {
         // console.log('_filter', _filter)
         setScaffoldingTypeOptions(_filter)
       }
-
+      console.log('ptt',demodata.getRandomLocation(12.71857, 101.14561, 100))
       let latlng = item.data.map(obj => {
         // console.log('obj', obj)
         return {
@@ -206,8 +206,8 @@ const WorkpermitPage = () => {
           "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
           // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
           "status_work": `${obj.WorkPermitStatus}_normal`,
-          "latitude": obj.FeaturesPropertiesCentroid_X,
-          "longitude": obj.FeaturesPropertiesCentroid_Y,
+          "latitude": demodata.getRandomLocation(12.71857, 101.14561, 100).latitude,
+          "longitude": demodata.getRandomLocation(12.71857, 101.14561, 100).longitude,
           "locatoin": obj.SubAreaName,
           "work_type": obj.WorkpermitType,
         }
@@ -240,27 +240,23 @@ const WorkpermitPage = () => {
         },
         clusterMinSize: "40px",
         clusterMaxSize: "60px",
-        labelingInfo: [
-          {
-            deconflictionStrategy: 'none',
-            labelExpressionInfo: {
-              expression: "Text($feature.cluster_count, '#,###')",
-            },
-            symbol: {
-              type: 'text',
-              color: '#ffffff',
-              font: {
-                weight: 'bold',
-                family: 'Noto Sans',
-                size: '18px',
-              },
-              url: await CreateIcon('#ff7c44', 'warning'),
-            },
-
-            labelPlacement: 'center-center',
+        labelsVisible: true,
+        labelingInfo: [{
+          deconflictionStrategy: "none",
+          labelExpressionInfo: {
+            expression: "Text($feature.cluster_count, '#,###')"
           },
-
-        ],
+          symbol: {
+            type: "text",
+            color: "#004a5d",
+            font: {
+              weight: "bold",
+              family: "Noto Sans",
+              size: "12px"
+            }
+          },
+          labelPlacement: "center-center",
+        }],
 
       };
       let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
@@ -275,8 +271,8 @@ const WorkpermitPage = () => {
         field: 'status_work',
         featureReduction: clusterConfig,
         popupTemplate: {
-          title: 'name {name}',
-          content: 'name {name}',
+          title: 'ชื่อ {name}',
+          content: 'ชื่อ {name}',
           fieldInfos: [
             {
               fieldName: 'time',
@@ -315,19 +311,19 @@ const WorkpermitPage = () => {
     const scaffoldingIcon = [
       {
         name: "Reject by Allower",
-        img: '/assets/iconmap/scaffolding/0001.png'
+        img: '#F54'
       },
       {
         name: "Waiting for Close (Allower)",
-        img: '/assets/iconmap/scaffolding/0002.png'
+        img: '#ff9900'
       },
       {
         name: "Reject by Approver",
-        img: '/assets/iconmap/scaffolding/0003.png'
+        img: '#00fa9a'
       },
       {
         name: "Waiting for QSHE",
-        img: '/assets/iconmap/scaffolding/0004.png'
+        img: '#ff33ff'
       },
     ]
     const scaffoldingStatusWork = [
@@ -356,7 +352,7 @@ const WorkpermitPage = () => {
               value: `${a.name}_${b.name}`,
               symbol: {
                 type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                url: await CreateImgIcon(a.img, b.status),
+                url: await CreateIcon(a.img, b.status),
                 width: '35px',
                 height: '35px',
               },
@@ -434,7 +430,6 @@ const WorkpermitPage = () => {
 
     PTTlayer.ADDPTTWMSLAYER(map, view)
     view.graphics.addMany(await PTTlayer.SHOW_AREALAYERNAME());
-
     setStateMap(map);
     setStateView(view);
 

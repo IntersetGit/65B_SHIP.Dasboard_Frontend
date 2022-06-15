@@ -32,7 +32,7 @@ export const PagesConfigs = [
   },
   {
     permittedRole: RoutePermittedRole.user,
-    path: '/peopleTracking',
+    path: '/peopletracking',
     element: <People />,
   },
   {
