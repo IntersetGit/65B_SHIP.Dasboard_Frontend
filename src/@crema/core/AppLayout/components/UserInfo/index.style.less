@@ -4,17 +4,18 @@
 .cr-user-info {
   background-color: transparent;
   padding: 7px 12px;
-  min-height: 56px;
   min-width: 200px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   .transition(all .2s ease);
 
-  @media screen and (min-width: @screen-md) {
+  @media screen and (min-width: @screen-sm) {
     padding-top: 10px;
     padding-bottom: 10px;
     min-height: 71px;
+    min-width: 0px !important;
+
   }
 
   & .ant-dropdown-link {
