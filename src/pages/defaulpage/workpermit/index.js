@@ -25,7 +25,7 @@ import Demodata from '../../demodata';
 import WaGeojson from '../../../util/WaGeojson';
 import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
-import { isArray } from 'lodash';
+import { isArray, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 
 
@@ -127,24 +127,34 @@ const WorkpermitPage = () => {
     },
   ];
 
-  const getWorkpermit = async (item) => {
-    let url = `/workpermit/all?`;
-    if (item.PTTStaffCode) url += `&PTTStaffCode=${item.PTTStaffCode}`;
-    if (item.VendorCode) url += `&VendorCode=${item.VendorCode}`;
-    if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
-    if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
-    if (item.AreaID) url += `&AreaID=${item.AreaID}`;
-    if (isArray(item.ScaffoldingType)) {
-      url += `&ScaffoldingType=${item.ScaffoldingType.toString()}`;
-    }
-    const { data } = await API.get(url);
-    return data.Status === 'success' ? data.Message : {
-      data: [],
-      summary: {
-        all: 0,
-        expire: 0,
-        near_expire: 0,
+  const [loading, setloading] = useState(false);
+  const getWorkpermit = async (item, openTableBool) => {
+    try {
+      setloading(true);
+      let url = `/workpermit/all?`;
+      if (item.PTTStaffID) url += `&PTTStaffID=${item.PTTStaffID}`;
+      if (item.AgencyID) url += `&AgencyID=${item.AgencyID}`;
+      if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
+      if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
+      if (isArray(item.WorkPermitStatusID)) {
+        url += `&WorkPermitStatusID=${item.WorkPermitStatusID.toString()}`;
       }
+      if (isArray(item.WorkpermitTypeID)) {
+        url += `&WorkpermitTypeID=${item.WorkpermitTypeID.toString()}`;
+      }
+      const { data } = await API.get(url);
+      if (openTableBool) openTable()
+      setloading(false);
+      return data.Status === 'success' ? data.Message : {
+        data: [],
+        summary: {
+          all: 0,
+          expire: 0,
+          near_expire: 0,
+        }
+      }
+    } catch (error) {
+      setloading(false);
     }
   }
 
@@ -175,140 +185,142 @@ const WorkpermitPage = () => {
 
   }
 
+  const [AgencyIDOptions, setAgencyIDOptions] = useState([]);
+  const [PTTStaffIDOptions, setPTTStaffIDOptions] = useState([]);
+  const [WorkPermitStatusIDOptions, setWorkPermitStatusIDOptions] = useState([]);
+  const [WorkpermitTypeIDOptions, setWorkpermitTypeIDOptions] = useState([]);
+
   const setLayerpoint = async (item) => {
+    console.log('item', item, stateView)
+    // if (stateView) {
 
-    if (stateView) {
+    // let latlng = item.data;
+    Status_cal(item.summary);
 
-      // let latlng = item.data;
-      Status_cal(item.summary);
+    // console.log("data =>>>>>>>>>>>>>>>>>", item.data);
+    if (isPlainObject(item.filter)) {
+      if (isArray(item.filter.AgencyID)) setAgencyIDOptions(item.filter.AgencyID.map(e => { return { value: e } }))
+      if (isArray(item.filter.PTTStaffID)) setPTTStaffIDOptions(item.filter.PTTStaffID.map(e => { return { value: e } }))
+      if (isArray(item.filter.WorkPermitStatusID)) setWorkPermitStatusIDOptions(item.filter.WorkPermitStatusID.map(e => { return { value: e } }))
+      if (isArray(item.filter.WorkpermitTypeID)) setWorkpermitTypeIDOptions(item.filter.WorkpermitTypeID.map(e => { return { value: e } }))
+    }
 
-      console.log("data =>>>>>>>>>>>>>>>>>", item.data);
-      // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
-      if (isArray(item.filter)) {
-        const _filter = item.filter.map(e => {
-          return {
-            value: e._id
-          }
-        });
-        setScaffoldingTypeOptions(_filter)
+    let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
+
+    let latlng = item.data.map(obj => {
+      // console.log('obj', obj)
+      let findeArea = GetAllArea.find((area) => area.attributes.UNITNAME == (obj.AreaName).replace(/#/i, ''));
+      let randomlatlng = demodata.getRandomLocation(findeArea?.geometry?.centroid?.latitude, findeArea?.geometry?.centroid?.longitude, 100)
+      return {
+        ...obj,
+        "id": obj._id,
+        "work_number": obj.WorkPermitNo,
+        "name": obj.Name,
+        "licensor": obj.PTTStaff,
+        "supervisor": obj.OwnerName,
+        "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
+        "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
+        // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
+        "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
+        "latitude": randomlatlng.latitude,
+        "longitude": randomlatlng.longitude,
+        "locatoin": obj.SubAreaName,
+        "work_type": obj.WorkpermitType,
       }
 
-      let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
+    })
 
-      let latlng = item.data.map(obj => {
-        // console.log('obj', obj)
-        let findeArea = GetAllArea.find((area) => area.attributes.UNITNAME == (obj.AreaName).replace(/#/i, ''));
-        let randomlatlng = demodata.getRandomLocation(findeArea?.geometry?.centroid?.latitude, findeArea?.geometry?.centroid?.longitude,100)
-        return {
-          ...obj,
-          "id": obj._id,
-          "work_number": obj.WorkPermitNo,
-          "name": obj.Name,
-          "licensor": obj.PTTStaff,
-          "supervisor": obj.OwnerName,
-          "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-          "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-          // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
-          "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
-          "latitude": randomlatlng.latitude,
-          "longitude": randomlatlng.longitude,
-          "locatoin": obj.SubAreaName,
-          "work_type": obj.WorkpermitType,
-        }
+    const clusterConfig = {
+      type: "cluster",
+      clusterRadius: "20px",
+      popupTemplate: {
+        title: 'Cluster summary',
+        content: 'This cluster represents {cluster_count} earthquakes.',
+        fieldInfos: [
+          {
+            fieldName: 'cluster_count',
+            format: {
+              places: 0,
+              digitSeparator: true,
+            },
+          },
+        ],
+      },
+      clusterMinSize: "40px",
+      clusterMaxSize: "60px",
+      labelsVisible: true,
+      labelingInfo: [{
+        deconflictionStrategy: "none",
+        labelExpressionInfo: {
+          expression: "Text($feature.cluster_count, '#,###')"
+        },
+        symbol: {
+          type: "text",
+          color: "#004a5d",
+          font: {
+            weight: "bold",
+            family: "Noto Sans",
+            size: "12px"
+          }
+        },
+        labelPlacement: "center-center",
+      }],
 
-      })
-
-      const clusterConfig = {
-        type: "cluster",
-        clusterRadius: "20px",
-        popupTemplate: {
-          title: 'Cluster summary',
-          content: 'This cluster represents {cluster_count} earthquakes.',
-          fieldInfos: [
-            {
-              fieldName: 'cluster_count',
-              format: {
-                places: 0,
-                digitSeparator: true,
+    };
+    let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
+    Status_cal(latlng);
+    setTabledata(latlng);
+    const [FeatureLayer, GeoJSONLayer] = await loadModules([
+      'esri/layers/FeatureLayer',
+      'esri/layers/GeoJSONLayer',
+    ]);
+    const layerpoint = new GeoJSONLayer({
+      id: 'pointlayer',
+      title: 'ใช้สีสัญลักษณ์แทนประเภท',
+      url: datageojson,
+      copyright: 'USGS Earthquakes',
+      field: 'status_work',
+      featureReduction: clusterConfig,
+      popupTemplate: {
+        title: "{name}",
+        content: [
+          {
+            type: "fields",
+            fieldInfos: [
+              {
+                fieldName: "VendorName"
               },
-            },
-          ],
-        },
-        clusterMinSize: "40px",
-        clusterMaxSize: "60px",
-        labelsVisible: true,
-        labelingInfo: [{
-          deconflictionStrategy: "none",
-          labelExpressionInfo: {
-            expression: "Text($feature.cluster_count, '#,###')"
-          },
-          symbol: {
-            type: "text",
-            color: "#004a5d",
-            font: {
-              weight: "bold",
-              family: "Noto Sans",
-              size: "12px"
-            }
-          },
-          labelPlacement: "center-center",
-        }],
-
-      };
-      let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
-      Status_cal(latlng);
-      setTabledata(latlng);
-      const [FeatureLayer, GeoJSONLayer] = await loadModules([
-        'esri/layers/FeatureLayer',
-        'esri/layers/GeoJSONLayer',
-      ]);
-      const layerpoint = new GeoJSONLayer({
-        id: 'pointlayer',
-        title: 'ใช้สีสัญลักษณ์แทนประเภท',
-        url: datageojson,
-        copyright: 'USGS Earthquakes',
+              {
+                fieldName: "WorkPermitStatus"
+              },
+              {
+                fieldName: "AreaName"
+              }
+            ]
+          }
+        ]
+      },
+      renderer: {
+        type: 'unique-value',
         field: 'status_work',
-        featureReduction: clusterConfig,
-        popupTemplate: {
-          title: "{name}",
-          content: [
-            {
-              type: "fields",
-              fieldInfos: [
-                {
-                  fieldName: "VendorName"
-                },
-                {
-                  fieldName: "WorkPermitStatus"
-                },
-                {
-                  fieldName: "AreaName"
-                }
-              ]
-            }
-          ]
-        },
-        renderer: {
-          type: 'unique-value',
+        symbol: {
           field: 'status_work',
-          symbol: {
-            field: 'status_work',
-            type: 'simple-marker',
-            size: 15,
-            color: [226, 255, 40],
-            outline: {
-              color: '#000',
-              width: 1,
-            },
+          type: 'simple-marker',
+          size: 15,
+          color: [226, 255, 40],
+          outline: {
+            color: '#000',
+            width: 1,
           },
-          uniqueValueInfos: await gen_uniqueValueInfos(item.filter.WorkpermitTypeID, item.filter.WorkPermitStatusID)
-
-
         },
-      });
-      await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
-      stateMap?.add(layerpoint);
-    }
+        uniqueValueInfos: await gen_uniqueValueInfos(item.filter.WorkpermitTypeID, item.filter.WorkPermitStatusID)
+
+
+      },
+    });
+    await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
+    stateMap?.add(layerpoint);
+    // }
   }
   const gen_uniqueValueInfos = async (type, status) => {
     const uniqueValueInfos = [];
@@ -468,9 +480,7 @@ const WorkpermitPage = () => {
         EndDateTime: isMoment(value.EndDateTime) ? value.EndDateTime.format(`YYYY-MM-DD HH:mm`) : ""
       }
       // console.log('model', model)
-
-      // console.log('first', getWorkpermit(model))
-      setLayerpoint(await getWorkpermit(model))
+      setLayerpoint(await getWorkpermit(model , true))
 
     } catch (error) {
       console.log('error', error)
@@ -482,9 +492,16 @@ const WorkpermitPage = () => {
   }
 
   const [visible, setVisible] = useState(false);
-  const [scaffoldingTypeOptions, setScaffoldingTypeOptions] = useState([]);
+
   const [form] = Form.useForm()
 
+  const openTable = () => {
+    document.querySelector('.ant-table-wrapper').style.setProperty('display', 'block', 'important');
+  }
+
+  const closeTable = () => {
+    document.querySelector('.ant-table-wrapper').style.setProperty('display', 'none', 'important');
+  }
   return (
     <div id="pagediv">
       <Map
@@ -509,17 +526,20 @@ const WorkpermitPage = () => {
                 document.querySelector('.ant-table-wrapper').style.display ===
                 ''
               ) {
-                document
-                  .querySelector('.ant-table-wrapper')
-                  .style.setProperty('display', 'block', 'important');
+                // document
+                //   .querySelector('.ant-table-wrapper')
+                //   .style.setProperty('display', 'block', 'important');
+                openTable()
               } else {
-                document
-                  .querySelector('.ant-table-wrapper')
-                  .style.setProperty('display', 'none', 'important');
+                // document
+                //   .querySelector('.ant-table-wrapper')
+                //   .style.setProperty('display', 'none', 'important');
+                closeTable()
               }
             }}
           />
         </div>
+
         <div
           ref={refdrawn}
           id='viewtest'
@@ -534,17 +554,27 @@ const WorkpermitPage = () => {
             onFinishFailed={onFinishFailed}
           >
             <Form.Item
-              name="PTTStaffCode"
-              label='รหัสพนักงานผู้ควบคุม'
+              name="PTTStaffID"
+              label='รหัสพนักงานผู้ควบคุมงาน'
             >
-              <Input />
+              <Select
+                showArrow
+                loading={loading}
+                style={{ width: '100%' }}
+                options={PTTStaffIDOptions}
+              />
             </Form.Item>
 
             <Form.Item
-              name="PTTStaffCode"
-              label='หน่วยงานผู้ควบคุม'
+              name="AgencyID"
+              label='รหัสหน่วยงานผู้ควบคุม'
             >
-              <Input />
+              <Select
+                loading={loading}
+                showArrow
+                style={{ width: '100%' }}
+                options={AgencyIDOptions}
+              />
             </Form.Item>
 
             <Form.Item
@@ -552,6 +582,7 @@ const WorkpermitPage = () => {
               label='วัน-เวลา เริ่มต้น'
             >
               <DatePicker
+                loading={loading}
                 showTime={{ format: 'HH:mm' }}
                 format="DD/MM/YYYY HH:mm"
                 style={{ width: '100%' }} />
@@ -562,49 +593,46 @@ const WorkpermitPage = () => {
               label='วัน-เวลา สิ้นสุด'
             >
               <DatePicker
+                loading={loading}
                 showTime={{ format: 'HH:mm' }}
                 format="DD/MM/YYYY HH:mm"
                 style={{ width: '100%' }} />
             </Form.Item>
 
             <Form.Item
-              name="AreaID"
-              label='สถานที่ปฏิบัติงาน'
-            >
-              <Input />
-            </Form.Item>
-
-            <Form.Item
-              name="ScaffoldingType"
+              name="WorkPermitStatusID"
               label='ประเภทใบอนุญาต'
             >
               <Select
+                loading={loading}
                 mode='multiple'
                 showArrow
                 style={{ width: '100%' }}
-                options={scaffoldingTypeOptions}
+                options={WorkPermitStatusIDOptions}
               />
             </Form.Item>
 
             <Form.Item
-              name="ScaffoldingType"
+              name="WorkpermitTypeID"
               label='หัวหน้าการค้นหา'
             >
               <Select
+                loading={loading}
                 mode='multiple'
                 showArrow
                 style={{ width: '100%' }}
-                options={scaffoldingTypeOptions}
+                options={WorkpermitTypeIDOptions}
               />
+
             </Form.Item>
 
             <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
 
-              <Button type='primary' htmlType='submit' style={{ width: 100 }}>
+              <Button type='primary' htmlType='submit' style={{ width: 100 }} loading={loading}>
                 ค้นหา
               </Button>
               <span style={{ paddingRight: 5 }} />
-              <Button style={{ width: 100 }} onClick={reset}>
+              <Button style={{ width: 100 }} onClick={reset} loading={loading}>
                 ค่าเริ่มต้น
               </Button>
             </Form.Item>
