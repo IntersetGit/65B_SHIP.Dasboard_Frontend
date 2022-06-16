@@ -272,7 +272,7 @@ const WorkpermitPage = () => {
           },
           symbol: {
             type: "text",
-            color: "#004a5d",
+            color: "#FFF",
             font: {
               weight: "bold",
               family: "Noto Sans",
@@ -303,19 +303,26 @@ const WorkpermitPage = () => {
       field: 'status_work',
       featureReduction: clusterConfig,
       popupTemplate: {
-        title: "{name}",
+        title: "ชื่อผู้รับเหมา: {Name}",
         content: [
           {
             type: "fields",
             fieldInfos: [
               {
-                fieldName: "VendorName"
+                fieldName: "WorkPermitNo",
+                label:"เลข Workpermit"
               },
               {
-                fieldName: "WorkPermitStatus"
+                fieldName: "WorkPermitType",
+                label:"ประเภทใบงาย"
               },
               {
-                fieldName: "AreaName"
+                fieldName: "WorkPermitStatus",
+                label:"สถานะใบงาน"
+              },
+              {
+                fieldName: "GasMeasurement",
+                label:"แจ้งเตือนแก๊ส"
               }
             ]
           }
@@ -353,7 +360,7 @@ const WorkpermitPage = () => {
       },
       {
         name: "CD",
-        color: '#ff9900'
+        color: '#32a852'
       },
       {
         name: "HT1",

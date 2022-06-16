@@ -72,7 +72,8 @@ function CreateIcon(color = "red", type = false, isdraw = 1) {
     ctx.beginPath();
     ctx.globalCompositeOperation = ct[4];
     ctx.fillStyle = color;
-    ctx.strokeStyle = "#000000";
+    ctx.strokeStyle = "#FFF";
+    ctx.lineWidth=5;
     if (isdraw == 1) {
       ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, 2 * Math.PI);
     } else {
@@ -141,8 +142,9 @@ async function CreateImgIcon(
           ctx.globalCompositeOperation = ct[4];
           // await ctx.rect(0, 0, 300, 300);
           // await ctx.clip();
-          ctx.fillStyle = "#000";
-          ctx.strokeStyle = "#FFF";
+          ctx.fillStyle = "#F54";
+          ctx.strokeStyle = "#000";
+          ctx.lineWidth=5;
           await ctx.arc(
             canvas.width / 2,
             canvas.height / 2,

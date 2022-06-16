@@ -498,7 +498,7 @@ const ScaffoldingPage = () => {
     view.ui.add(detaillayer, 'top-right');
 
     PTTlayer.ADDPTTWMSLAYER(map, view)
-    view.graphics.addMany(await PTTlayer.SHOW_AREALAYERNAME());
+    map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
     setStateMap(map);
     setStateView(view);
