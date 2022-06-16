@@ -31,8 +31,9 @@ class PTTlayer {
     }
 
     ADDAREALAYER = async (layername = "PLANT") => {
-        const [Graphic,] = await loadModules([
+        const [Graphic, GeoJSONLayer] = await loadModules([
             "esri/Graphic",
+            'esri/layers/GeoJSONLayer'
         ]);
         const apiArea = await Axios.post(`${process.env.REACT_APP_PTT_PROXY}${btoa("user=dashboard&system=api")}/api/track/attribute`,
             [
@@ -52,24 +53,60 @@ class PTTlayer {
             const layerArea = data.length > 0 ? data[0].RESULT : null;
             if (layerArea) {
                 this.AreaALL = layerArea;
-
-                let GraphicAll = layerArea.map((area) => {
-                    const fillSymbol = {
-                        type: "simple-fill",
-                        color: [227, 139, 79, 0.8],
-                        outline: {
-                            color: [255, 255, 255],
-                            width: 1
-                        }
-                    };
-                    const polygon = {
-                        type: String(area.SHAPE.TYPE).toLowerCase(),
-                        rings: area.SHAPE.GEOMETRY
+                let Creategeojsonlayer = layerArea.map((area) => {
+                    let geojson = {
+                        "type": "FeatureCollection",
+                        "features": [
+                            {
+                                "type": "Feature",
+                                "properties": area,
+                                "geometry": {
+                                    "type": "Polygon",
+                                    "coordinates": area.SHAPE.GEOMETRY
+                                }
+                            }
+                        ]
                     }
-                    const polygonGraphic = new Graphic({
-                        geometry: polygon,
-                        symbol: fillSymbol,
-                        attributes: area,
+                    const blob = new Blob([JSON.stringify(geojson)], {
+                        type: 'application/json',
+                    });
+                    const url = URL.createObjectURL(blob);
+                    const uniqueValuesByColorProperty = {
+                        type: "unique-value",
+                        field: "color",
+                        defaultSymbol: {
+                            type: "simple-fill",
+                            color: [227, 139, 79, 0.8],
+                            outline: {
+                                color: [255, 255, 255],
+                                width: 1
+                            },
+                            width: 1,
+                            style: "solid"
+                        },
+                        defaultLabel: "Other polygons", //  used in the Legend widget for types not specified
+                        uniqueValueInfos: [{
+                            value: "red",
+                            symbol: {
+                                type: "simple-fill",
+                                color: "red"
+                            },
+                            label: "Red polygons" // displayed in the Legend widget
+                        },
+                        {
+                            value: "yellow",
+                            symbol: {
+                                type: "simple-fill",
+                                color: "yellow"
+                            },
+                            label: "Yellow polygons" // displayed in the Legend widget
+                        }
+                        ]
+                    };
+                    const geojsonlayer = new GeoJSONLayer({
+                        url: url,
+                        copyright: "PTT",
+                        renderer: uniqueValuesByColorProperty,
                         popupTemplate: {
                             title: "{UNITNAME}",
                             content: [
@@ -78,6 +115,9 @@ class PTTlayer {
                                     fieldInfos: [
                                         {
                                             fieldName: "OBJECTID"
+                                        },
+                                        {
+                                            fieldName: "UNITID"
                                         },
                                         {
                                             fieldName: "SUBUNITNAME"
@@ -90,10 +130,50 @@ class PTTlayer {
                             ]
                         }
                     });
-                    return polygonGraphic;
-                })
+                    return geojsonlayer;
+                });
+                return Creategeojsonlayer;
+                // let GraphicAll = layerArea.map((area) => {
+                //     const fillSymbol = {
+                //         type: "simple-fill",
+                //         color: [227, 139, 79, 0.8],
+                //         outline: {
+                //             color: [255, 255, 255],
+                //             width: 1
+                //         }
+                //     };
+                //     const polygon = {
+                //         type: String(area.SHAPE.TYPE).toLowerCase(),
+                //         rings: area.SHAPE.GEOMETRY
+                //     }
+                //     const polygonGraphic = new Graphic({
+                //         geometry: polygon,
+                //         symbol: fillSymbol,
+                //         attributes: area,
+                //         popupTemplate: {
+                //             title: "{UNITNAME}",
+                //             content: [
+                //                 {
+                //                     type: "fields",
+                //                     fieldInfos: [
+                //                         {
+                //                             fieldName: "OBJECTID"
+                //                         },
+                //                         {
+                //                             fieldName: "SUBUNITNAME"
+                //                         },
+                //                         {
+                //                             fieldName: "UNITNAME"
+                //                         }
+                //                     ]
+                //                 }
+                //             ]
+                //         }
+                //     });
+                //     return polygonGraphic;
+                // })
                 // console.log('GraphicAll :>> ', GraphicAll);
-                return GraphicAll;
+                // return GraphicAll;
             }
 
 

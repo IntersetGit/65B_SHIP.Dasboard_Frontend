@@ -194,12 +194,27 @@ const WorkpermitPage = () => {
       }
 
       let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
+      let getcenterarea = await GetAllArea[0].queryExtent();
+      // console.log('getcenterarea :>> ', getcenterarea.extent.center.latitude);
 
-      let latlng = item.data.map(obj => {
+      let latlng = []
+      for (const opp in item.data) {
+        const obj = item.data[opp];
+        // let latlng = item.data.map(async obj => {
+
         // console.log('obj', obj)
-        let findeArea = GetAllArea.find((area) => area.attributes.UNITNAME == (obj.AreaName).replace(/#/i, ''));
-        let randomlatlng = demodata.getRandomLocation(findeArea?.geometry?.centroid?.latitude, findeArea?.geometry?.centroid?.longitude,100)
-        return {
+        // let findeArea = GetAllArea.find((area) => area.attributes.UNITNAME == (obj.AreaName).replace(/#/i, ''));
+        let findeArea = GetAllArea.find(async (area) => {
+          let feature = await area.queryFeatures();
+          if (feature.features[0].attributes.UNITNAME == (obj.AreaName).replace(/#/i, '')) {
+            return area;
+          }
+        });
+        let getextentcenter = await findeArea.queryExtent();
+        // console.log('getextentcenter :>> ', getextentcenter.extent.center.latitude);
+        let randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude, getextentcenter?.extent?.center?.longitude, 40)
+        // console.log('randomlatlng :>> ', randomlatlng);
+        latlng.push ({
           ...obj,
           "id": obj._id,
           "work_number": obj.WorkPermitNo,
@@ -214,10 +229,10 @@ const WorkpermitPage = () => {
           "longitude": randomlatlng.longitude,
           "locatoin": obj.SubAreaName,
           "work_type": obj.WorkpermitType,
-        }
+        })
 
-      })
-
+        //})
+      }
       const clusterConfig = {
         type: "cluster",
         clusterRadius: "20px",
@@ -256,6 +271,8 @@ const WorkpermitPage = () => {
 
       };
       let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
+      console.log('latlng :>> ', datageojson);
+
       Status_cal(latlng);
       setTabledata(latlng);
       const [FeatureLayer, GeoJSONLayer] = await loadModules([
@@ -448,7 +465,7 @@ const WorkpermitPage = () => {
 
 
     PTTlayer.ADDPTTWMSLAYER(map, view)
-    view.graphics.addMany(await PTTlayer.SHOW_AREALAYERNAME());
+    map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
     setStateMap(map);
     setStateView(view);
 
