@@ -73,7 +73,7 @@ function CreateIcon(color = "red", type = false, isdraw = 1) {
     ctx.globalCompositeOperation = ct[4];
     ctx.fillStyle = color;
     ctx.strokeStyle = "#FFF";
-    ctx.lineWidth=5;
+    // ctx.lineWidth=5;
     if (isdraw == 1) {
       ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, 2 * Math.PI);
     } else {

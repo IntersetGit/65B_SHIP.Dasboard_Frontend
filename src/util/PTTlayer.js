@@ -76,9 +76,9 @@ class PTTlayer {
                         field: "color",
                         defaultSymbol: {
                             type: "simple-fill",
-                            color: [227, 139, 79, 0.8],
+                            color: [0,255,222, 0.3],
                             outline: {
-                                color: [255, 255, 255],
+                                color: [0, 255, 222],
                                 width: 1
                             },
                             width: 1,

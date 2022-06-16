@@ -76,9 +76,9 @@ const SignInJwtAuth = () => {
               <IntlMessages id='common.rememberMe' />
             </Checkbox>
 
-            <span className='sign-link' onClick={onGoToForgetPassword}>
+            {/* <span className='sign-link' onClick={onGoToForgetPassword}>
               <IntlMessages id='common.forgetPassword' />
-            </span>
+            </span> */}
           </div>
 
           <div className='form-btn-field'>

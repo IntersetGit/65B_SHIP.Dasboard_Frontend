@@ -27,6 +27,7 @@ import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
 import { isArray, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
+import { stringify } from 'querystring';
 
 
 const WorkpermitPage = () => {
@@ -206,87 +207,90 @@ const WorkpermitPage = () => {
     }
 
 
-      let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
-      let getcenterarea = await GetAllArea[0].queryExtent();
-      // console.log('getcenterarea :>> ', getcenterarea.extent.center.latitude);
+    let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
+    let getcenterarea = await GetAllArea[0].queryExtent();
+    // console.log('getcenterarea :>> ', getcenterarea.extent.center.latitude);
 
-      let latlng = []
-      for (const opp in item.data) {
-        const obj = item.data[opp];
-        // let latlng = item.data.map(async obj => {
+    let latlng = []
+    for (const opp in item.data) {
+      const obj = item.data[opp];
+      // let latlng = item.data.map(async obj => {
 
-        // console.log('obj', obj)
-        // let findeArea = GetAllArea.find((area) => area.attributes.UNITNAME == (obj.AreaName).replace(/#/i, ''));
-        let findeArea = GetAllArea.find(async (area) => {
-          let feature = await area.queryFeatures();
-          if (feature.features[0].attributes.UNITNAME == (obj.AreaName).replace(/#/i, '')) {
-            return area;
-          }
-        });
-        let getextentcenter = await findeArea.queryExtent();
-        // console.log('getextentcenter :>> ', getextentcenter.extent.center.latitude);
-        let randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude, getextentcenter?.extent?.center?.longitude, 40)
-        // console.log('randomlatlng :>> ', randomlatlng);
-        latlng.push ({
-          ...obj,
-          "id": obj._id,
-          "work_number": obj.WorkPermitNo,
-          "name": obj.Name,
-          "licensor": obj.PTTStaff,
-          "supervisor": obj.OwnerName,
-          "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-          "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-          // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
-          "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
-          "latitude": randomlatlng.latitude,
-          "longitude": randomlatlng.longitude,
-          "locatoin": obj.SubAreaName,
-          "work_type": obj.WorkpermitType,
-        })
+      // console.log('obj', obj)
+      // let findeArea = GetAllArea.find((area) => area.attributes.UNITNAME == (obj.AreaName).replace(/#/i, ''));
+      let findeArea = GetAllArea.find(async (area) => {
+        let feature = await area.queryFeatures();
+        if (feature.features[0].attributes.UNITNAME == (obj.AreaName).replace(/#/i, '')) {
+          return area;
+        }
+      });
+      let getextentcenter = await findeArea.queryExtent();
+      // console.log('getextentcenter :>> ', getextentcenter.extent.center.latitude);
+      let randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude, getextentcenter?.extent?.center?.longitude, 40)
+      // console.log('randomlatlng :>> ', randomlatlng);
+      latlng.push({
+        ...obj,
+        "id": obj._id,
+        "work_number": obj.WorkPermitNo,
+        "name": obj.Name,
+        "licensor": obj.PTTStaff,
+        "supervisor": obj.OwnerName,
+        "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
+        "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
+        // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
+        "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
+        "latitude": randomlatlng.latitude,
+        "longitude": randomlatlng.longitude,
+        "locatoin": obj.SubAreaName,
+        "work_type": obj.WorkpermitType,
+      })
 
-        //})
-      }
-      const clusterConfig = {
-        type: "cluster",
-        clusterRadius: "20px",
-        popupTemplate: {
-          title: 'Cluster summary',
-          content: 'This cluster represents {cluster_count} earthquakes.',
-          fieldInfos: [
-            {
-              fieldName: 'cluster_count',
-              format: {
-                places: 0,
-                digitSeparator: true,
-              },
+      //})
+    }
+    const clusterConfig = {
+      type: "cluster",
+      clusterRadius: "20px",
+      labelsVisible: true,
+      popupTemplate: {
+        title: 'Cluster summary',
+        content: 'This cluster represents {cluster_count} earthquakes.',
+        fieldInfos: [
+          {
+            fieldName: 'cluster_count',
+            format: {
+              places: 0,
+              digitSeparator: true,
             },
-          ],
+          },
+        ],
+      },
+      clusterMinSize: "40px",
+      clusterMaxSize: "60px",
+      labelingInfo: [{
+        deconflictionStrategy: "none",
+        labelExpressionInfo: {
+          expression: "Text($feature.cluster_count, '#,###')"
         },
-        clusterMinSize: "40px",
-        clusterMaxSize: "60px",
-        labelsVisible: true,
-        labelingInfo: [{
-          deconflictionStrategy: "none",
-          labelExpressionInfo: {
-            expression: "Text($feature.cluster_count, '#,###')"
+        symbol: {
+          type: "text",
+          color: "#FFF",
+          haloSize: "2px",
+          font: {
+            weight: "bold",
+            family: "Noto Sans",
+            size: "18px"
           },
-          symbol: {
-            type: "text",
-            color: "#FFF",
-            font: {
-              weight: "bold",
-              family: "Noto Sans",
-              size: "12px"
-            }
-          },
-          labelPlacement: "center-center",
-        }],
+          xoffset: 0,
+          yoffset: 0
+        },
+        labelPlacement: "center-center",
+      }],
 
-      };
+    };
 
 
-      Status_cal(latlng);
-      setTabledata(latlng);
+    Status_cal(latlng);
+    setTabledata(latlng);
 
     let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
     Status_cal(latlng);
@@ -310,19 +314,19 @@ const WorkpermitPage = () => {
             fieldInfos: [
               {
                 fieldName: "WorkPermitNo",
-                label:"เลข Workpermit"
+                label: "เลข Workpermit"
               },
               {
                 fieldName: "WorkPermitType",
-                label:"ประเภทใบงาย"
+                label: "ประเภทใบงาน"
               },
               {
                 fieldName: "WorkPermitStatus",
-                label:"สถานะใบงาน"
+                label: "สถานะใบงาน"
               },
               {
                 fieldName: "GasMeasurement",
-                label:"แจ้งเตือนแก๊ส"
+                label: "แจ้งเตือนแก๊ส"
               }
             ]
           }
@@ -356,19 +360,19 @@ const WorkpermitPage = () => {
     const scaffoldingIcon = [
       {
         name: "SF",
-        color: '#3443eb'
+        color: "rgba(106, 61, 154)"
       },
       {
         name: "CD",
-        color: '#32a852'
+        color: "rgba(251, 154, 153)"
       },
       {
         name: "HT1",
-        color: '#eb7434'
+        color: "rgba(255, 127, 0)"
       },
       {
         name: "RD",
-        color: '#ff33ff'
+        color: "rgba(51, 160, 44)"
       },
     ]
 
@@ -411,8 +415,8 @@ const WorkpermitPage = () => {
                 symbol: {
                   type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
                   url: await CreateIcon(a.color, b.status, typedraw),
-                  width: '35px',
-                  height: '35px',
+                  width: '15px',
+                  height: '15px',
                 },
               })
             }
@@ -421,7 +425,7 @@ const WorkpermitPage = () => {
       }
     }
 
-    // console.log("uniqueValueInfos", uniqueValueInfos)
+    console.log("uniqueValueInfos", uniqueValueInfos)
 
     return uniqueValueInfos
 
@@ -508,7 +512,7 @@ const WorkpermitPage = () => {
         EndDateTime: isMoment(value.EndDateTime) ? value.EndDateTime.format(`YYYY-MM-DD HH:mm`) : ""
       }
       // console.log('model', model)
-      setLayerpoint(await getWorkpermit(model , true))
+      setLayerpoint(await getWorkpermit(model, true))
 
     } catch (error) {
       console.log('error', error)
@@ -671,7 +675,24 @@ const WorkpermitPage = () => {
         </div>
 
       </Map>
-
+      <Modal
+        title='รายละเอียด'
+        okButtonProps={{ hidden: true }}
+        onCancel={() => setIsModalVisible(!isModalVisible)}
+        visible={isModalVisible}
+      >
+        {datamodal &&
+          Object.entries(datamodal).map(([key, value]) => (
+            !(typeof value == 'object') &&
+            <Row key={key}>
+              <Col span={12}>
+                <a>{key}</a>
+              </Col>
+              {console.log(value)}
+              <Col span={12}>{value}</Col>
+            </Row>
+          ))}
+      </Modal>
       <Table
         id='divtable'
         scroll={{ y: '25vh' }}
