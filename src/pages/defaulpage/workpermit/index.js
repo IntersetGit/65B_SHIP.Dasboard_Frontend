@@ -491,10 +491,10 @@ const WorkpermitPage = () => {
 
     view.watch('zoom', zoomChanged);
     function zoomChanged(newValue, oldValue, property, object) {
-      console.log("New value: ", newValue,
-        "<br>Old value: ", oldValue,
-        "<br>Watched property: ", property,
-        "<br>Watched object: ", object);
+      // console.log("New value: ", newValue,
+      //   "<br>Old value: ", oldValue,
+      //   "<br>Watched property: ", property,
+      //   "<br>Watched object: ", object);
     }
 
 
