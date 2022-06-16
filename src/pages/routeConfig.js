@@ -22,7 +22,7 @@ const routesConfig = [
         id: 'workpermit',
         title: 'workpermit',
         messageId: 'sidebar.sample.page1',
-        message: "Work Permit2",
+        message: "Work Permit",
         type: 'item',
         icon: (
           <Icon
@@ -77,7 +77,7 @@ const routesConfig = [
         path: '/scaffolding',
       },
       {
-        id: 'peopleTracking',
+        id: 'peopletracking',
         title: 'peopleTracking',
         messageId: 'sidebar.sample.page5',
         type: 'item',
@@ -92,10 +92,10 @@ const routesConfig = [
             )}
           />
         ),
-        path: '/peopleTracking',
+        path: '/peopletracking',
       },
       {
-        id: 'acesscontrol',
+        id: 'accesscontrol',
         title: 'acesscontrol',
         messageId: 'sidebar.sample.page6',
         type: 'item',
@@ -106,7 +106,7 @@ const routesConfig = [
             )}
           />
         ),
-        path: '/acesscontrol',
+        path: '/accesscontrol',
       },
       // {
       //   id: 'page-7',

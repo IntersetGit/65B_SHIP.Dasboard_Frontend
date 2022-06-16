@@ -14,21 +14,19 @@ import {
   DatePicker
 } from 'antd';
 import { Map, WebScene } from '@esri/react-arcgis';
-import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
+import { loadModules } from 'esri-loader';
 import './index.style.less';
 import io from 'socket.io-client';
 import socketClient from '../../../util/socket';
-import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
 import moment, { isMoment } from 'moment';
-import Demodata from '../../demodata';
 import WaGeojson from '../../../util/WaGeojson';
 import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
 import { isArray } from 'lodash';
+import PTTlayers from '../../../util/PTTlayer'
 
-setDefaultOptions({ css: true });
 
 
 const ScaffoldingPage = () => {
@@ -40,8 +38,8 @@ const ScaffoldingPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [datamodal, setDatamodal] = useState(null);
   const dispatch = useDispatch();
-  const datademo = new Demodata('workpermit');
   const Geojson = new WaGeojson();
+  const PTTlayer = new PTTlayers();
 
   const columns = [
     {
@@ -226,28 +224,10 @@ const ScaffoldingPage = () => {
 
   const initMap = async (socket) => {
 
-    const { WFSLayer, WMSLayer, Extent } = await loadModules(['esri/layers/WFSLayer', 'esri/layers/WMSLayer', "esri/geometry/Extent"]).then(
-      ([WFSLayer, WMSLayer, Extent]) => ({ WFSLayer, WMSLayer, Extent }),
-    );
-    const layer = new WMSLayer({
-      url: 'http://45.136.253.221:8080/geoserver/GeoServer_ITS/wms?request=GetCapabilities&service=WMS&version=1.3.0',
-      sublayers: [
-        {
-          name: 'GeoServer_ITS:merge_area'
-        }
-      ],
-    });
-    layer.when(async (data) => {
-      console.log('data', data.fullExtent.toJSON())
-      let extent = new Extent(data.fullExtent.toJSON());
-      // console.log('extent :>> ', extent.center);
-      // await stateView?.goTo(extent.center)
-    });
-    stateMap?.add(layer);
-    // CreateArea();
 
     /* Layerpoint */
     const resSf = await getScaffolding({});
+    // console.log('resSf :>> ', resSf);
     setLayerpoint(resSf)
     socket.on("scaffolding", (res) => {
       // console.log('socket', res)
@@ -279,7 +259,8 @@ const ScaffoldingPage = () => {
       }
 
       let latlng = item.data.map(obj => {
-        // console.log('obj', obj)
+        console.log('status_work', `A${obj.ScaffoldingTypeID}_${obj.Status.toLowerCase()}`)
+
         return {
           ...obj,
           "id": obj._id,
@@ -290,7 +271,7 @@ const ScaffoldingPage = () => {
           "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
           "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
           // "status_work": obj.WorkPermitStatus.toLowerCase(),
-          "status_work": `${obj.ScaffoldingCode.toLowerCase()}_${obj.Status.toLowerCase()}`,
+          "status_work": `A${obj.ScaffoldingTypeID}_${obj.Status.toLowerCase()}`,
           "latitude": obj.FeaturesPropertiesCentroid_X,
           "longitude": obj.FeaturesPropertiesCentroid_Y,
           "locatoin": obj.SubAreaName,
@@ -305,10 +286,10 @@ const ScaffoldingPage = () => {
 
       const datageojson = await Geojson.CleateGeojson(latlng, 'Point');
 
-      const { FeatureLayer, GeoJSONLayer } = await loadModules([
+      const [FeatureLayer, GeoJSONLayer] = await loadModules([
         'esri/layers/FeatureLayer',
         'esri/layers/GeoJSONLayer',
-      ]).then(([FeatureLayer, GeoJSONLayer]) => ({ FeatureLayer, GeoJSONLayer }));
+      ]);
 
       const clusterConfig = {
         type: "cluster",
@@ -336,7 +317,7 @@ const ScaffoldingPage = () => {
             },
             symbol: {
               type: 'text',
-              color: '#ffffff',
+              color: '#000',
               font: {
                 weight: 'bold',
                 family: 'Noto Sans',
@@ -352,23 +333,7 @@ const ScaffoldingPage = () => {
 
       };
 
-      stateView?.ui?.add(
-        ['divtable', document.querySelector('.ant-table-wrapper')],
-        'bottom-left',
-      );
-
-      // {
-      //     value: "near_expire", //ใกล้ Exp
-      //     symbol: {
-      //         type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-      //         url: await CreateIcon('#ff7c44', 'warning'),
-      //         width: '35px',
-      //         height: '35px',
-      //     },
-      // },
-
-      // console.log('datageojson :>> ', datageojson);
-      // console.log('await CreateImgIcon(false , false)', await CreateImgIcon())
+      const uniqueValueInfos = await gen_uniqueValueInfos()
       const layerpoint = new GeoJSONLayer({
         id: 'pointlayer',
         title: 'Earthquakes from the last month',
@@ -377,16 +342,23 @@ const ScaffoldingPage = () => {
         field: 'status_work',
         featureReduction: clusterConfig,
         popupTemplate: {
-          title: 'name {name}',
-          content: 'name {name}',
-          fieldInfos: [
+          title: "{OwnerName}",
+          content: [
             {
-              fieldName: 'time',
-              format: {
-                dateFormat: 'short-date-short-time',
-              },
-            },
-          ],
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "OwnerName"
+                },
+                {
+                  fieldName: "WarningStatus"
+                },
+                {
+                  fieldName: "WorkpermitType"
+                }
+              ]
+            }
+          ]
         },
         renderer: {
           type: 'unique-value',
@@ -401,134 +373,159 @@ const ScaffoldingPage = () => {
               width: 1,
             },
           },
-          uniqueValueInfos: await gen_uniqueValueInfos()
-
+          uniqueValueInfos
 
         },
       });
+      // console.log('layerpoint', layerpoint)
       await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
       stateMap?.add(layerpoint);
     }
   }
 
   const gen_uniqueValueInfos = async () => {
+    try {
+      const uniqueValueInfos = [];
+      // debugger
+      const scaffoldingIcon = [
+        {
+          name: "1",
+          img: '/assets/iconmap/scaffolding/1.svg'
+        },
+        {
+          name: "2",
+          img: '/assets/iconmap/scaffolding/2.svg'
+        },
+        {
+          name: "3",
+          img: '/assets/iconmap/scaffolding/3.svg'
+        },
+        {
+          name: "4",
+          img: '/assets/iconmap/scaffolding/4.svg'
+        },
+        {
+          name: "5",
+          img: '/assets/iconmap/scaffolding/5.svg'
+        },
+        {
+          name: "6",
+          img: '/assets/iconmap/scaffolding/6.svg'
+        },
+        {
+          name: "7",
+          img: '/assets/iconmap/scaffolding/7.svg'
+        },
+        {
+          name: "8",
+          img: '/assets/iconmap/scaffolding/8.svg'
+        },
+        {
+          name: "9",
+          img: '/assets/iconmap/scaffolding/9.svg'
+        },
+        {
+          name: "10",
+          img: '/assets/iconmap/scaffolding/10.svg'
+        },
+        {
+          name: "11",
+          img: '/assets/iconmap/scaffolding/11.svg'
+        },
+        {
+          name: "12",
+          img: '/assets/iconmap/scaffolding/12.svg'
+        },
+        {
+          name: "13",
+          img: '/assets/iconmap/scaffolding/13.svg'
+        },
+        {
+          name: "14",
+          img: '/assets/iconmap/scaffolding/14.svg'
+        },
+        {
+          name: "15",
+          img: '/assets/iconmap/scaffolding/15.svg'
+        },
+        {
+          name: "16",
+          img: '/assets/iconmap/scaffolding/16.svg'
+        },
+        {
+          name: "17",
+          img: '/assets/iconmap/scaffolding/17.svg'
+        },
+        {
+          name: "18",
+          img: '/assets/iconmap/scaffolding/18.svg'
+        },
+        {
+          name: "19",
+          img: '/assets/iconmap/scaffolding/19.svg'
+        },
+        {
+          name: "20",
+          img: '/assets/iconmap/scaffolding/20.svg'
+        },
+        {
+          name: "21",
+          img: '/assets/iconmap/scaffolding/21.svg'
+        },
+        {
+          name: "22",
+          img: '/assets/iconmap/scaffolding/22.svg'
+        },
+      ]
 
-    const uniqueValueInfos = [];
+      const scaffoldingStatusWork = [
+        {
+          name: "near_expire",
+          status: "warning",
+        },
+        {
+          name: "expire",
+          status: "warningWork",
+        },
+        {
+          name: "normal",
+          status: false,
+        },
+      ]
 
-    const scaffoldingIcon = [
-      {
-        name: "001",
-        img: '/assets/iconmap/scaffolding/0001.png'
-      },
-      {
-        name: "002",
-        img: '/assets/iconmap/scaffolding/0002.png'
-      },
-      {
-        name: "003",
-        img: '/assets/iconmap/scaffolding/0003.png'
-      },
-      {
-        name: "004",
-        img: '/assets/iconmap/scaffolding/0004.png'
-      },
-    ]
-    const scaffoldingStatusWork = [
-      {
-        name: "near_expire",
-        status: "warning",
-      },
-      {
-        name: "expire",
-        status: "warningWork",
-      },
-      {
-        name: "normal",
-        status: false,
-      },
-    ]
-
-
-    for (const x in scaffoldingIcon) {
-      if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
-        const a = scaffoldingIcon[x];
-        for (const y in scaffoldingStatusWork) {
-          if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
-            const b = scaffoldingStatusWork[y];
-            uniqueValueInfos.push({
-              value: `${a.name}_${b.name}`,
-              symbol: {
-                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                url: await CreateImgIcon(a.img, b.status),
-                width: '35px',
-                height: '35px',
-              },
-            })
+      for (const x in scaffoldingIcon) {
+        if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
+          const a = scaffoldingIcon[x];
+          for (const y in scaffoldingStatusWork) {
+            if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
+              const b = scaffoldingStatusWork[y];
+              uniqueValueInfos.push({
+                value: `A${a.name}_${b.name}`,
+                symbol: {
+                  type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                  url: await CreateImgIcon(a.img, b.status),
+                  width: '35px',
+                  height: '35px',
+                },
+              })
+            }
           }
         }
       }
+
+      console.log("uniqueValueInfos", uniqueValueInfos)
+
+      return uniqueValueInfos
+
+    } catch (error) {
+      // debugger
+      console.log('error', error)
     }
-
-    console.log("uniqueValueInfos", uniqueValueInfos)
-
-    return uniqueValueInfos
 
   }
 
-  loadModules([
-    'esri/config',
-    'esri/Map',
-    'esri/views/MapView',
-    'esri/layers/TileLayer',
-  ]).then(async ([esriConfig, Map, MapView, TileLayer]) => {
-    esriConfig.apiKey =
-      'AAPKf24959e55476492eb12c8cbaa4d1261etdgkaLK718fs8_EuvckemKt2gyRR-8p04PR7mC2G8Oi5oNli_65xV-C8u8BuPQTZ';
-  });
 
-  const CreateArea = async () => {
-    const { Graphic, GraphicsLayer, Polygon } = await loadModules([
-      'esri/Graphic',
-      'esri/layers/GraphicsLayer',
-      'esri/geometry/Polygon',
-    ]).then(([Graphic, GraphicsLayer, Polygon]) => {
-      return { Graphic, GraphicsLayer, Polygon };
-    });
-    for (const layer in DaraArea) {
-      // DaraArea.map( async(layer) => {
-      let layerArea = new GraphicsLayer({
-        id: DaraArea[layer].name,
-      });
-      stateMap?.add(layerArea, 0);
 
-      const polygon = new Polygon({
-        rings: DaraArea[layer].geomantry,
-      });
-
-      // Create a symbol for rendering the graphic
-      const fillSymbol = {
-        type: 'simple-fill', // autocasts as new SimpleFillSymbol()
-        color: DaraArea[layer].color,
-        outline: {
-          // autocasts as new SimpleLineSymbol()
-          color: [255, 255, 255],
-          width: 1,
-        },
-      };
-
-      // Add the geometry and symbol to a new graphic
-      const polygonGraphic = new Graphic({
-        geometry: polygon,
-        symbol: fillSymbol,
-      });
-      // stateView?.graphics?.addMany([polygonGraphic]);
-      await layerArea.add(polygonGraphic);
-
-      await stateView?.goTo(polygon.extent);
-      // console.log('polygon.extent :>> ', polygon.extent.toJSON());
-
-      // })
-    }
-  };
 
   const Status_cal = async (data) => {
 
@@ -544,18 +541,18 @@ const ScaffoldingPage = () => {
   };
 
   const Onload = async (map, view) => {
-    const { Fullscreen, UI, Zoom, Expand, Extent, locator } = await loadModules([
+    const [Fullscreen, UI, Zoom, Expand, Extent, locator] = await loadModules([
       'esri/widgets/Fullscreen',
       'esri/views/ui/UI',
       'esri/widgets/Zoom',
       'esri/widgets/Expand',
       'esri/geometry/Extent',
       'esri/rest/locator',
-    ]).then(([Fullscreen, UI, Zoom, Expand, Extent, locator]) => {
-      return { Fullscreen, UI, Zoom, Expand, Extent, locator };
-    });
+    ]);
     const fullscreenui = new Fullscreen({
       view: view,
+      element: document.querySelector("#pagediv"),
+      id: 'fullscreenwiget'
     });
     const zoomui = new Zoom({
       view: view,
@@ -579,49 +576,21 @@ const ScaffoldingPage = () => {
     view.ui.add(fullscreenui, 'top-right');
     view.ui.add(zoomui, 'top-right');
     view.ui.add(detaillayer, 'top-right');
-    view?.ui?.add(
-      ['divtable', document.querySelector('.ant-table-wrapper')],
-      'bottom-left',
-    );
-    const geocodingServiceUrl = "https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
-    view.on("click", function (event) {
-      event.stopPropagation(); // overwrite default click-for-popup behavior
-      // console.log('event.mapPoint :>> ', event.mapPoint);
-      var lat = Math.round(event.mapPoint.latitude * 1000) / 1000;
-      var lon = Math.round(event.mapPoint.longitude * 1000) / 1000;
-      view.popup.open({
-        title: "ตำแหน่งที่ตั้ง: [" + lon + ", " + lat + "]",
-        location: event.mapPoint // Set the location of the popup to the clicked location
-      });
-      // Display the popup
-      locator.locationToAddress(geocodingServiceUrl, { location: event.mapPoint }).then((res) => {
-        view.popup.content = res.address;
-      })
-    });
+
+    PTTlayer.ADDPTTWMSLAYER(map, view)
+    map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
     setStateMap(map);
     setStateView(view);
 
-    // view.watch('updating', function (val) {
-    //   const ext = new Extent({
-    //     type: 'extent',
-    //     spatialReference: { wkid: 4326 },
-    //     xmax: 100.32800674438477,
-    //     xmin: 100.30938148498534,
-    //     ymax: 13.785986924617411,
-    //     ymin: 13.767647416498118,
-    //   });
-    //   if (!view.extent.intersects(ext)) {
-    //     view.goTo(ext);
-    //   }
-    // });
+
   };
 
   const reset = () => {
     form.resetFields()
     onFinish(form.getFieldValue())
   }
-  
+
   const onFinish = async (value) => {
     try {
       // console.log('value', value)
@@ -644,7 +613,6 @@ const ScaffoldingPage = () => {
     console.log('error', error)
   }
 
-  const [visible, setVisible] = useState(false);
   const [scaffoldingTypeOptions, setScaffoldingTypeOptions] = useState([]);
   const [form] = Form.useForm()
 
@@ -671,21 +639,13 @@ const ScaffoldingPage = () => {
 
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div id="pagediv">
       <Map
         className='Mapacrgis'
         onLoad={Onload}
         mapProperties={{
           basemap: `${'arcgis-navigation'}`,
           autoResize: false,
-          // extent: {
-          //   type:'extent',
-          //   spatialReference: { wkid: 4326 },
-          //   xmax: 100.32800674438477,
-          //   xmin: 100.30938148498534,
-          //   ymax: 13.785986924617411,
-          //   ymin: 13.767647416498118,
-          // },
         }}
         viewProperties={{
           center: [100.3330867, 14.5548052],
@@ -696,22 +656,20 @@ const ScaffoldingPage = () => {
           <div
             className='esri-widget--button esri-icon-table'
             onClick={() => {
-              // if (
-              //     document.querySelector('.esri-ui-bottom-left').style.display ===
-              //     'none' ||
-              //     document.querySelector('.esri-ui-bottom-left').style.display ===
-              //     ''
-              // ) {
-              //     document
-              //         .querySelector('.esri-ui-bottom-left')
-              //         .style.setProperty('display', 'block', 'important');
-              // } else {
-              //     document
-              //         .querySelector('.esri-ui-bottom-left')
-              //         .style.setProperty('display', 'none', 'important');
-              // }
-
-              setVisible(!visible)
+              if (
+                document.querySelector('.ant-table-wrapper').style.display ===
+                'none' ||
+                document.querySelector('.ant-table-wrapper').style.display ===
+                ''
+              ) {
+                document
+                  .querySelector('.ant-table-wrapper')
+                  .style.setProperty('display', 'block', 'important');
+              } else {
+                document
+                  .querySelector('.ant-table-wrapper')
+                  .style.setProperty('display', 'none', 'important');
+              }
             }}
           />
         </div>
@@ -842,20 +800,7 @@ const ScaffoldingPage = () => {
             </Col>
           </Row>
         </div>
-        <Table
-          id='divtable'
-          scroll={{ y: '25vh' }}
-          size='small'
-          rowClassName={(record, index) =>
-            record?.status_warnning !== null &&
-              record?.status_warnning !== undefined
-              ? 'table-row-red'
-              : ''
-          }
-          rowKey={(i) => i.id}
-          columns={columns}
-          dataSource={tabledata}
-        />
+
       </Map>
 
       {/* <div id="viewDiv" style={{height:'70vh'}}></div> */}
@@ -877,16 +822,21 @@ const ScaffoldingPage = () => {
           ))}
       </Modal>
 
-      <Drawer
-        // id='divtable'
-        title={false}
-        placement={"bottom"}
-        // closable={false}
-        onClose={() => setVisible(false)}
-        visible={visible}
-      >
-        <Table size='small' dataSource={tabledata} columns={columns2} rowKey={(row) => row.id} scroll={{ x: "100%", y: "30vh" }} />
-      </Drawer>
+      <Table
+        id='divtable'
+        scroll={{ y: '25vh' }}
+        size='small'
+        style={{ position: 'absolute', bottom: 0, backgroundColor: 'white', display: 'none' }}
+        rowClassName={(record, index) =>
+          record?.status_warnning !== null &&
+            record?.status_warnning !== undefined
+            ? 'table-row-red'
+            : ''
+        }
+        rowKey={(i) => i.id}
+        columns={columns2}
+        dataSource={tabledata}
+      />
     </div>
   );
 };
