@@ -317,7 +317,7 @@ const ScaffoldingPage = () => {
             },
             symbol: {
               type: 'text',
-              color: '#ffffff',
+              color: '#000',
               font: {
                 weight: 'bold',
                 family: 'Noto Sans',

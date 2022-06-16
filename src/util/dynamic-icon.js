@@ -145,8 +145,8 @@ async function CreateImgIcon(
           ctx.globalCompositeOperation = ct[4];
           // await ctx.rect(0, 0, 300, 300);
           // await ctx.clip();
-          ctx.fillStyle = "#F54";
-          ctx.strokeStyle = "#000";
+          ctx.fillStyle = "#FFF";
+          ctx.strokeStyle = "#FFF";
           ctx.lineWidth=5;
           await ctx.arc(
             canvas.width / 2,
