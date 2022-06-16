@@ -101,44 +101,47 @@ async function CreateImgIcon(
   img = "https://cdn-icons-png.flaticon.com/512/2554/2554936.png",
   type = "warningGas"
 ) {
-  var element = document.getElementById("canvas2");
-  if (element) {
-    element.remove();
-  }
-  var canvas = document.createElement("canvas");
-  canvas.id = "canvas2";
-  canvas.style.display = 'none';
-  canvas.width = 210;
-  canvas.height = 210;
-  var body = document.getElementsByTagName("body")[0];
-  body.appendChild(canvas);
-  var ctx = canvas.getContext("2d");
+  try {
 
-  if(type) {
-    const drawer1 = () => new Promise((resolve, reject) => {
-      const image = new Image();
-      image.crossOrigin = "anonymous";
-      image.onload = async () => {
-        await ctx.save();
-        await ctx.beginPath();
-        ctx.globalCompositeOperation = ct[4];
-        await ctx.arc(200, 80, 100, 0, 2 * Math.PI);
-        await ctx.drawImage(image, canvas.width / 2, 0, 100, 110);
-        resolve();
-      };
-      image.src = imgicon[type];
-    });
-    await drawer1()
-  }
 
-  const drawer2 = () =>
+    var element = document.getElementById("canvas2");
+    if (element) {
+      element.remove();
+    }
+    var canvas = document.createElement("canvas");
+    canvas.id = "canvas2";
+    canvas.style.display = 'none';
+    canvas.width = 210;
+    canvas.height = 210;
+    var body = document.getElementsByTagName("body")[0];
+    body.appendChild(canvas);
+    var ctx = canvas.getContext("2d");
+
+    if (type) {
+      const drawer1 = () => new Promise((resolve, reject) => {
+        const image = new Image();
+        image.crossOrigin = "anonymous";
+        image.onload = async () => {
+          await ctx.save();
+          await ctx.beginPath();
+          ctx.globalCompositeOperation = ct[4];
+          await ctx.arc(200, 80, 100, 0, 2 * Math.PI);
+          await ctx.drawImage(image, canvas.width / 2, 0, 100, 110);
+          resolve();
+        };
+        image.src = imgicon[type];
+      });
+      await drawer1()
+    }
+
+    const drawer2 = () =>
       new Promise((resolve, reject) => {
         const image2 = new Image();
         image2.crossOrigin = "anonymous";
         image2.onload = async () => {
           await ctx.save();
           await ctx.beginPath();
-           await ctx.drawImage(image2, 0, 0, canvas.width, canvas.height);
+          await ctx.drawImage(image2, 0, 0, canvas.width, canvas.height);
           ctx.globalCompositeOperation = ct[4];
           // await ctx.rect(0, 0, 300, 300);
           // await ctx.clip();
@@ -163,10 +166,14 @@ async function CreateImgIcon(
         image2.src = img;
       });
 
-  await drawer2();
+    await drawer2();
 
-  var dataURL = canvas.toDataURL("image/png", 2.0);
-  return dataURL;
+    var dataURL = canvas.toDataURL("image/png", 2.0);
+    return dataURL;
+  } catch (error) {
+    console.log('error', error)
+    return error
+  }
 }
 
 async function DownloadIcon(
