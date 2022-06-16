@@ -259,7 +259,8 @@ const ScaffoldingPage = () => {
       }
 
       let latlng = item.data.map(obj => {
-        console.log('obj', `${obj.ScaffoldingCode.toLowerCase()}_${obj.Status.toLowerCase()}`)
+        console.log('status_work', `A${obj.ScaffoldingTypeID}_${obj.Status.toLowerCase()}`)
+
         return {
           ...obj,
           "id": obj._id,
@@ -270,7 +271,7 @@ const ScaffoldingPage = () => {
           "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
           "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
           // "status_work": obj.WorkPermitStatus.toLowerCase(),
-          "status_work":  `${obj.ScaffoldingCode.toLowerCase()}_${obj.Status.toLowerCase()}`,
+          "status_work": `A${obj.ScaffoldingTypeID}_${obj.Status.toLowerCase()}`,
           "latitude": obj.FeaturesPropertiesCentroid_X,
           "longitude": obj.FeaturesPropertiesCentroid_Y,
           "locatoin": obj.SubAreaName,
@@ -331,6 +332,8 @@ const ScaffoldingPage = () => {
         ],
 
       };
+
+      const uniqueValueInfos = await gen_uniqueValueInfos()
       const layerpoint = new GeoJSONLayer({
         id: 'pointlayer',
         title: 'Earthquakes from the last month',
@@ -341,20 +344,20 @@ const ScaffoldingPage = () => {
         popupTemplate: {
           title: "{OwnerName}",
           content: [
-              {
-                  type: "fields",
-                  fieldInfos: [
-                      {
-                          fieldName: "OwnerName"
-                      },
-                      {
-                          fieldName: "WarningStatus"
-                      },
-                      {
-                          fieldName: "WorkpermitType"
-                      }
-                  ]
-              }
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "OwnerName"
+                },
+                {
+                  fieldName: "WarningStatus"
+                },
+                {
+                  fieldName: "WorkpermitType"
+                }
+              ]
+            }
           ]
         },
         renderer: {
@@ -370,7 +373,7 @@ const ScaffoldingPage = () => {
               width: 1,
             },
           },
-          uniqueValueInfos: await gen_uniqueValueInfos()
+          uniqueValueInfos
 
         },
       });
@@ -381,66 +384,143 @@ const ScaffoldingPage = () => {
   }
 
   const gen_uniqueValueInfos = async () => {
+    try {
+      const uniqueValueInfos = [];
+      // debugger
+      const scaffoldingIcon = [
+        {
+          name: "1",
+          img: '/assets/iconmap/scaffolding/1.svg'
+        },
+        {
+          name: "2",
+          img: '/assets/iconmap/scaffolding/2.svg'
+        },
+        {
+          name: "3",
+          img: '/assets/iconmap/scaffolding/3.svg'
+        },
+        {
+          name: "4",
+          img: '/assets/iconmap/scaffolding/4.svg'
+        },
+        {
+          name: "5",
+          img: '/assets/iconmap/scaffolding/5.svg'
+        },
+        {
+          name: "6",
+          img: '/assets/iconmap/scaffolding/6.svg'
+        },
+        {
+          name: "7",
+          img: '/assets/iconmap/scaffolding/7.svg'
+        },
+        {
+          name: "8",
+          img: '/assets/iconmap/scaffolding/8.svg'
+        },
+        {
+          name: "9",
+          img: '/assets/iconmap/scaffolding/9.svg'
+        },
+        {
+          name: "10",
+          img: '/assets/iconmap/scaffolding/10.svg'
+        },
+        {
+          name: "11",
+          img: '/assets/iconmap/scaffolding/11.svg'
+        },
+        {
+          name: "12",
+          img: '/assets/iconmap/scaffolding/12.svg'
+        },
+        {
+          name: "13",
+          img: '/assets/iconmap/scaffolding/13.svg'
+        },
+        {
+          name: "14",
+          img: '/assets/iconmap/scaffolding/14.svg'
+        },
+        {
+          name: "15",
+          img: '/assets/iconmap/scaffolding/15.svg'
+        },
+        {
+          name: "16",
+          img: '/assets/iconmap/scaffolding/16.svg'
+        },
+        {
+          name: "17",
+          img: '/assets/iconmap/scaffolding/17.svg'
+        },
+        {
+          name: "18",
+          img: '/assets/iconmap/scaffolding/18.svg'
+        },
+        {
+          name: "19",
+          img: '/assets/iconmap/scaffolding/19.svg'
+        },
+        {
+          name: "20",
+          img: '/assets/iconmap/scaffolding/20.svg'
+        },
+        {
+          name: "21",
+          img: '/assets/iconmap/scaffolding/21.svg'
+        },
+        {
+          name: "22",
+          img: '/assets/iconmap/scaffolding/22.svg'
+        },
+      ]
 
-    const uniqueValueInfos = [];
+      const scaffoldingStatusWork = [
+        {
+          name: "near_expire",
+          status: "warning",
+        },
+        {
+          name: "expire",
+          status: "warningWork",
+        },
+        {
+          name: "normal",
+          status: false,
+        },
+      ]
 
-    const scaffoldingIcon = [
-      {
-        name: "sfm001",
-        img: '/assets/iconmap/scaffolding/0001.png'
-      },
-      {
-        name: "sfm002",
-        img: '/assets/iconmap/scaffolding/0002.png'
-      },
-      {
-        name: "sfm003",
-        img: '/assets/iconmap/scaffolding/0003.png'
-      },
-      {
-        name: "sfm004",
-        img: '/assets/iconmap/scaffolding/0004.png'
-      },
-    ]
-    const scaffoldingStatusWork = [
-      {
-        name: "near_expire",
-        status: "warning",
-      },
-      {
-        name: "expire",
-        status: "warningWork",
-      },
-      {
-        name: "normal",
-        status: false,
-      },
-    ]
-
-
-    for (const x in scaffoldingIcon) {
-      if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
-        const a = scaffoldingIcon[x];
-        for (const y in scaffoldingStatusWork) {
-          if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
-            const b = scaffoldingStatusWork[y];
-            uniqueValueInfos.push({
-              value: `${a.name}_${b.name}`,
-              symbol: {
-                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                url: await CreateImgIcon(a.img, b.status),
-                width: '35px',
-                height: '35px',
-              },
-            })
+      for (const x in scaffoldingIcon) {
+        if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
+          const a = scaffoldingIcon[x];
+          for (const y in scaffoldingStatusWork) {
+            if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
+              const b = scaffoldingStatusWork[y];
+              uniqueValueInfos.push({
+                value: `A${a.name}_${b.name}`,
+                symbol: {
+                  type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                  url: await CreateImgIcon(a.img, b.status),
+                  width: '35px',
+                  height: '35px',
+                },
+              })
+            }
           }
         }
       }
+
+      console.log("uniqueValueInfos", uniqueValueInfos)
+
+      return uniqueValueInfos
+
+    } catch (error) {
+      // debugger
+      console.log('error', error)
     }
-
-    console.log("uniqueValueInfos", uniqueValueInfos)
-
-    return uniqueValueInfos
 
   }
 

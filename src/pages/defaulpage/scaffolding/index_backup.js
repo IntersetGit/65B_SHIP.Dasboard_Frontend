@@ -18,7 +18,6 @@ import { setDefaultOptions, loadModules, loadCss } from 'esri-loader';
 import './index.style.less';
 import io from 'socket.io-client';
 import socketClient from '../../../util/socket';
-import DaraArea from './dataarea';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
 import moment, { isMoment } from 'moment';
@@ -238,7 +237,7 @@ const ScaffoldingPage = () => {
             // console.log('Names of all child sublayers', names.join());
         });
         stateMap?.add(layer);
-        CreateArea();
+        // CreateArea();
 
         /* Layerpoint */
         // const latlng = await datademo.getDemodata();
@@ -275,7 +274,7 @@ const ScaffoldingPage = () => {
             }
 
             let latlng = item.data.map(obj => {
-                // console.log('obj', obj)
+                console.log('status_work', `A${obj.ScaffoldingTypeID}_${obj.Status.toLowerCase()}`)
                 return {
                     ...obj,
                     "id": obj._id,
@@ -286,7 +285,8 @@ const ScaffoldingPage = () => {
                     "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
                     "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
                     // "status_work": obj.WorkPermitStatus.toLowerCase(),
-                    "status_work": `${obj.ScaffoldingCode.toLowerCase()}_${obj.Status.toLowerCase()}`,
+                    "status_work": `A${obj.ScaffoldingTypeID}_${obj.Status.toLowerCase()}`,
+                    // "status_work": `open`,
                     "latitude": obj.FeaturesPropertiesCentroid_X,
                     "longitude": obj.FeaturesPropertiesCentroid_Y,
                     "locatoin": obj.SubAreaName,
@@ -365,6 +365,7 @@ const ScaffoldingPage = () => {
 
             // console.log('datageojson :>> ', datageojson);
             // console.log('await CreateImgIcon(false , false)', await CreateImgIcon())
+            const uniqueValueInfos = await gen_uniqueValueInfos()
             const layerpoint = new GeoJSONLayer({
                 id: 'pointlayer',
                 title: 'Earthquakes from the last month',
@@ -397,7 +398,7 @@ const ScaffoldingPage = () => {
                             width: 1,
                         },
                     },
-                    uniqueValueInfos: await gen_uniqueValueInfos()
+                    uniqueValueInfos
 
 
                 },
@@ -413,22 +414,95 @@ const ScaffoldingPage = () => {
 
         const scaffoldingIcon = [
             {
-                name: "001",
-                img: '/assets/iconmap/scaffolding/0001.png'
+                name: "1",
+                img: '/assets/iconmap/scaffolding/1.svg'
             },
             {
-                name: "002",
-                img: '/assets/iconmap/scaffolding/0002.png'
+                name: "2",
+                img: '/assets/iconmap/scaffolding/2.svg'
             },
             {
-                name: "003",
-                img: '/assets/iconmap/scaffolding/0003.png'
+                name: "3",
+                img: '/assets/iconmap/scaffolding/3.svg'
             },
             {
-                name: "004",
-                img: '/assets/iconmap/scaffolding/0004.png'
+                name: "4",
+                img: '/assets/iconmap/scaffolding/4.svg'
+            },
+            {
+                name: "5",
+                img: '/assets/iconmap/scaffolding/5.svg'
+            },
+            {
+                name: "6",
+                img: '/assets/iconmap/scaffolding/6.svg'
+            },
+            {
+                name: "7",
+                img: '/assets/iconmap/scaffolding/7.svg'
+            },
+            {
+                name: "8",
+                img: '/assets/iconmap/scaffolding/8.svg'
+            },
+            {
+                name: "9",
+                img: '/assets/iconmap/scaffolding/9.svg'
+            },
+            {
+                name: "10",
+                img: '/assets/iconmap/scaffolding/10.svg'
+            },
+            {
+                name: "11",
+                img: '/assets/iconmap/scaffolding/11.svg'
+            },
+            {
+                name: "12",
+                img: '/assets/iconmap/scaffolding/12.svg'
+            },
+            {
+                name: "13",
+                img: '/assets/iconmap/scaffolding/13.svg'
+            },
+            {
+                name: "14",
+                img: '/assets/iconmap/scaffolding/14.svg'
+            },
+            {
+                name: "15",
+                img: '/assets/iconmap/scaffolding/15.svg'
+            },
+            {
+                name: "16",
+                img: '/assets/iconmap/scaffolding/16.svg'
+            },
+            {
+                name: "17",
+                img: '/assets/iconmap/scaffolding/17.svg'
+            },
+            {
+                name: "18",
+                img: '/assets/iconmap/scaffolding/18.svg'
+            },
+            {
+                name: "19",
+                img: '/assets/iconmap/scaffolding/19.svg'
+            },
+            {
+                name: "20",
+                img: '/assets/iconmap/scaffolding/20.svg'
+            },
+            {
+                name: "21",
+                img: '/assets/iconmap/scaffolding/21.svg'
+            },
+            {
+                name: "22",
+                img: '/assets/iconmap/scaffolding/22.svg'
             },
         ]
+        
         const scaffoldingStatusWork = [
             {
                 name: "near_expire",
@@ -452,10 +526,10 @@ const ScaffoldingPage = () => {
                     if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
                         const b = scaffoldingStatusWork[y];
                         uniqueValueInfos.push({
-                            value: `${a.name}_${b.name}`,
+                            value: `A${a.name}_${b.name}`,
                             symbol: {
                                 type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                                url: await CreateImgIcon(a.img , b.status),
+                                url: await CreateImgIcon(a.img, b.status),
                                 width: '35px',
                                 height: '35px',
                             },
@@ -465,7 +539,7 @@ const ScaffoldingPage = () => {
             }
         }
 
-        console.log("uniqueValueInfos" , uniqueValueInfos)
+        console.log("uniqueValueInfos", uniqueValueInfos)
 
         return uniqueValueInfos
 
@@ -482,50 +556,6 @@ const ScaffoldingPage = () => {
             'AAPKf24959e55476492eb12c8cbaa4d1261etdgkaLK718fs8_EuvckemKt2gyRR-8p04PR7mC2G8Oi5oNli_65xV-C8u8BuPQTZ';
     });
 
-    const CreateArea = async () => {
-        const { Graphic, GraphicsLayer, Polygon } = await loadModules([
-            'esri/Graphic',
-            'esri/layers/GraphicsLayer',
-            'esri/geometry/Polygon',
-        ]).then(([Graphic, GraphicsLayer, Polygon]) => {
-            return { Graphic, GraphicsLayer, Polygon };
-        });
-        for (const layer in DaraArea) {
-            // DaraArea.map( async(layer) => {
-            let layerArea = new GraphicsLayer({
-                id: DaraArea[layer].name,
-            });
-            stateMap?.add(layerArea, 0);
-
-            const polygon = new Polygon({
-                rings: DaraArea[layer].geomantry,
-            });
-
-            // Create a symbol for rendering the graphic
-            const fillSymbol = {
-                type: 'simple-fill', // autocasts as new SimpleFillSymbol()
-                color: DaraArea[layer].color,
-                outline: {
-                    // autocasts as new SimpleLineSymbol()
-                    color: [255, 255, 255],
-                    width: 1,
-                },
-            };
-
-            // Add the geometry and symbol to a new graphic
-            const polygonGraphic = new Graphic({
-                geometry: polygon,
-                symbol: fillSymbol,
-            });
-            // stateView?.graphics?.addMany([polygonGraphic]);
-            await layerArea.add(polygonGraphic);
-
-            await stateView?.goTo(polygon.extent);
-            // console.log('polygon.extent :>> ', polygon.extent.toJSON());
-
-            // })
-        }
-    };
 
     const Status_cal = async (data) => {
 
