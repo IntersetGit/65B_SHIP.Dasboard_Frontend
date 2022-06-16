@@ -489,6 +489,13 @@ const WorkpermitPage = () => {
     view.ui.add(zoomui, 'top-right');
     view.ui.add(detaillayer, 'top-right');
 
+    view.watch('zoom', zoomChanged);
+    function zoomChanged(newValue, oldValue, property, object) {
+      console.log("New value: ", newValue,
+        "<br>Old value: ", oldValue,
+        "<br>Watched property: ", property,
+        "<br>Watched object: ", object);
+    }
 
 
     PTTlayer.ADDPTTWMSLAYER(map, view)
