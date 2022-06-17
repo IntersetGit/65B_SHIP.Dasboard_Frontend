@@ -637,8 +637,8 @@ const WorkpermitPage = () => {
             </Form.Item>
 
             <Form.Item
-              name="WorkPermitStatusID"
-              label='ประเภทใบอนุญาต'
+              name="AreaName"
+              label='สถานที่ปฏิบัติงาน'
             >
               <Select
                 loading={loading}
@@ -647,11 +647,26 @@ const WorkpermitPage = () => {
                 style={{ width: '100%' }}
                 options={WorkPermitStatusIDOptions}
               />
+
+            </Form.Item>
+
+            <Form.Item
+              name="WorkPermitStatusID"
+              label='สถานะ Work'
+            >
+              <Select
+                loading={loading}
+                mode='multiple'
+                showArrow
+                style={{ width: '100%' }}
+                options={WorkPermitStatusIDOptions}
+              />
+
             </Form.Item>
 
             <Form.Item
               name="WorkpermitTypeID"
-              label='หัวหน้าการค้นหา'
+              label='ประเภทใบอนุญาต'
             >
               <Select
                 loading={loading}
@@ -660,8 +675,9 @@ const WorkpermitPage = () => {
                 style={{ width: '100%' }}
                 options={WorkpermitTypeIDOptions}
               />
-
             </Form.Item>
+
+
 
             <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
 
