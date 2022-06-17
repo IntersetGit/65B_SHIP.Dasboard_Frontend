@@ -193,166 +193,164 @@ const WorkpermitPage = () => {
 
   const setLayerpoint = async (item) => {
     console.log('item', item, stateView)
-    // if (stateView) {
+    if (stateView) {
 
-    // let latlng = item.data;
-    Status_cal(item.summary);
+      // let latlng = item.data;
+      Status_cal(item.summary);
 
-    // console.log("data =>>>>>>>>>>>>>>>>>", item.data);
-    if (isPlainObject(item.filter)) {
-      if (isArray(item.filter.AgencyID)) setAgencyIDOptions(item.filter.AgencyID.map(e => { return { value: e } }))
-      if (isArray(item.filter.PTTStaffID)) setPTTStaffIDOptions(item.filter.PTTStaffID.map(e => { return { value: e } }))
-      if (isArray(item.filter.WorkPermitStatusID)) setWorkPermitStatusIDOptions(item.filter.WorkPermitStatusID.map(e => { return { value: e } }))
-      if (isArray(item.filter.WorkpermitTypeID)) setWorkpermitTypeIDOptions(item.filter.WorkpermitTypeID.map(e => { return { value: e } }))
-    }
+      // console.log("data =>>>>>>>>>>>>>>>>>", item.data);
+      if (isPlainObject(item.filter)) {
+        if (isArray(item.filter.AgencyID)) setAgencyIDOptions(item.filter.AgencyID.map(e => { return { value: e } }))
+        if (isArray(item.filter.PTTStaffID)) setPTTStaffIDOptions(item.filter.PTTStaffID.map(e => { return { value: e } }))
+        if (isArray(item.filter.WorkPermitStatusID)) setWorkPermitStatusIDOptions(item.filter.WorkPermitStatusID.map(e => { return { value: e } }))
+        if (isArray(item.filter.WorkpermitTypeID)) setWorkpermitTypeIDOptions(item.filter.WorkpermitTypeID.map(e => { return { value: e } }))
+      }
 
 
-    let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
-    let getcenterarea = await GetAllArea[0].queryExtent();
-    // console.log('getcenterarea :>> ', getcenterarea.extent.center.latitude);
+      let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
+      let getcenterarea = await GetAllArea[0].queryExtent();
+      // console.log('getcenterarea :>> ', getcenterarea.extent.center.latitude);
 
-    let latlng = []
-    for (const opp in item.data) {
-      const obj = item.data[opp];
-      // let latlng = item.data.map(async obj => {
+      let latlng = []
+      for (const opp in item.data) {
+        const obj = item.data[opp];
+        // let latlng = item.data.map(async obj => {
 
-      // console.log('obj', obj)
-      // let findeArea = GetAllArea.find((area) => area.attributes.UNITNAME == (obj.AreaName).replace(/#/i, ''));
-      let findeArea = GetAllArea.find(async (area) => {
-        let feature = await area.queryFeatures();
-        if (feature.features[0].attributes.UNITNAME == (obj.AreaName).replace(/#/i, '')) {
-          return area;
-        }
-      });
-      let getextentcenter = await findeArea.queryExtent();
-      // console.log('getextentcenter :>> ', getextentcenter.extent.center.latitude);
-      let randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude, getextentcenter?.extent?.center?.longitude, 40)
-      // console.log('randomlatlng :>> ', randomlatlng);
-      latlng.push({
-        ...obj,
-        "id": obj._id,
-        "work_number": obj.WorkPermitNo,
-        "name": obj.Name,
-        "licensor": obj.PTTStaff,
-        "supervisor": obj.OwnerName,
-        "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-        "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-        // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
-        "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
-        "latitude": randomlatlng.latitude,
-        "longitude": randomlatlng.longitude,
-        "locatoin": obj.SubAreaName,
-        "work_type": obj.WorkpermitType,
-      })
+        // console.log('obj', obj)
+        // let findeArea = GetAllArea.find((area) => area.attributes.UNITNAME == (obj.AreaName).replace(/#/i, ''));
+        let findeArea = GetAllArea.find(async (area) => {
+          let feature = await area.queryFeatures();
+          if (feature.features[0].attributes.UNITNAME == (obj.AreaName).replace(/#/i, '')) {
+            return area;
+          }
+        });
+        let getextentcenter = await findeArea.queryExtent();
+        // console.log('getextentcenter :>> ', getextentcenter.extent.center.latitude);
+        let randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude, getextentcenter?.extent?.center?.longitude, 40)
+        // console.log('randomlatlng :>> ', randomlatlng);
+        latlng.push({
+          ...obj,
+          "id": obj._id,
+          "work_number": obj.WorkPermitNo,
+          "name": obj.Name,
+          "licensor": obj.PTTStaff,
+          "supervisor": obj.OwnerName,
+          "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
+          "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
+          // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
+          "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
+          "latitude": randomlatlng.latitude,
+          "longitude": randomlatlng.longitude,
+          "locatoin": obj.SubAreaName,
+          "work_type": obj.WorkpermitType,
+        })
 
-      //})
-    }
-    const clusterConfig = {
-      type: "cluster",
-      clusterRadius: "20px",
-      labelsVisible: true,
-      popupTemplate: {
-        title: 'Cluster summary',
-        content: 'This cluster represents {cluster_count} earthquakes.',
-        fieldInfos: [
-          {
-            fieldName: 'cluster_count',
-            format: {
-              places: 0,
-              digitSeparator: true,
+        //})
+      }
+      const clusterConfig = {
+        type: "cluster",
+        clusterRadius: "20px",
+        labelsVisible: true,
+        popupTemplate: {
+          title: 'Cluster summary',
+          content: 'This cluster represents {cluster_count} earthquakes.',
+          fieldInfos: [
+            {
+              fieldName: 'cluster_count',
+              format: {
+                places: 0,
+                digitSeparator: true,
+              },
+            },
+          ],
+        },
+        clusterMinSize: "40px",
+        clusterMaxSize: "60px",
+        labelingInfo: [{
+          deconflictionStrategy: "none",
+          labelExpressionInfo: {
+            expression: "Text($feature.cluster_count, '#,###')"
+          },
+          symbol: {
+            type: "text",
+            color: "#FFF",
+            haloSize: "2px",
+            font: {
+              weight: "bold",
+              family: "Noto Sans",
+              size: "18px"
+            },
+            xoffset: 0,
+            yoffset: 0
+          },
+          labelPlacement: "center-center",
+        }],
+
+      };
+
+
+      setTabledata(latlng);
+
+      let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
+      setTabledata(latlng);
+      const [FeatureLayer, GeoJSONLayer] = await loadModules([
+        'esri/layers/FeatureLayer',
+        'esri/layers/GeoJSONLayer',
+      ]);
+      const layerpoint = new GeoJSONLayer({
+        id: 'pointlayer',
+        title: 'ใช้สีสัญลักษณ์แทนประเภท',
+        url: datageojson,
+        copyright: 'USGS Earthquakes',
+        field: 'status_work',
+        featureReduction: clusterConfig,
+        popupTemplate: {
+          title: "ชื่อผู้รับเหมา: {Name}",
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "WorkPermitNo",
+                  label: "เลข Workpermit"
+                },
+                {
+                  fieldName: "WorkPermitType",
+                  label: "ประเภทใบงาน"
+                },
+                {
+                  fieldName: "WorkPermitStatus",
+                  label: "สถานะใบงาน"
+                },
+                {
+                  fieldName: "GasMeasurement",
+                  label: "แจ้งเตือนแก๊ส"
+                }
+              ]
+            }
+          ]
+        },
+        renderer: {
+          type: 'unique-value',
+          field: 'status_work',
+          symbol: {
+            field: 'status_work',
+            type: 'simple-marker',
+            size: 15,
+            color: [226, 255, 40],
+            outline: {
+              color: '#000',
+              width: 1,
             },
           },
-        ],
-      },
-      clusterMinSize: "40px",
-      clusterMaxSize: "60px",
-      labelingInfo: [{
-        deconflictionStrategy: "none",
-        labelExpressionInfo: {
-          expression: "Text($feature.cluster_count, '#,###')"
+          uniqueValueInfos: await gen_uniqueValueInfos(item.filter.WorkpermitTypeID, item.filter.WorkPermitStatusID)
+
+
         },
-        symbol: {
-          type: "text",
-          color: "#FFF",
-          haloSize: "2px",
-          font: {
-            weight: "bold",
-            family: "Noto Sans",
-            size: "18px"
-          },
-          xoffset: 0,
-          yoffset: 0
-        },
-        labelPlacement: "center-center",
-      }],
-
-    };
-
-
-    Status_cal(latlng);
-    setTabledata(latlng);
-
-    let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
-    Status_cal(latlng);
-    setTabledata(latlng);
-    const [FeatureLayer, GeoJSONLayer] = await loadModules([
-      'esri/layers/FeatureLayer',
-      'esri/layers/GeoJSONLayer',
-    ]);
-    const layerpoint = new GeoJSONLayer({
-      id: 'pointlayer',
-      title: 'ใช้สีสัญลักษณ์แทนประเภท',
-      url: datageojson,
-      copyright: 'USGS Earthquakes',
-      field: 'status_work',
-      featureReduction: clusterConfig,
-      popupTemplate: {
-        title: "ชื่อผู้รับเหมา: {Name}",
-        content: [
-          {
-            type: "fields",
-            fieldInfos: [
-              {
-                fieldName: "WorkPermitNo",
-                label: "เลข Workpermit"
-              },
-              {
-                fieldName: "WorkPermitType",
-                label: "ประเภทใบงาน"
-              },
-              {
-                fieldName: "WorkPermitStatus",
-                label: "สถานะใบงาน"
-              },
-              {
-                fieldName: "GasMeasurement",
-                label: "แจ้งเตือนแก๊ส"
-              }
-            ]
-          }
-        ]
-      },
-      renderer: {
-        type: 'unique-value',
-        field: 'status_work',
-        symbol: {
-          field: 'status_work',
-          type: 'simple-marker',
-          size: 15,
-          color: [226, 255, 40],
-          outline: {
-            color: '#000',
-            width: 1,
-          },
-        },
-        uniqueValueInfos: await gen_uniqueValueInfos(item.filter.WorkpermitTypeID, item.filter.WorkPermitStatusID)
-
-
-      },
-    });
-    await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
-    stateMap?.add(layerpoint);
-    // }
+      });
+      await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
+      stateMap?.add(layerpoint);
+    }
   }
   const gen_uniqueValueInfos = async (type, status) => {
     const uniqueValueInfos = [];
@@ -438,10 +436,10 @@ const WorkpermitPage = () => {
     // console.log('data', data)
     dispatch(
       setStatus({
-        "จำนวน": data.all,
-        "ปกติ": data.normal,
+        "จำนวน": data.close,
+        "ปกติ": data.gas,
         "⚠️ ใกล้ Exp": data.near_expire,
-        "‼️ หมด Exp": data.expire,
+        "‼️ หมด Exp": data.open,
       }),
     );
   };
@@ -491,10 +489,10 @@ const WorkpermitPage = () => {
 
     view.watch('zoom', zoomChanged);
     function zoomChanged(newValue, oldValue, property, object) {
-      console.log("New value: ", newValue,
-        "<br>Old value: ", oldValue,
-        "<br>Watched property: ", property,
-        "<br>Watched object: ", object);
+      // console.log("New value: ", newValue,
+      //   "<br>Old value: ", oldValue,
+      //   "<br>Watched property: ", property,
+      //   "<br>Watched object: ", object);
     }
 
 

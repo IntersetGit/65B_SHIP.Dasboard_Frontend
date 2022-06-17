@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Dropdown, Input, Layout, Menu, Row } from 'antd';
+import { Col, Dropdown, Input, Layout, Menu, Row, Badge } from 'antd';
 import './index.style.less';
 import { AiOutlineMenuFold, AiOutlineMenuUnfold } from 'react-icons/ai';
 import PropTypes from 'prop-types';
@@ -39,6 +39,13 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
     </List>
   );
 
+  const IconLink = ({ number, text }) => (
+    <a className="example-link">
+      <Badge style={{ backgroundColor: `${'#'+Math.floor(Math.random()*16777215).toString(16)}` }} count={number ? number : 0} />
+      {text}
+    </a>
+  );
+
   const getUserAvatar = () => {
     if (user.displayName) {
       return user.displayName.charAt(0).toUpperCase();
@@ -64,7 +71,11 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
                 {Object.keys(StatusMap).map((status) => {
                   return (
                     <Col key={status} lg={8} md={12} sm={12} xs={24}>
-                      <p>{status} : {StatusMap[status]}</p>
+                      {/* <p>{status} : {StatusMap[status]}</p> */}
+                      <IconLink
+                        number={StatusMap[status]}
+                        text={status}
+                      />
                     </Col>
                   );
                 })}
