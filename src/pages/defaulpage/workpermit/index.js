@@ -438,8 +438,8 @@ const WorkpermitPage = () => {
       setStatus({
         "จำนวน": data.close,
         "ปกติ": data.gas,
-        "⚠️ ใกล้ Exp": data.near_expire,
-        "‼️ หมด Exp": data.open,
+        "ใกล้ Exp": data.near_expire,
+        "หมด Exp": data.open,
       }),
     );
   };
