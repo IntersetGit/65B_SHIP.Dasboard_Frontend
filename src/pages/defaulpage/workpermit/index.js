@@ -95,8 +95,9 @@ const WorkpermitPage = () => {
     },
     {
       title: 'สถานะ work',
-      dataIndex: 'WorkPermitStatus',
-      key: 'WorkPermitStatus',
+      dataIndex: 'others',
+      key: 'others',
+      render: (text, record) => text.WorkPermitStatusID
 
     },
     {
@@ -131,7 +132,7 @@ const WorkpermitPage = () => {
                   "รหัสเจ้าของพื้นที่": record.OwnerID,
                   "ชื่อเจ้าของพื้นที่": record.OwnerName,
                   "รหัสสถานะใบงาน": record.WorkPermitStatusID,
-                  "สถานะใบงาน": record.WorkPermitStatus,
+                  "สถานะใบงาน": record.others.WorkPermitStatusID,
                   "เวลาการตรวจวัดก๊าซล่าสุด": record.GasMeasurement,
                   "อุปกรณ์ที่ Impairment": record.impairmentName,
                 }),
@@ -463,13 +464,15 @@ const WorkpermitPage = () => {
 
   const Status_cal = async (data) => {
 
-    // console.log('data', data)
+    console.log('data Status_cal ========>', data)
     dispatch(
       setStatus({
-        "จำนวน": data.close,
-        "ปกติ": data.gas,
+        "Total": data.total,
+        "Open": data.open,
+        "Close": data.close,
         "⚠️ ใกล้ Exp": data.near_expire,
-        "‼️ หมด Exp": data.open,
+        "‼️ หมด Exp": data.expire,
+        "ก๊าซที่ต้องตรวจวัด": data.gas,
       }),
     );
   };
@@ -744,7 +747,6 @@ const WorkpermitPage = () => {
               <Col span={12}>
                 <span style={{ color: "#0A8FDC" }}>{key}</span>
               </Col>
-              {console.log(value)}
               <Col span={12}>{value ?? "-"}</Col>
             </Row>
           ))}
