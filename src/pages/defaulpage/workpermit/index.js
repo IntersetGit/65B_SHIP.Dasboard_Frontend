@@ -49,13 +49,11 @@ const WorkpermitPage = () => {
       title: 'เลข work',
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
-      render: (text) => <a>{text}</a>,
-
     },
     {
-      title: 'ผู้รับเหมา',
-      dataIndex: 'VendorName',
-      key: 'VendorName',
+      title: 'ชื่อ - สกุล ผู้รับเหมา',
+      dataIndex: 'Name',
+      key: 'Name',
 
 
     },
@@ -67,18 +65,18 @@ const WorkpermitPage = () => {
     },
     {
       title: 'ผู้ควบคุมงาน',
-      dataIndex: 'PTTStaff',
-      key: 'PTTStaff',
+      dataIndex: 'PTTStaffName',
+      key: 'PTTStaffName',
 
     },
     {
-      title: 'ประเภทใบอนุญาต',
+      title: 'ประเภทงาน',
       key: 'WorkpermitType',
       dataIndex: 'WorkpermitType',
 
     },
     {
-      title: 'สถานที่ติดตั้ง',
+      title: 'สถานที่ปฏิบัติงาน',
       key: 'AreaName',
       dataIndex: 'AreaName',
 
@@ -102,12 +100,6 @@ const WorkpermitPage = () => {
 
     },
     {
-      title: 'สถานะแจ้งเตือน',
-      dataIndex: 'WarningStatus',
-      key: 'WarningStatus',
-
-    },
-    {
       title: '...',
       key: '',
 
@@ -117,7 +109,33 @@ const WorkpermitPage = () => {
             <Button
               type='primary'
               onClick={() => {
-                setDatamodal(record), setIsModalVisible(!isModalVisible);
+                setDatamodal({
+                  "ชื่อ-สกุล": record.Name,
+                  "เลขบัตรประชาชน": record.PersonalID,
+                  "เลข Work Permit": record.WorkPermitNo,
+                  "รหัสประเภทของ work": record.WorkpermitTypeID,
+                  "ประเภทของ work": record.WorkpermitType,
+                  "รายละเอียดของงาน": record.Description,
+                  "ชื่อสถานที่ปฏิบัติงานหลัก": record.AreaName,
+                  "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubAreaName,
+                  "วันที่เริ่มต้นของใบงาน": record.WorkingDateStart,
+                  "วันที่สิ้นสุดของใบงาน": record.WorkingDateEnd,
+                  "เวลาเริ่มต้นการปฏิบัติงาน": record.WorkingTimeStart,
+                  "เวลาสิ้นสุดการปฏิบัติงาน": record.WorkingTimeEnd,
+                  "รหัสบริษัท": record.VendorID,
+                  "ชื่อบริษัท": record.VendorName,
+                  "รหัสผู้ควบคุมงาน": record.PTTStaffID,
+                  "ชื่อผู้ควบคุมงาน": record.PTTStaffName,
+                  "รหัสหน่วยงานผู้ควบคุม": record.AgencyID,
+                  "ชื่อหน่วยงานผู้ควบคุม": record.AgencyName,
+                  "รหัสเจ้าของพื้นที่": record.OwnerID,
+                  "ชื่อเจ้าของพื้นที่": record.OwnerName,
+                  "รหัสสถานะใบงาน": record.WorkPermitStatusID,
+                  "สถานะใบงาน": record.WorkPermitStatus,
+                  "เวลาการตรวจวัดก๊าซล่าสุด": record.GasMeasurement,
+                  "อุปกรณ์ที่ Impairment": record.impairmentName,
+                }),
+                  setIsModalVisible(!isModalVisible);
               }}
             >
               Detail
@@ -135,6 +153,7 @@ const WorkpermitPage = () => {
       let url = `/workpermit/all?`;
       if (item.PTTStaffID) url += `&PTTStaffID=${item.PTTStaffID}`;
       if (item.AgencyID) url += `&AgencyID=${item.AgencyID}`;
+      if (item.AreaName) url += `&AreaName=${item.AreaName}`;
       if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
       if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
       if (isArray(item.WorkPermitStatusID)) {
@@ -176,23 +195,23 @@ const WorkpermitPage = () => {
 
     const resSf = await getWorkpermit({});
     setLayerpoint(resSf)
-    console.log('resSf :>> ', resSf);
-    socket.on("workpermit", (res) => {
-      if (res.Status == "success") {
-        setLayerpoint(res.Message)
-      }
+    // console.log('resSf :>> ', resSf);
+    socket.on("workpermit", async (res) => {
+      const resSf = await getWorkpermit(form.getFieldValue());
+      setLayerpoint(resSf)
     });
 
 
   }
 
   const [AgencyIDOptions, setAgencyIDOptions] = useState([]);
+  const [AreaNameOptions, setAreaNameOptions] = useState([]);
   const [PTTStaffIDOptions, setPTTStaffIDOptions] = useState([]);
   const [WorkPermitStatusIDOptions, setWorkPermitStatusIDOptions] = useState([]);
   const [WorkpermitTypeIDOptions, setWorkpermitTypeIDOptions] = useState([]);
 
   const setLayerpoint = async (item) => {
-    console.log('item', item, stateView)
+    // console.log('item', item, stateView)
     if (stateView) {
 
       // let latlng = item.data;
@@ -200,10 +219,21 @@ const WorkpermitPage = () => {
 
       // console.log("data =>>>>>>>>>>>>>>>>>", item.data);
       if (isPlainObject(item.filter)) {
-        if (isArray(item.filter.AgencyID)) setAgencyIDOptions(item.filter.AgencyID.map(e => { return { value: e } }))
-        if (isArray(item.filter.PTTStaffID)) setPTTStaffIDOptions(item.filter.PTTStaffID.map(e => { return { value: e } }))
-        if (isArray(item.filter.WorkPermitStatusID)) setWorkPermitStatusIDOptions(item.filter.WorkPermitStatusID.map(e => { return { value: e } }))
-        if (isArray(item.filter.WorkpermitTypeID)) setWorkpermitTypeIDOptions(item.filter.WorkpermitTypeID.map(e => { return { value: e } }))
+        if (isArray(item.filter.AgencyID)) setAgencyIDOptions(item.filter.AgencyID.map(e => { return { value: e.AgencyID } }))
+        if (isArray(item.filter.AreaName)) setAreaNameOptions(item.filter.AreaName.map(e => { return { value: e.AreaName } }))
+        if (isArray(item.filter.PTTStaffID)) setPTTStaffIDOptions(item.filter.PTTStaffID.map(e => { return { value: e.PTTStaffID } }))
+        if (isArray(item.filter.WorkPermitStatusID)) setWorkPermitStatusIDOptions(item.filter.WorkPermitStatusID.map(e => {
+          return {
+            id: e.WorkPermitStatusID,
+            value: e.Status_Desc
+          }
+        }))
+        if (isArray(item.filter.WorkpermitTypeID)) setWorkpermitTypeIDOptions(item.filter.WorkpermitTypeID.map(e => {
+          return {
+            id: e.WorkpermitTypeID,
+            value: e.WP_Type_Name
+          }
+        }))
       }
 
 
@@ -637,6 +667,19 @@ const WorkpermitPage = () => {
             </Form.Item>
 
             <Form.Item
+              name="AreaName"
+              label='สถานที่ปฎิบัติงาน'
+            >
+              <Select
+                loading={loading}
+                showArrow
+                style={{ width: '100%' }}
+                options={AreaNameOptions}
+              />
+            </Form.Item>
+
+
+            <Form.Item
               name="WorkPermitStatusID"
               label='ประเภทใบอนุญาต'
             >
@@ -645,8 +688,11 @@ const WorkpermitPage = () => {
                 mode='multiple'
                 showArrow
                 style={{ width: '100%' }}
-                options={WorkPermitStatusIDOptions}
-              />
+
+              >
+                {WorkPermitStatusIDOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
+
+              </Select>
             </Form.Item>
 
             <Form.Item
@@ -658,8 +704,9 @@ const WorkpermitPage = () => {
                 mode='multiple'
                 showArrow
                 style={{ width: '100%' }}
-                options={WorkpermitTypeIDOptions}
-              />
+              >
+                {WorkpermitTypeIDOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
+              </Select>
 
             </Form.Item>
 
@@ -685,16 +732,20 @@ const WorkpermitPage = () => {
         okButtonProps={{ hidden: true }}
         onCancel={() => setIsModalVisible(!isModalVisible)}
         visible={isModalVisible}
+        bodyStyle={{
+          maxHeight: 600,
+          overflowX: "auto"
+        }}
       >
         {datamodal &&
           Object.entries(datamodal).map(([key, value]) => (
             !(typeof value == 'object') &&
             <Row key={key}>
               <Col span={12}>
-                <a>{key}</a>
+                <span style={{ color: "#0A8FDC" }}>{key}</span>
               </Col>
               {console.log(value)}
-              <Col span={12}>{value}</Col>
+              <Col span={12}>{value ?? "-"}</Col>
             </Row>
           ))}
       </Modal>
