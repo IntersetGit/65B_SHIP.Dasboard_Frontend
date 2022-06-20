@@ -545,11 +545,12 @@ const WorkpermitPage = () => {
     }
 
 
-    // PTTlayer.ADDPTTWMSLAYER(map, view)
-    // map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
     setStateMap(map);
     setStateView(view);
+
+    // PTTlayer.ADDPTTWMSLAYER(map, view)
+    // map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
   };
 

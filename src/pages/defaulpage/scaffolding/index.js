@@ -528,16 +528,16 @@ const ScaffoldingPage = () => {
 
 
   const Status_cal = async (data) => {
-
     // console.log('data', data)
     dispatch(
       setStatus({
-        "จำนวน": data.all,
-        "ปกติ": data.normal,
-        "⚠️ ใกล้ Exp": data.near_expire,
-        "‼️ หมด Exp": data.expire,
+        "จำนวนจุด": { value: data.all, color: '#112345' },
+        "ปกติ": { value: data.normal, color: '#F54' },
+        "ใกล้ Exp": { value: data.near_expire, color: '#F09234' },
+        "หมด Exp": { value: data.expire, color: '#F88' },
       }),
     );
+
   };
 
   const Onload = async (map, view) => {
@@ -576,12 +576,12 @@ const ScaffoldingPage = () => {
     view.ui.add(fullscreenui, 'top-right');
     view.ui.add(zoomui, 'top-right');
     view.ui.add(detaillayer, 'top-right');
+    setStateMap(map);
+    setStateView(view);
 
     // PTTlayer.ADDPTTWMSLAYER(map, view)
     // map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
-    setStateMap(map);
-    setStateView(view);
 
 
   };

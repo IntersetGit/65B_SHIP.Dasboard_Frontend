@@ -307,11 +307,13 @@ const Vehicle = () => {
     view.ui.add(zoomui, 'top-right');
     view.ui.add(detaillayer, 'top-right');
 
-    PTTlayer.ADDPTTWMSLAYER(map, view)
-    view.graphics.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
     setStateMap(map);
     setStateView(view);
+
+
+    // PTTlayer.ADDPTTWMSLAYER(map, view)
+    // view.graphics.addMany(await PTTlayer.SHOW_AREALAYERNAME());
   };
   return (
     <div id="pagediv">
