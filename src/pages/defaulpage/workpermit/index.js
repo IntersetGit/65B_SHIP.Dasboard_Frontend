@@ -208,10 +208,10 @@ const WorkpermitPage = () => {
     const resSf = await getWorkpermit({});
     setLayerpoint(resSf)
     // console.log('resSf :>> ', resSf);
-    socket.on("workpermit", async (res) => {
-      const resSf = await getWorkpermit(form.getFieldValue());
-      setLayerpoint(resSf)
-    });
+    // socket.on("workpermit", async (res) => {
+    //   const resSf = await getWorkpermit(form.getFieldValue());
+    //   setLayerpoint(resSf)
+    // });
 
 
   }
@@ -223,7 +223,7 @@ const WorkpermitPage = () => {
   const [WorkpermitTypeIDOptions, setWorkpermitTypeIDOptions] = useState([]);
 
   const setLayerpoint = async (item) => {
-    // console.log('item', item, stateView)
+    console.log('item', item, stateView)
     if (stateView) {
 
       // let latlng = item.data;
@@ -541,8 +541,9 @@ const WorkpermitPage = () => {
     }
 
 
-    PTTlayer.ADDPTTWMSLAYER(map, view)
-    map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
+    // PTTlayer.ADDPTTWMSLAYER(map, view)
+    // map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
+ 
     setStateMap(map);
     setStateView(view);
 
