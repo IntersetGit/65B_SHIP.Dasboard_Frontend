@@ -41,102 +41,19 @@ const ScaffoldingPage = () => {
   const Geojson = new WaGeojson();
   const PTTlayer = new PTTlayers();
 
-  const columns = [
-    {
-      title: 'เลข work',
-      dataIndex: 'WorkPermitNo',
-      key: 'WorkPermitNo',
-      render: (text) => <a>{text}</a>,
-
-    },
-    {
-      title: 'ผู้รับเหมา',
-      dataIndex: 'VendorName',
-      key: 'VendorName',
-
-
-    },
-    {
-      title: 'เจ้าของพื้นที่',
-      dataIndex: 'OwnerName',
-      key: 'OwnerName',
-
-    },
-    {
-      title: 'ผู้ควบคุมงาน',
-      dataIndex: 'PTTStaff',
-      key: 'PTTStaff',
-
-    },
-    {
-      title: 'ประเภทใบอนุญาต',
-      key: 'WorkpermitType',
-      dataIndex: 'WorkpermitType',
-
-    },
-    {
-      title: 'สถานที่ติดตั้ง',
-      key: 'AreaName',
-      dataIndex: 'AreaName',
-
-    },
-    {
-      title: 'วัน-เวลา เริ่มต้น',
-      dataIndex: 'date_time_start',
-      key: 'date_time_start',
-
-    },
-    {
-      title: 'วัน-เวลา สิ้นสุด',
-      dataIndex: 'date_time_end',
-      key: 'date_time_end',
-
-    },
-    {
-      title: 'สถานะ work',
-      dataIndex: 'WorkPermitStatus',
-      key: 'WorkPermitStatus',
-
-    },
-    {
-      title: 'สถานะแจ้งเตือน',
-      dataIndex: 'WarningStatus',
-      key: 'WarningStatus',
-
-    },
-    {
-      title: '...',
-      key: '',
-
-      render: (text, record) => {
-        return (
-          <Space size='middle'>
-            <Button
-              type='primary'
-              onClick={() => {
-                setDatamodal(record), setIsModalVisible(!isModalVisible);
-              }}
-            >
-              Detail
-            </Button>
-          </Space>
-        );
-      },
-    },
-  ];
-
   const columns2 = [
     {
       title: 'เลข work',
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
-      render: (text) => <a>{text}</a>,
+      render: (text) => text ?? "-",
       width: 150
     },
     {
-      title: 'ผู้รับเหมา',
+      title: 'ชื่อ-สกุล ผู้รับเหมา',
       dataIndex: 'VendorName',
       key: 'VendorName',
+      render: (text) => text ?? "-",
       width: 250
 
     },
@@ -144,48 +61,63 @@ const ScaffoldingPage = () => {
       title: 'เจ้าของพื้นที่',
       dataIndex: 'OwnerName',
       key: 'OwnerName',
+      render: (text) => text ?? "-",
       width: 200
     },
     {
       title: 'ผู้ควบคุมงาน',
       dataIndex: 'PTTStaff',
       key: 'PTTStaff',
+      render: (text) => text ?? "-",
       width: 200
     },
     {
       title: 'ประเภทใบอนุญาต',
       key: 'WorkpermitType',
       dataIndex: 'WorkpermitType',
+      render: (text) => text ?? "-",
       width: 150
     },
     {
       title: 'สถานที่ติดตั้ง',
       key: 'AreaName',
       dataIndex: 'AreaName',
+      render: (text) => text ?? "-",
+      width: 150
+    },
+    {
+      title: 'วันหมดอายุ',
+      key: 'ExpiredDate',
+      dataIndex: 'ExpiredDate',
+      render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD") : "-",
       width: 150
     },
     {
       title: 'วัน-เวลา เริ่มต้น',
-      dataIndex: 'date_time_start',
-      key: 'date_time_start',
+      dataIndex: 'WorkingStartDate',
+      key: 'WorkingStartDate',
+      render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD HH:mm:ss") : "-",
       width: 200
     },
     {
       title: 'วัน-เวลา สิ้นสุด',
-      dataIndex: 'date_time_end',
-      key: 'date_time_end',
+      dataIndex: 'WorkingEndDate',
+      key: 'WorkingEndDate',
+      render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD HH:mm:ss") : "-",
       width: 200
     },
     {
       title: 'สถานะ work',
-      dataIndex: 'WorkPermitStatus',
-      key: 'WorkPermitStatus',
+      dataIndex: 'StatusName',
+      key: 'StatusName',
+      render: (text) => text ?? "-",
       width: 150
     },
     {
       title: 'สถานะแจ้งเตือน',
       dataIndex: 'WarningStatus',
       key: 'WarningStatus',
+      render: (text) => text ?? "-",
       width: 150
     },
     {
@@ -198,7 +130,39 @@ const ScaffoldingPage = () => {
             <Button
               type='primary'
               onClick={() => {
-                setDatamodal(record), setIsModalVisible(!isModalVisible);
+                setDatamodal({
+
+                  "เลขที่นั่งร้าน": record.ScaffoldingCode ?? "-",
+                  "ประเภทผู้ขอรายการ": record.OwnerType ?? "-",
+                  "รหัสผู้ขอรายการ": record.WorkOwnerID ?? "-",
+                  "ชื่อ นามสกุล": record.WorkName ?? "-",
+                  "เลขบัตรประชาชน": record.PersonalID ?? "-",
+                  "เลข Work Permit": record.WorkPermitNo ?? "-",
+                  "รหัสประเภทนั่งร้าน": record.ScaffoldingTypeID ?? "-",
+                  "ชื่องาน": record.Title ?? "-",
+                  "รายละเอียดของงาน": record.Description ?? "-",
+                  "วัตถุประสงค์": record.Objective ?? "-",
+                  "วันหมดอายุสภาพนั่งร้าน": record.ExpiredDate ?? "-",
+                  "รหัสสถานที่ปฏิบัติงานหลัก": record.Area ?? "-",
+                  "ชื่อสถานที่ปฏิบัติงานหลัก": record.AreaName ?? "-",
+                  "รหัสสถานที่ปฏิบัติงานย่อย": record.SubArea ?? "-",
+                  "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubAreaName ?? "-",
+                  "ข้อมูลพิกัดนั่งร้าน": record.Features ?? "-",
+                  "ข้อมูลคุณสมบัตินั่งร้าน": record.FeaturesProperties ?? "-",
+                  "วัน เวลา เริ่มต้นการปฏิบัติงาน": record.WorkingStartDate ?? "-",
+                  "วัน เวลา สิ้นสุดการปฏิบัติงาน": record.WorkingEndDate ?? "-",
+                  "รหัสบริษัท": record.VendorCode ?? "-",
+                  "ชื่อบริษัท": record.VendorName ?? "-",
+                  "รหัสผู้ควบคุมงาน": record.PTTStaffCode ?? "-",
+                  "ชื่อผู้ควบคุมงาน": record.PTTStaff ?? "-",
+                  "รหัสหน่วยงานผู้ควบคุม": record.AgencyID ?? "-",
+                  "ชื่อหน่วยงานผู้ควบคุม": record.AgencyName ?? "-",
+                  "รหัสเจ้าของพื้นที่": record.Owner ?? "-",
+                  "ประเภทของ Work": record.WorkpermitType ?? "-",
+                  "สถานะใบงาน": record.StatusID ?? "-",
+                  "สถานะแจ้งเตือน": record.StatusID ?? "-",
+
+                }), setIsModalVisible(!isModalVisible);
               }}
             >
               Detail
@@ -602,7 +566,7 @@ const ScaffoldingPage = () => {
       // console.log('model', model)
 
       // console.log('first', getScaffolding(model))
-      setLayerpoint(await getScaffolding(model))
+      setLayerpoint(await getScaffolding(model, true))
 
     } catch (error) {
       console.log('error', error)
@@ -616,7 +580,7 @@ const ScaffoldingPage = () => {
   const [scaffoldingTypeOptions, setScaffoldingTypeOptions] = useState([]);
   const [form] = Form.useForm()
 
-  const getScaffolding = async (item) => {
+  const getScaffolding = async (item, openTableBool) => {
     let url = `/scaffolding/all?`;
     if (item.PTTStaffCode) url += `&PTTStaffCode=${item.PTTStaffCode}`;
     if (item.VendorCode) url += `&VendorCode=${item.VendorCode}`;
@@ -627,6 +591,7 @@ const ScaffoldingPage = () => {
       url += `&ScaffoldingType=${item.ScaffoldingType.toString()}`;
     }
     const { data } = await API.get(url);
+    if (openTableBool) openTable()
     return data.Status === 'success' ? data.Message : {
       data: [],
       summary: {
@@ -637,6 +602,13 @@ const ScaffoldingPage = () => {
     }
   }
 
+  const openTable = () => {
+    document.querySelector('.ant-table-wrapper').style.setProperty('display', 'block', 'important');
+  }
+
+  const closeTable = () => {
+    document.querySelector('.ant-table-wrapper').style.setProperty('display', 'none', 'important');
+  }
 
   return (
     <div id="pagediv">
@@ -662,13 +634,15 @@ const ScaffoldingPage = () => {
                 document.querySelector('.ant-table-wrapper').style.display ===
                 ''
               ) {
-                document
-                  .querySelector('.ant-table-wrapper')
-                  .style.setProperty('display', 'block', 'important');
+                // document
+                //   .querySelector('.ant-table-wrapper')
+                //   .style.setProperty('display', 'block', 'important');
+                openTable()
               } else {
-                document
-                  .querySelector('.ant-table-wrapper')
-                  .style.setProperty('display', 'none', 'important');
+                // document
+                //   .querySelector('.ant-table-wrapper')
+                //   .style.setProperty('display', 'none', 'important');
+                closeTable()
               }
             }}
           />
@@ -810,12 +784,16 @@ const ScaffoldingPage = () => {
         okButtonProps={{ hidden: true }}
         onCancel={() => setIsModalVisible(!isModalVisible)}
         visible={isModalVisible}
+        bodyStyle={{
+          maxHeight: 600,
+          overflowX: "auto"
+        }}
       >
         {datamodal &&
           Object.entries(datamodal).map(([key, value]) => (
             <Row key={key}>
               <Col span={12}>
-                <a>{key}</a>
+                <span style={{ color: "#0A8FDC" }}>{key}</span>
               </Col>
               <Col span={12}>{value}</Col>
             </Row>
