@@ -98,7 +98,18 @@ const WorkpermitPage = () => {
       dataIndex: 'others',
       key: 'others',
       render: (text, record) => text.WorkPermitStatusID
-
+    },
+    {
+      title: 'สถานะแจ้งเตือน',
+      dataIndex: 'notification',
+      key: 'notification',
+      render: (text, record) => (
+        <>
+          {text.near_expire ? "⚠️ ใกล้ Exp" : ""}
+          {text.expire ? "‼️ หมด Exp" : ""}
+          {text.gas ? "ก๊าซที่ต้องตรวจวัด" : ""}
+        </>
+      )
     },
     {
       title: '...',
@@ -259,6 +270,7 @@ const WorkpermitPage = () => {
         // console.log('getextentcenter :>> ', getextentcenter.extent.center.latitude);
         let randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude, getextentcenter?.extent?.center?.longitude, 40)
         // console.log('randomlatlng :>> ', randomlatlng);
+        console.log("ASdasdasdas", `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`)
         latlng.push({
           ...obj,
           "id": obj._id,
@@ -266,8 +278,8 @@ const WorkpermitPage = () => {
           "name": obj.Name,
           "licensor": obj.PTTStaff,
           "supervisor": obj.OwnerName,
-          "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-          "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
+          "date_time_start": moment(new Date(obj.others.WorkingStart)).format("DD/MM/YYYY hh:mm:ss"),
+          "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
           // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
           "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
           "latitude": randomlatlng.latitude,
@@ -684,7 +696,7 @@ const WorkpermitPage = () => {
 
             <Form.Item
               name="WorkPermitStatusID"
-              label='ประเภทใบอนุญาต'
+              label='สถานะ Work'
             >
               <Select
                 loading={loading}
@@ -700,7 +712,7 @@ const WorkpermitPage = () => {
 
             <Form.Item
               name="WorkpermitTypeID"
-              label='หัวหน้าการค้นหา'
+              label='ประเภทใบอนุญาต'
             >
               <Select
                 loading={loading}
