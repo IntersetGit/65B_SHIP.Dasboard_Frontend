@@ -577,8 +577,8 @@ const ScaffoldingPage = () => {
     view.ui.add(zoomui, 'top-right');
     view.ui.add(detaillayer, 'top-right');
 
-    PTTlayer.ADDPTTWMSLAYER(map, view)
-    map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
+    // PTTlayer.ADDPTTWMSLAYER(map, view)
+    // map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
     setStateMap(map);
     setStateView(view);
