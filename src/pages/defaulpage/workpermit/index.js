@@ -483,12 +483,12 @@ const WorkpermitPage = () => {
     // console.log('data Status_cal ========>', data)
     dispatch(
       setStatus({
-        "Total": data.total,
-        "Open": data.open,
-        "Close": data.close,
-        "⚠️ ใกล้ Exp": data.near_expire,
-        "‼️ หมด Exp": data.expire,
-        "ก๊าซที่ต้องตรวจวัด": data.gas,
+        "total": { value: data.total, color: '#112345' },
+        "open": { value: data.open, color: '#F09234' },
+        "close": { value: data.close, color: '#F88' },
+        // "ใบอนุญาติใกล้ exp": { value: data.near_expire, color: '#F54' },
+        // "ใบอนุญาติ exp": { value: data.open, color: '#F54' },
+        "ก๊าซที่ต้องตรวจวัด": { value: data.gas, color: '#F54' },
       }),
     );
   };
@@ -545,11 +545,12 @@ const WorkpermitPage = () => {
     }
 
 
-    // PTTlayer.ADDPTTWMSLAYER(map, view)
-    // map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
     setStateMap(map);
     setStateView(view);
+
+    // PTTlayer.ADDPTTWMSLAYER(map, view)
+    // map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
   };
 
