@@ -634,8 +634,8 @@ const WorkpermitPage = () => {
         >
           <Form
             form={form}
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 18 }}
+            labelCol={{ span: 10 }}
+            wrapperCol={{ span: 16 }}
             name='nest-messages'
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
