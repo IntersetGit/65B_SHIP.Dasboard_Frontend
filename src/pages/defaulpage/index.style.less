@@ -31,3 +31,41 @@
     display: none !important;
   }
 }
+
+.sysmbole{
+  min-width: 300px;
+  background-color: black;
+  color: white;
+  .sysmbole_table{
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 12px;
+      align-items: center;
+      text-align: end;
+  }
+  .ant-collapse-content > .ant-collapse-content-box{
+      overflow: scroll;
+      max-height: 300px;
+      :hover{
+          .avatar {
+              // background-color: rgb(0, 0, 0);
+              border-color: rgb(0, 235, 235);
+              border-width: 2px;
+          }
+          color: rgb(0, 235, 235);
+          transform: translateY(-0.25em);
+      }
+  }
+
+}
+.avatar {
+  vertical-align: middle;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border-color: #05050544;
+  border-width: 1px;
+  border-style: solid;
+}

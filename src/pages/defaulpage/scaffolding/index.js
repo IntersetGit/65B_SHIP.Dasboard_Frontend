@@ -224,7 +224,7 @@ const ScaffoldingPage = () => {
       }
 
       let latlng = item.data.map(obj => {
-        console.log('status_work', `A${obj.ScaffoldingTypeID}_${obj.Status.toLowerCase()}`)
+        // console.log('status_work', `A${obj.ScaffoldingTypeID}_${obj.Status.toLowerCase()}`)
 
         return {
           ...obj,
@@ -236,7 +236,7 @@ const ScaffoldingPage = () => {
           "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
           "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
           // "status_work": obj.WorkPermitStatus.toLowerCase(),
-          "status_work": `A${obj.ScaffoldingTypeID}_${obj.Status.toLowerCase()}`,
+          "status_work": `A${obj.ScaffoldingTypeID}_${obj.others?.StatusName}`,
           "latitude": obj.FeaturesPropertiesCentroid_X,
           "longitude": obj.FeaturesPropertiesCentroid_Y,
           "locatoin": obj.SubAreaName,
@@ -250,7 +250,7 @@ const ScaffoldingPage = () => {
       setTabledata(latlng);
 
       const datageojson = await Geojson.CleateGeojson(latlng, 'Point');
-
+      console.log('datageojson:>> ', datageojson);
       const [FeatureLayer, GeoJSONLayer] = await loadModules([
         'esri/layers/FeatureLayer',
         'esri/layers/GeoJSONLayer',
@@ -316,7 +316,7 @@ const ScaffoldingPage = () => {
                   fieldName: "OwnerName"
                 },
                 {
-                  fieldName: "WarningStatus"
+                  fieldName: "status_work"
                 },
                 {
                   fieldName: "WorkpermitType"
@@ -355,91 +355,113 @@ const ScaffoldingPage = () => {
       const scaffoldingIcon = [
         {
           name: "1",
-          img: '/assets/iconmap/scaffolding/1.svg'
+          img: '/assets/iconmap/scaffolding/1.svg',
+          detail:'Light Duty'
         },
         {
           name: "2",
-          img: '/assets/iconmap/scaffolding/2.svg'
+          img: '/assets/iconmap/scaffolding/2.svg',
+          detail:'Light Duty_Independent Tower'
         },
         {
           name: "3",
-          img: '/assets/iconmap/scaffolding/3.svg'
+          img: '/assets/iconmap/scaffolding/3.svg',
+          detail:'Light Duty_Mobile'
         },
         {
           name: "4",
-          img: '/assets/iconmap/scaffolding/4.svg'
+          img: '/assets/iconmap/scaffolding/4.svg',
+          detail:'Light Duty_Overhang'
         },
         {
           name: "5",
-          img: '/assets/iconmap/scaffolding/5.svg'
+          img: '/assets/iconmap/scaffolding/5.svg',
+          detail:'Light Duty_Hanging'
         },
         {
           name: "6",
-          img: '/assets/iconmap/scaffolding/6.svg'
+          img: '/assets/iconmap/scaffolding/6.svg',
+          detail:'Heavy Duty'
         },
         {
           name: "7",
-          img: '/assets/iconmap/scaffolding/7.svg'
+          img: '/assets/iconmap/scaffolding/7.svg',
+          detail:'Heavy Duty_Independent Tower'
         },
         {
           name: "8",
-          img: '/assets/iconmap/scaffolding/8.svg'
+          img: '/assets/iconmap/scaffolding/8.svg',
+          detail:'Heavy Duty_Mobile'
         },
         {
           name: "9",
-          img: '/assets/iconmap/scaffolding/9.svg'
+          img: '/assets/iconmap/scaffolding/9.svg',
+          detail:'Heavy Duty_Overhang'
         },
         {
           name: "10",
-          img: '/assets/iconmap/scaffolding/10.svg'
+          img: '/assets/iconmap/scaffolding/10.svg',
+          detail:'Heavy Duty_Hanging'
         },
         {
           name: "11",
-          img: '/assets/iconmap/scaffolding/11.svg'
+          img: '/assets/iconmap/scaffolding/11.svg',
+          detail:'Heavy Duty_Internal'
         },
         {
           name: "12",
-          img: '/assets/iconmap/scaffolding/12.svg'
+          img: '/assets/iconmap/scaffolding/12.svg',
+          detail:'Heavy Duty_Heavy Duty'
         },
         {
           name: "13",
-          img: '/assets/iconmap/scaffolding/13.svg'
+          img: '/assets/iconmap/scaffolding/13.svg',
+          detail:'Confined Space'
         },
         {
           name: "14",
-          img: '/assets/iconmap/scaffolding/14.svg'
+          img: '/assets/iconmap/scaffolding/14.svg',
+          detail:'Confined Space_Independent Tower'
         },
         {
           name: "15",
-          img: '/assets/iconmap/scaffolding/15.svg'
+          img: '/assets/iconmap/scaffolding/15.svg',
+          detail:'Confined Space_Mobile'
         },
         {
           name: "16",
-          img: '/assets/iconmap/scaffolding/16.svg'
+          img: '/assets/iconmap/scaffolding/16.svg',
+          detail:'Confined Space_Overhang'
         },
         {
           name: "17",
-          img: '/assets/iconmap/scaffolding/17.svg'
+          img: '/assets/iconmap/scaffolding/17.svg',
+          detail:'Confined Space_Hanging'
         },
         {
           name: "18",
-          img: '/assets/iconmap/scaffolding/18.svg'
+          img: '/assets/iconmap/scaffolding/18.svg',
+          detail:'Confined Space_Internal'
         },
         {
           name: "19",
-          img: '/assets/iconmap/scaffolding/19.svg'
+          img: '/assets/iconmap/scaffolding/19.svg',
+          detail:'Confined Space_Heavy Duty'
         },
         {
           name: "20",
-          img: '/assets/iconmap/scaffolding/20.svg'
+          img: '/assets/iconmap/scaffolding/20.svg',
+          detail:'Test Header 1'
         },
         {
           name: "21",
-          img: '/assets/iconmap/scaffolding/21.svg'
+          img: '/assets/iconmap/scaffolding/21.svg',
+          detail:'Test Header Two'
         },
         {
           name: "22",
-          img: '/assets/iconmap/scaffolding/22.svg'
+          img: '/assets/iconmap/scaffolding/22.svg',
+          detail:'Test Header Two_Sub Test Header Two'
         },
       ]
 
@@ -462,7 +484,7 @@ const ScaffoldingPage = () => {
       var jsxsysmboleIcon = await Promise.all(scaffoldingIcon.map(async (item, index) => {
         return <div className='sysmbole_table' key={index.toString()}>
           <img src={item.img} alt="Avatar" className="avatar" />
-          <span>{item.name}</span>
+          <span>{item.detail}</span>
         </div>
       }));
       var jsxsysmboleStatus = await Promise.all(scaffoldingStatusWork.map(async (item, index) => {
@@ -749,7 +771,7 @@ const ScaffoldingPage = () => {
             <Panel header="ใช้สีแทนประเภทนั้งร้าน" key="1">
               {stateSysmbole && stateSysmbole[0]}
             </Panel>
-            <Panel header="ใช้สัญลักษณืแทนการแจ้งเตือน" key="2">
+            <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
               {stateSysmbole && stateSysmbole[1]}
             </Panel>
 
