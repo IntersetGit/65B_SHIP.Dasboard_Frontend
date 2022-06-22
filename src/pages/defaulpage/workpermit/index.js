@@ -16,7 +16,6 @@ import {
 import { Map, WebScene } from '@esri/react-arcgis';
 import { loadModules } from 'esri-loader';
 import './index.style.less';
-import io from 'socket.io-client';
 import socketClient from '../../../util/socket';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
@@ -27,7 +26,6 @@ import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
 import { isArray, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
-import { stringify } from 'querystring';
 
 
 const WorkpermitPage = () => {
