@@ -1,0 +1,128 @@
+{
+    "scaffoldingIcon": [{
+            "name": "1",
+            "img": "/assets/iconmap/scaffolding/1.svg",
+            "detail": "Light Duty"
+        },
+        {
+            "name": "2",
+            "img": "/assets/iconmap/scaffolding/2.svg",
+            "detail": "Light Duty_Independent Tower"
+        },
+        {
+            "name": "3",
+            "img": "/assets/iconmap/scaffolding/3.svg",
+            "detail": "Light Duty_Mobile"
+        },
+        {
+            "name": "4",
+            "img": "/assets/iconmap/scaffolding/4.svg",
+            "detail": "Light Duty_Overhang"
+        },
+        {
+            "name": "5",
+            "img": "/assets/iconmap/scaffolding/5.svg",
+            "detail": "Light Duty_Hanging"
+        },
+        {
+            "name": "6",
+            "img": "/assets/iconmap/scaffolding/6.svg",
+            "detail": "Heavy Duty"
+        },
+        {
+            "name": "7",
+            "img": "/assets/iconmap/scaffolding/7.svg",
+            "detail": "Heavy Duty_Independent Tower"
+        },
+        {
+            "name": "8",
+            "img": "/assets/iconmap/scaffolding/8.svg",
+            "detail": "Heavy Duty_Mobile"
+        },
+        {
+            "name": "9",
+            "img": "/assets/iconmap/scaffolding/9.svg",
+            "detail": "Heavy Duty_Overhang"
+        },
+        {
+            "name": "10",
+            "img": "/assets/iconmap/scaffolding/10.svg",
+            "detail": "Heavy Duty_Hanging"
+        },
+        {
+            "name": "11",
+            "img": "/assets/iconmap/scaffolding/11.svg",
+            "detail": "Heavy Duty_Internal"
+        },
+        {
+            "name": "12",
+            "img": "/assets/iconmap/scaffolding/12.svg",
+            "detail": "Heavy Duty_Heavy Duty"
+        },
+        {
+            "name": "13",
+            "img": "/assets/iconmap/scaffolding/13.svg",
+            "detail": "Confined Space"
+        },
+        {
+            "name": "14",
+            "img": "/assets/iconmap/scaffolding/14.svg",
+            "detail": "Confined Space_Independent Tower"
+        },
+        {
+            "name": "15",
+            "img": "/assets/iconmap/scaffolding/15.svg",
+            "detail": "Confined Space_Mobile"
+        },
+        {
+            "name": "16",
+            "img": "/assets/iconmap/scaffolding/16.svg",
+            "detail": "Confined Space_Overhang"
+        },
+        {
+            "name": "17",
+            "img": "/assets/iconmap/scaffolding/17.svg",
+            "detail": "Confined Space_Hanging"
+        },
+        {
+            "name": "18",
+            "img": "/assets/iconmap/scaffolding/18.svg",
+            "detail": "Confined Space_Internal"
+        },
+        {
+            "name": "19",
+            "img": "/assets/iconmap/scaffolding/19.svg",
+            "detail": "Confined Space_Heavy Duty"
+        },
+        {
+            "name": "20",
+            "img": "/assets/iconmap/scaffolding/20.svg",
+            "detail": "Test Header 1"
+        },
+        {
+            "name": "21",
+            "img": "/assets/iconmap/scaffolding/21.svg",
+            "detail": "Test Header Two"
+        },
+        {
+            "name": "22",
+            "img": "/assets/iconmap/scaffolding/22.svg",
+            "detail": "Test Header Two_Sub Test Header Two"
+        }
+    ],
+    "status": [{
+            "name": "near_expire",
+            "status": "warning",
+            "img": "/assets/iconmap/status/warning-red.png"
+        },
+        {
+            "name": "expire",
+            "status": "warningWork",
+            "img": "/assets/iconmap/status/warning-yellow.png"
+        },
+        {
+            "name": "normal",
+            "status": false
+        }
+    ]
+}

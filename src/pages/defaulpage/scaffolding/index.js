@@ -813,7 +813,7 @@ const ScaffoldingPage = () => {
             ? 'table-row-red'
             : ''
         }
-        rowKey={(i) => i.id}
+        rowKey={(d,index) => index.toString()}
         columns={columns2}
         dataSource={tabledata}
       />
