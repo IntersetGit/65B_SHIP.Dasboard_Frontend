@@ -10,7 +10,7 @@ import {
   Row,
   Col,
   Modal,
-  Drawer,
+  Collapse,
   DatePicker
 } from 'antd';
 import { Map, WebScene } from '@esri/react-arcgis';
@@ -27,6 +27,7 @@ import API from '../../../util/Api'
 import { isArray } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 
+const { Panel } = Collapse;
 
 
 const ScaffoldingPage = () => {
@@ -40,7 +41,7 @@ const ScaffoldingPage = () => {
   const dispatch = useDispatch();
   const Geojson = new WaGeojson();
   const PTTlayer = new PTTlayers();
-
+  const [stateSysmbole, setstateSysmbole] = useState(null);
   const columns2 = [
     {
       title: 'เลข work',
@@ -446,16 +447,32 @@ const ScaffoldingPage = () => {
         {
           name: "near_expire",
           status: "warning",
+          img: '/assets/iconmap/status/warning-red.png'
         },
         {
           name: "expire",
           status: "warningWork",
+          img: '/assets/iconmap/status/warning-yellow.png'
         },
         {
           name: "normal",
           status: false,
         },
       ]
+      var jsxsysmboleIcon = await Promise.all(scaffoldingIcon.map(async (item, index) => {
+        return <div className='sysmbole_table' key={index.toString()}>
+          <img src={item.img} alt="Avatar" className="avatar" />
+          <span>{item.name}</span>
+        </div>
+      }));
+      var jsxsysmboleStatus = await Promise.all(scaffoldingStatusWork.map(async (item, index) => {
+        return item.img && <div className='sysmbole_table' key={index.toString()}>
+          <img src={item.img} alt="Avatar" className="avatar" />
+          <span>{item.name}</span>
+        </div>
+      }));
+
+      setstateSysmbole([jsxsysmboleIcon, jsxsysmboleStatus]);
 
       for (const x in scaffoldingIcon) {
         if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
@@ -468,8 +485,8 @@ const ScaffoldingPage = () => {
                 symbol: {
                   type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
                   url: await CreateImgIcon(a.img, b.status),
-                  width: '35px',
-                  height: '35px',
+                  width: '25px',
+                  height: '25px',
                 },
               })
             }
@@ -725,59 +742,22 @@ const ScaffoldingPage = () => {
             </Form.Item>
           </Form>
         </div>
-        <div ref={refdetail} className='menuserchslide detailemo esri-widget'>
-          <Row>
-            <Col span={8}>
-              <p>ใช้ 8 สีแทนประเภท</p>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gridGap: '5px',
-                }}
-              >
-                <span>🔴</span>
-                <span>🟠</span>
-                <span>🟡</span>
-                <span>🟢</span>
-                <span>🔵</span>
-              </div>
-            </Col>
-            <Col span={8}>
-              <p>ใช้ 2 สีแทนประเภท</p>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gridGap: '5px',
-                }}
-              >
-                <span>🟢</span>
-                <span>🔵</span>
-              </div>
-            </Col>
-            <Col span={8}>
-              <p>ใช้สัญลักษณ์แทนการแจ้งเตือน</p>
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(2, 1fr)',
-                  gridGap: '5px',
-                }}
-              >
-                <span>🚸</span>
-                <span>⛔</span>
-                <span>✅</span>
-                <span>🛑</span>
-                <span>🚯</span>
-              </div>
-            </Col>
-          </Row>
+
+
+        <div ref={refdetail} className='sysmbole esri-widget'>
+          <Collapse accordion >
+            <Panel header="ใช้สีแทนประเภทนั้งร้าน" key="1">
+              {stateSysmbole && stateSysmbole[0]}
+            </Panel>
+            <Panel header="ใช้สัญลักษณืแทนการแจ้งเตือน" key="2">
+              {stateSysmbole && stateSysmbole[1]}
+            </Panel>
+
+          </Collapse>
         </div>
 
       </Map>
 
-      {/* <div id="viewDiv" style={{height:'70vh'}}></div> */}
 
       <Modal
         title='รายละเอียด'
