@@ -99,7 +99,7 @@ function CreateIcon(color = "red", type = false, isdraw = 1) {
 
 async function CreateImgIcon(
   img = "https://cdn-icons-png.flaticon.com/512/2554/2554936.png",
-  type = "warningGas"
+  type = false
 ) {
   try {
 
@@ -129,7 +129,7 @@ async function CreateImgIcon(
           await ctx.drawImage(image, canvas.width / 2, 0, 100, 110);
           resolve();
         };
-        image.src = imgicon[type];
+        image.src = type;
       });
       await drawer1()
     }

@@ -39,10 +39,11 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
     </List>
   );
 
-  const IconLink = ({ number, text ,color }) => (
+  const IconLink = ({ number, text ,color ,img }) => (
     <a className="example-link">
       <Badge style={{ backgroundColor: `${color ? color :'#'+Math.floor(Math.random()*16777215).toString(16)}` }} count={number ? number : 0} showZero />
       {" "+text}
+      {img && <img style={{position:'relative',left:'5px'}} width={15} height={15} src={img} alt="Avatar"  />}
     </a>
   );
 
@@ -70,12 +71,13 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
               <Row >
                 {Object.keys(StatusMap).map((status,index) => {
                   return (
-                    <Col key={index.toString()} lg={8} md={12} sm={12} xs={24}>
+                    <Col key={index.toString()} lg={8} md={12} sm={12} xs={12}>
                       {/* <p>{status} : {StatusMap[status]}</p> */}
                       <IconLink
                         number={StatusMap[status].value}
                         text={status}
                         color={StatusMap[status].color}
+                        img={StatusMap[status].img}
                       />
                     </Col>
                   );

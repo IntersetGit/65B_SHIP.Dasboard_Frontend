@@ -250,7 +250,7 @@ const ScaffoldingPage = () => {
       setTabledata(latlng);
 
       const datageojson = await Geojson.CleateGeojson(latlng, 'Point');
-      console.log('datageojson:>> ', datageojson);
+      // console.log('datageojson:>> ', datageojson);
       const [FeatureLayer, GeoJSONLayer] = await loadModules([
         'esri/layers/FeatureLayer',
         'esri/layers/GeoJSONLayer',
@@ -468,17 +468,18 @@ const ScaffoldingPage = () => {
       const scaffoldingStatusWork = [
         {
           name: "near_expire",
-          status: "warning",
-          img: '/assets/iconmap/status/warning-red.png'
-        },
-        {
-          name: "expire",
-          status: "warningWork",
+          detail: "ใกล้หมดอายุ",
           img: '/assets/iconmap/status/warning-yellow.png'
         },
         {
+          name: "expire",
+          detail: "หมดอายุ",
+          img: '/assets/iconmap/status/warning-red.png'
+        },
+        {
           name: "normal",
-          status: false,
+          detail:'ปกติ',
+          img: false,
         },
       ]
       var jsxsysmboleIcon = await Promise.all(scaffoldingIcon.map(async (item, index) => {
@@ -490,7 +491,7 @@ const ScaffoldingPage = () => {
       var jsxsysmboleStatus = await Promise.all(scaffoldingStatusWork.map(async (item, index) => {
         return item.img && <div className='sysmbole_table' key={index.toString()}>
           <img src={item.img} alt="Avatar" className="avatar" />
-          <span>{item.name}</span>
+          <span>{item.detail}</span>
         </div>
       }));
 
@@ -506,7 +507,7 @@ const ScaffoldingPage = () => {
                 value: `A${a.name}_${b.name}`,
                 symbol: {
                   type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                  url: await CreateImgIcon(a.img, b.status),
+                  url: await CreateImgIcon(a.img, b.img),
                   width: '25px',
                   height: '25px',
                 },
@@ -535,9 +536,9 @@ const ScaffoldingPage = () => {
     dispatch(
       setStatus({
         "จำนวนจุด": { value: data.all, color: '#112345' },
-        "ปกติ": { value: data.normal, color: '#F54' },
-        "ใกล้ Exp": { value: data.near_expire, color: '#F09234' },
-        "หมด Exp": { value: data.expire, color: '#F88' },
+        "ปกติ": { value: data.normal, color: '#17d149' },
+        "ใกล้ Exp": { value: data.near_expire, color: '#F09234', img:'/assets/iconmap/status/warning-yellow.png' },
+        "หมด Exp": { value: data.expire, color: '#F54', img:'/assets/iconmap/status/warning-red.png' },
       }),
     );
 
