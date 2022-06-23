@@ -16,7 +16,6 @@ import {
 import { Map, WebScene } from '@esri/react-arcgis';
 import { loadModules } from 'esri-loader';
 import './index.style.less';
-import io from 'socket.io-client';
 import socketClient from '../../../util/socket';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
@@ -24,7 +23,7 @@ import moment, { isMoment } from 'moment';
 import WaGeojson from '../../../util/WaGeojson';
 import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
-import { isArray } from 'lodash';
+import { isArray, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 
 const { Panel } = Collapse;
@@ -52,8 +51,8 @@ const ScaffoldingPage = () => {
     },
     {
       title: 'ชื่อ-สกุล ผู้รับเหมา',
-      dataIndex: 'VendorName',
-      key: 'VendorName',
+      dataIndex: 'WorkName',
+      key: 'WorkName',
       render: (text) => text ?? "-",
       width: 250
 
@@ -118,7 +117,7 @@ const ScaffoldingPage = () => {
       title: 'สถานะแจ้งเตือน',
       dataIndex: 'WarningStatus',
       key: 'WarningStatus',
-      render: (text) => text ?? "-",
+      render: (text, record) => record.others.StatusName ?? "-",
       width: 150
     },
     {
@@ -134,7 +133,7 @@ const ScaffoldingPage = () => {
                 setDatamodal({
 
                   "เลขที่นั่งร้าน": record.ScaffoldingCode ?? "-",
-                  "ประเภทผู้ขอรายการ": record.OwnerType ?? "-",
+                  "ประเภทผู้ขอรายการ": record.OwnerType == 1 ? "พนักงาน ปตท." : record.OwnerType == 2 ? "ผู้รับเหมา" : "-",
                   "รหัสผู้ขอรายการ": record.WorkOwnerID ?? "-",
                   "ชื่อ นามสกุล": record.WorkName ?? "-",
                   "เลขบัตรประชาชน": record.PersonalID ?? "-",
@@ -143,15 +142,15 @@ const ScaffoldingPage = () => {
                   "ชื่องาน": record.Title ?? "-",
                   "รายละเอียดของงาน": record.Description ?? "-",
                   "วัตถุประสงค์": record.Objective ?? "-",
-                  "วันหมดอายุสภาพนั่งร้าน": record.ExpiredDate ?? "-",
+                  "วันหมดอายุสภาพนั่งร้าน": record.ExpiredDate ? moment(new Date(record.ExpiredDate)).format("YYYY-MM-DD") : "-",
                   "รหัสสถานที่ปฏิบัติงานหลัก": record.Area ?? "-",
                   "ชื่อสถานที่ปฏิบัติงานหลัก": record.AreaName ?? "-",
                   "รหัสสถานที่ปฏิบัติงานย่อย": record.SubArea ?? "-",
                   "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubAreaName ?? "-",
-                  "ข้อมูลพิกัดนั่งร้าน": record.Features ?? "-",
-                  "ข้อมูลคุณสมบัตินั่งร้าน": record.FeaturesProperties ?? "-",
-                  "วัน เวลา เริ่มต้นการปฏิบัติงาน": record.WorkingStartDate ?? "-",
-                  "วัน เวลา สิ้นสุดการปฏิบัติงาน": record.WorkingEndDate ?? "-",
+                  // "ข้อมูลพิกัดนั่งร้าน": record.Features ?? "-",
+                  // "ข้อมูลคุณสมบัตินั่งร้าน": record.FeaturesProperties ?? "-",
+                  "วัน เวลา เริ่มต้นการปฏิบัติงาน": record.WorkingStartDate ? moment(new Date(record.WorkingStartDate)).format("YYYY-MM-DD HH:mm:ss") : "-",
+                  "วัน เวลา สิ้นสุดการปฏิบัติงาน": record.WorkingEndDate ? moment(new Date(record.WorkingEndDate)).format("YYYY-MM-DD HH:mm:ss") : "-",
                   "รหัสบริษัท": record.VendorCode ?? "-",
                   "ชื่อบริษัท": record.VendorName ?? "-",
                   "รหัสผู้ควบคุมงาน": record.PTTStaffCode ?? "-",
@@ -160,8 +159,8 @@ const ScaffoldingPage = () => {
                   "ชื่อหน่วยงานผู้ควบคุม": record.AgencyName ?? "-",
                   "รหัสเจ้าของพื้นที่": record.Owner ?? "-",
                   "ประเภทของ Work": record.WorkpermitType ?? "-",
-                  "สถานะใบงาน": record.StatusID ?? "-",
-                  "สถานะแจ้งเตือน": record.StatusID ?? "-",
+                  "สถานะใบงาน": record.StatusName ?? "-",
+                  "สถานะแจ้งเตือน": record.others.StatusName ?? "-",
 
                 }), setIsModalVisible(!isModalVisible);
               }}
@@ -194,15 +193,25 @@ const ScaffoldingPage = () => {
     const resSf = await getScaffolding({});
     // console.log('resSf :>> ', resSf);
     setLayerpoint(resSf)
-    socket.on("scaffolding", (res) => {
-      // console.log('socket', res)
-      if (res.Status == "success") {
-        setLayerpoint(res.Message)
-      }
+    // socket.on("scaffolding", (res) => {
+    //   // console.log('socket', res)
+    //   if (res.Status == "success") {
+    //     setLayerpoint(res.Message)
+    //   }
+    // });
+
+    socket.on("scaffolding", async (res) => {
+      const resSf = await getScaffolding(form.getFieldValue());
+      setLayerpoint(resSf)
     });
 
 
   }
+
+  const [ScaffoldingType, setScaffoldingType] = useState([]);
+  const [AgencyName, setAgencyName] = useState([]);
+  const [AreaName, setAreaName] = useState([]);
+  const [PTTStaffCode, setPTTStaffCode] = useState([]);
 
   const setLayerpoint = async (item) => {
 
@@ -210,17 +219,15 @@ const ScaffoldingPage = () => {
 
       // let latlng = item.data;
       Status_cal(item.summary);
-
+      // console.log('item', item)
       console.log("data =>>>>>>>>>>>>>>>>>", item.data);
       // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
-      if (isArray(item.filter)) {
-        const _filter = item.filter.map(e => {
-          return {
-            value: e._id
-          }
-        });
-        // console.log('_filter', _filter)
-        setScaffoldingTypeOptions(_filter)
+      if (isPlainObject(item.filter)) {
+        if (isArray(item.filter.AgencyName)) setAgencyName(item.filter.AgencyName.map(e => { return { value: e.AgencyName } }))
+        if (isArray(item.filter.AreaName)) setAreaName(item.filter.AreaName.map(e => { return { value: e.AreaName } }))
+        if (isArray(item.filter.PTTStaffCode)) setPTTStaffCode(item.filter.PTTStaffCode.map(e => { return { value: e.PTTStaffCode } }))
+        if (isArray(item.filter.PTTStaffCode)) setPTTStaffCode(item.filter.PTTStaffCode.map(e => { return { value: e.PTTStaffCode } }))
+        if (isArray(item.filter.ScaffoldingType)) setScaffoldingType(item.filter.ScaffoldingType.map(e => { return { value: e.ScaffoldingType } }))
       }
 
       let latlng = item.data.map(obj => {
@@ -233,8 +240,8 @@ const ScaffoldingPage = () => {
           "name": obj.Name,
           "licensor": obj.PTTStaff,
           "supervisor": obj.OwnerName,
-          "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-          "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
+          "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY HH:mm:ss"),
+          "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY HH:mm:ss"),
           // "status_work": obj.WorkPermitStatus.toLowerCase(),
           "status_work": `A${obj.ScaffoldingTypeID}_${obj.others?.StatusName}`,
           "latitude": obj.FeaturesPropertiesCentroid_X,
@@ -359,112 +366,112 @@ const ScaffoldingPage = () => {
         {
           name: "1",
           img: '/assets/iconmap/scaffolding/1.svg',
-          detail:'Light Duty'
+          detail: 'Light Duty'
         },
         {
           name: "2",
           img: '/assets/iconmap/scaffolding/2.svg',
-          detail:'Light Duty_Independent Tower'
+          detail: 'Light Duty_Independent Tower'
         },
         {
           name: "3",
           img: '/assets/iconmap/scaffolding/3.svg',
-          detail:'Light Duty_Mobile'
+          detail: 'Light Duty_Mobile'
         },
         {
           name: "4",
           img: '/assets/iconmap/scaffolding/4.svg',
-          detail:'Light Duty_Overhang'
+          detail: 'Light Duty_Overhang'
         },
         {
           name: "5",
           img: '/assets/iconmap/scaffolding/5.svg',
-          detail:'Light Duty_Hanging'
+          detail: 'Light Duty_Hanging'
         },
         {
           name: "6",
           img: '/assets/iconmap/scaffolding/6.svg',
-          detail:'Heavy Duty'
+          detail: 'Heavy Duty'
         },
         {
           name: "7",
           img: '/assets/iconmap/scaffolding/7.svg',
-          detail:'Heavy Duty_Independent Tower'
+          detail: 'Heavy Duty_Independent Tower'
         },
         {
           name: "8",
           img: '/assets/iconmap/scaffolding/8.svg',
-          detail:'Heavy Duty_Mobile'
+          detail: 'Heavy Duty_Mobile'
         },
         {
           name: "9",
           img: '/assets/iconmap/scaffolding/9.svg',
-          detail:'Heavy Duty_Overhang'
+          detail: 'Heavy Duty_Overhang'
         },
         {
           name: "10",
           img: '/assets/iconmap/scaffolding/10.svg',
-          detail:'Heavy Duty_Hanging'
+          detail: 'Heavy Duty_Hanging'
         },
         {
           name: "11",
           img: '/assets/iconmap/scaffolding/11.svg',
-          detail:'Heavy Duty_Internal'
+          detail: 'Heavy Duty_Internal'
         },
         {
           name: "12",
           img: '/assets/iconmap/scaffolding/12.svg',
-          detail:'Heavy Duty_Heavy Duty'
+          detail: 'Heavy Duty_Heavy Duty'
         },
         {
           name: "13",
           img: '/assets/iconmap/scaffolding/13.svg',
-          detail:'Confined Space'
+          detail: 'Confined Space'
         },
         {
           name: "14",
           img: '/assets/iconmap/scaffolding/14.svg',
-          detail:'Confined Space_Independent Tower'
+          detail: 'Confined Space_Independent Tower'
         },
         {
           name: "15",
           img: '/assets/iconmap/scaffolding/15.svg',
-          detail:'Confined Space_Mobile'
+          detail: 'Confined Space_Mobile'
         },
         {
           name: "16",
           img: '/assets/iconmap/scaffolding/16.svg',
-          detail:'Confined Space_Overhang'
+          detail: 'Confined Space_Overhang'
         },
         {
           name: "17",
           img: '/assets/iconmap/scaffolding/17.svg',
-          detail:'Confined Space_Hanging'
+          detail: 'Confined Space_Hanging'
         },
         {
           name: "18",
           img: '/assets/iconmap/scaffolding/18.svg',
-          detail:'Confined Space_Internal'
+          detail: 'Confined Space_Internal'
         },
         {
           name: "19",
           img: '/assets/iconmap/scaffolding/19.svg',
-          detail:'Confined Space_Heavy Duty'
+          detail: 'Confined Space_Heavy Duty'
         },
         {
           name: "20",
           img: '/assets/iconmap/scaffolding/20.svg',
-          detail:'Test Header 1'
+          detail: 'Test Header 1'
         },
         {
           name: "21",
           img: '/assets/iconmap/scaffolding/21.svg',
-          detail:'Test Header Two'
+          detail: 'Test Header Two'
         },
         {
           name: "22",
           img: '/assets/iconmap/scaffolding/22.svg',
-          detail:'Test Header Two_Sub Test Header Two'
+          detail: 'Test Header Two_Sub Test Header Two'
         },
       ]
 
@@ -481,7 +488,7 @@ const ScaffoldingPage = () => {
         },
         {
           name: "normal",
-          detail:'ปกติ',
+          detail: 'ปกติ',
           img: false,
         },
       ]
@@ -540,8 +547,8 @@ const ScaffoldingPage = () => {
       setStatus({
         "จำนวนจุด": { value: data.all, color: '#112345' },
         "ปกติ": { value: data.normal, color: '#17d149' },
-        "ใกล้ Exp": { value: data.near_expire, color: '#F09234', img:'/assets/iconmap/status/warning-yellow.png' },
-        "หมด Exp": { value: data.expire, color: '#F54', img:'/assets/iconmap/status/warning-red.png' },
+        "ใกล้ Exp": { value: data.near_expire, color: '#F09234', img: '/assets/iconmap/status/warning-yellow.png' },
+        "หมด Exp": { value: data.expire, color: '#F54', img: '/assets/iconmap/status/warning-red.png' },
       }),
     );
 
@@ -620,16 +627,16 @@ const ScaffoldingPage = () => {
     console.log('error', error)
   }
 
-  const [scaffoldingTypeOptions, setScaffoldingTypeOptions] = useState([]);
+
   const [form] = Form.useForm()
 
   const getScaffolding = async (item, openTableBool) => {
     let url = `/scaffolding/all?`;
     if (item.PTTStaffCode) url += `&PTTStaffCode=${item.PTTStaffCode}`;
-    if (item.VendorCode) url += `&VendorCode=${item.VendorCode}`;
+    if (item.AgencyName) url += `&AgencyName=${item.AgencyName}`;
     if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
     if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
-    if (item.AreaID) url += `&AreaID=${item.AreaID}`;
+    if (item.AreaName) url += `&AreaName=${item.AreaName}`;
     if (isArray(item.ScaffoldingType)) {
       url += `&ScaffoldingType=${item.ScaffoldingType.toString()}`;
     }
@@ -707,14 +714,22 @@ const ScaffoldingPage = () => {
               name="PTTStaffCode"
               label='รหัสพนักงานผู้ควบคุมงาน'
             >
-              <Input />
+              <Select
+                showArrow
+                style={{ width: '100%' }}
+                options={PTTStaffCode}
+              />
             </Form.Item>
 
             <Form.Item
-              name="VendorCode"
-              label='บริษัทควบคุมงาน'
+              name="AgencyName"
+              label='หน่วยงานผู้ควบคุมงาน'
             >
-              <Input />
+              <Select
+                showArrow
+                style={{ width: '100%' }}
+                options={AgencyName}
+              />
             </Form.Item>
 
             <Form.Item
@@ -738,10 +753,14 @@ const ScaffoldingPage = () => {
             </Form.Item>
 
             <Form.Item
-              name="AreaID"
+              name="AreaName"
               label='สถานที่ปฏิบัติงาน'
             >
-              <Input />
+              <Select
+                showArrow
+                style={{ width: '100%' }}
+                options={AreaName}
+              />
             </Form.Item>
 
             <Form.Item
@@ -752,7 +771,7 @@ const ScaffoldingPage = () => {
                 mode='multiple'
                 showArrow
                 style={{ width: '100%' }}
-                options={scaffoldingTypeOptions}
+                options={ScaffoldingType}
               />
             </Form.Item>
 
@@ -817,7 +836,7 @@ const ScaffoldingPage = () => {
             ? 'table-row-red'
             : ''
         }
-        rowKey={(d,index) => index.toString()}
+        rowKey={(d, index) => index.toString()}
         columns={columns2}
         dataSource={tabledata}
       />

@@ -16,7 +16,6 @@ import {
 import { Map, WebScene } from '@esri/react-arcgis';
 import { loadModules } from 'esri-loader';
 import './index.style.less';
-import io from 'socket.io-client';
 import socketClient from '../../../util/socket';
 import { useDispatch } from 'react-redux';
 import { setStatus } from '../../../redux/actions';
@@ -27,7 +26,6 @@ import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
 import { isArray, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
-import { stringify } from 'querystring';
 
 const { Panel } = Collapse;
 
@@ -249,7 +247,6 @@ const WorkpermitPage = () => {
             }
           }))
         }
-
 
         let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
         let getcenterarea = await GetAllArea[0].queryExtent();
@@ -495,16 +492,15 @@ const WorkpermitPage = () => {
 
 
   const Status_cal = async (data) => {
-
-    // console.log('data Status_cal ========>', data)
     dispatch(
       setStatus({
-        "total": { value: data.total, color: '#112345' },
-        "open": { value: data.open, color: '#F09234' },
-        "close": { value: data.close, color: '#F88' },
-        // "ใบอนุญาติใกล้ exp": { value: data.near_expire, color: '#F54' },
-        // "ใบอนุญาติ exp": { value: data.open, color: '#F54' },
-        "ก๊าซที่ต้องตรวจวัด": { value: data.gas, color: '#F54' },
+        "Total": data.total,
+        "Open": data.open,
+        "Close": data.close,
+        "⚠️ ใกล้ Exp": data.near_expire,
+        "‼️ หมด Exp": data.expire,
+        "ก๊าซที่ต้องตรวจวัด": data.gas,
+
       }),
     );
   };
