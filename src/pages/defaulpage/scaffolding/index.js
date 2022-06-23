@@ -51,8 +51,8 @@ const ScaffoldingPage = () => {
     },
     {
       title: 'ชื่อ-สกุล ผู้รับเหมา',
-      dataIndex: 'VendorName',
-      key: 'VendorName',
+      dataIndex: 'WorkName',
+      key: 'WorkName',
       render: (text) => text ?? "-",
       width: 250
 
@@ -117,7 +117,7 @@ const ScaffoldingPage = () => {
       title: 'สถานะแจ้งเตือน',
       dataIndex: 'WarningStatus',
       key: 'WarningStatus',
-      render: (text , record) => record.others.StatusName ?? "-",
+      render: (text, record) => record.others.StatusName ?? "-",
       width: 150
     },
     {
@@ -133,7 +133,7 @@ const ScaffoldingPage = () => {
                 setDatamodal({
 
                   "เลขที่นั่งร้าน": record.ScaffoldingCode ?? "-",
-                  "ประเภทผู้ขอรายการ": record.OwnerType ?? "-",
+                  "ประเภทผู้ขอรายการ": record.OwnerType == 1 ? "พนักงาน ปตท." : record.OwnerType == 2 ? "ผู้รับเหมา" : "-",
                   "รหัสผู้ขอรายการ": record.WorkOwnerID ?? "-",
                   "ชื่อ นามสกุล": record.WorkName ?? "-",
                   "เลขบัตรประชาชน": record.PersonalID ?? "-",
@@ -142,15 +142,15 @@ const ScaffoldingPage = () => {
                   "ชื่องาน": record.Title ?? "-",
                   "รายละเอียดของงาน": record.Description ?? "-",
                   "วัตถุประสงค์": record.Objective ?? "-",
-                  "วันหมดอายุสภาพนั่งร้าน": record.ExpiredDate ?? "-",
+                  "วันหมดอายุสภาพนั่งร้าน": record.ExpiredDate ? moment(new Date(record.ExpiredDate)).format("YYYY-MM-DD") : "-",
                   "รหัสสถานที่ปฏิบัติงานหลัก": record.Area ?? "-",
                   "ชื่อสถานที่ปฏิบัติงานหลัก": record.AreaName ?? "-",
                   "รหัสสถานที่ปฏิบัติงานย่อย": record.SubArea ?? "-",
                   "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubAreaName ?? "-",
-                  "ข้อมูลพิกัดนั่งร้าน": record.Features ?? "-",
-                  "ข้อมูลคุณสมบัตินั่งร้าน": record.FeaturesProperties ?? "-",
-                  "วัน เวลา เริ่มต้นการปฏิบัติงาน": record.WorkingStartDate ?? "-",
-                  "วัน เวลา สิ้นสุดการปฏิบัติงาน": record.WorkingEndDate ?? "-",
+                  // "ข้อมูลพิกัดนั่งร้าน": record.Features ?? "-",
+                  // "ข้อมูลคุณสมบัตินั่งร้าน": record.FeaturesProperties ?? "-",
+                  "วัน เวลา เริ่มต้นการปฏิบัติงาน": record.WorkingStartDate ? moment(new Date(record.WorkingStartDate)).format("YYYY-MM-DD hh:mm:ss") : "-",
+                  "วัน เวลา สิ้นสุดการปฏิบัติงาน": record.WorkingEndDate ? moment(new Date(record.WorkingEndDate)).format("YYYY-MM-DD hh:mm:ss") : "-",
                   "รหัสบริษัท": record.VendorCode ?? "-",
                   "ชื่อบริษัท": record.VendorName ?? "-",
                   "รหัสผู้ควบคุมงาน": record.PTTStaffCode ?? "-",
@@ -159,7 +159,7 @@ const ScaffoldingPage = () => {
                   "ชื่อหน่วยงานผู้ควบคุม": record.AgencyName ?? "-",
                   "รหัสเจ้าของพื้นที่": record.Owner ?? "-",
                   "ประเภทของ Work": record.WorkpermitType ?? "-",
-                  "สถานะใบงาน": record.StatusID ?? "-",
+                  "สถานะใบงาน": record.StatusName ?? "-",
                   "สถานะแจ้งเตือน": record.others.StatusName ?? "-",
 
                 }), setIsModalVisible(!isModalVisible);
@@ -712,7 +712,7 @@ const ScaffoldingPage = () => {
               label='รหัสพนักงานผู้ควบคุมงาน'
             >
               <Select
-                showArrow={false}
+                showArrow
                 style={{ width: '100%' }}
                 options={PTTStaffCode}
               />
@@ -720,10 +720,10 @@ const ScaffoldingPage = () => {
 
             <Form.Item
               name="AgencyName"
-              label='บริษัทควบคุมงาน'
+              label='หน่วยงานผู้ควบคุมงาน'
             >
-               <Select
-                showArrow={false}
+              <Select
+                showArrow
                 style={{ width: '100%' }}
                 options={AgencyName}
               />
@@ -754,9 +754,9 @@ const ScaffoldingPage = () => {
               label='สถานที่ปฏิบัติงาน'
             >
               <Select
-                showArrow={false}
+                showArrow
                 style={{ width: '100%' }}
-                options={AgencyName}
+                options={AreaName}
               />
             </Form.Item>
 
