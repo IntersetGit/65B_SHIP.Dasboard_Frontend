@@ -307,19 +307,22 @@ const ScaffoldingPage = () => {
         field: 'status_work',
         featureReduction: clusterConfig,
         popupTemplate: {
-          title: "{OwnerName}",
+          title: "{WorkName}",
           content: [
             {
               type: "fields",
               fieldInfos: [
                 {
-                  fieldName: "OwnerName"
+                  fieldName: "WorkPermitNo",
+                  label:'เลข Work Permit'
                 },
                 {
-                  fieldName: "status_work"
+                  fieldName: "ExpiredDate",
+                  label:'วันหมดอายุสภาพนั่งร้าน'
                 },
                 {
-                  fieldName: "WorkpermitType"
+                  fieldName: "status_work",
+                  label:'สถานะแจ้งเตือน'
                 }
               ]
             }
@@ -769,11 +772,11 @@ const ScaffoldingPage = () => {
 
         <div ref={refdetail} className='sysmbole esri-widget'>
           <Collapse accordion >
-            <Panel header="ใช้สีแทนประเภทนั้งร้าน" key="1">
-              {stateSysmbole && stateSysmbole[0]}
+            <Panel header="ใช้สีแทนประเภทนั่งร้าน" key="1">
+              {stateSysmbole ? stateSysmbole[0] : <>กำลังรอข้อมูล...</>}
             </Panel>
             <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
-              {stateSysmbole && stateSysmbole[1]}
+              {stateSysmbole ? stateSysmbole[1] : <>กำลังรอข้อมูล...</>}
             </Panel>
 
           </Collapse>

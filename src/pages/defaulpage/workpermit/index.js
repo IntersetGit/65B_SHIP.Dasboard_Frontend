@@ -10,7 +10,7 @@ import {
   Row,
   Col,
   Modal,
-  Drawer,
+  Collapse,
   DatePicker
 } from 'antd';
 import { Map, WebScene } from '@esri/react-arcgis';
@@ -29,6 +29,8 @@ import { isArray, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 import { stringify } from 'querystring';
 
+const { Panel } = Collapse;
+
 
 const WorkpermitPage = () => {
   const [stateMap, setStateMap] = useState(null);
@@ -42,7 +44,7 @@ const WorkpermitPage = () => {
   const demodata = new Demodata('workpermit');
   const Geojson = new WaGeojson();
   const PTTlayer = new PTTlayers();
-  const [state_WorkpermitType, setState_WorkpermitType] = useState();
+  const [stateSysmbole, setstateSysmbole] = useState(null);
 
   const columns = [
     {
@@ -439,6 +441,20 @@ const WorkpermitPage = () => {
       },
     ]
 
+    var jsxsysmboleIcon = await Promise.all(scaffoldingIcon.map(async (item, index) => {
+      return <div className='sysmbole_table' key={index.toString()}>
+        <img src={item.img} alt="Avatar" className="avatar" />
+        <span>{item.detail}</span>
+      </div>
+    }));
+    var jsxsysmboleStatus = await Promise.all(scaffoldingStatusWork.map(async (item, index) => {
+      return item.img && <div className='sysmbole_table' key={index.toString()}>
+        <img src={item.img} alt="Avatar" className="avatar" />
+        <span>{item.detail}</span>
+      </div>
+    }));
+
+    setstateSysmbole([jsxsysmboleIcon, jsxsysmboleStatus]);
 
     for (const x in scaffoldingIcon) {
       if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
@@ -743,8 +759,18 @@ const WorkpermitPage = () => {
             </Form.Item>
           </Form>
         </div>
-        <div ref={refdetail} className='esri-widget'>
+        <div ref={refdetail} className='sysmbole esri-widget'>
+          <Collapse accordion >
+            <Panel header="ใช้สีแทนประเภทใบงาน" key="1">
+              {stateSysmbole ? stateSysmbole[0] : <>กำลังรอข้อมูล...</>}
+            </Panel>
+            <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
+              {stateSysmbole ? stateSysmbole[1] : <>กำลังรอข้อมูล...</>}
+            </Panel>
+
+          </Collapse>
           <div id="legendDiv"></div>
+
         </div>
 
       </Map>
