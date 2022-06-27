@@ -30,8 +30,9 @@ const UserInfo = ({ hasColor, onToggleSidebar, children }) => {
 
   const menu = (
     <List className='dropdown-list'>
-      <List.Item onClick={() => navigate('/my-profile')}>My Profile</List.Item>
-      <List.Item onClick={() => logout()}>Logout</List.Item>
+      <List.Item onClick={() => navigate('/my-profile')}>จัดการข้อมูลส่วนตัว</List.Item>
+      <List.Item onClick={() => navigate('/setting-page')}>จัดการรายการผู้ใช้</List.Item>
+      <List.Item onClick={() => logout()}>ออกจากระบบ</List.Item>
     </List>
   );
 
