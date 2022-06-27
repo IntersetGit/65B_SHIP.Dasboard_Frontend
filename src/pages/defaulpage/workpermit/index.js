@@ -251,6 +251,10 @@ const WorkpermitPage = () => {
         // let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
         let GetAllArea = null;
         let latlng = []
+
+        let workpermit_type = await (await gen_uniqueValueInfos()).scaffoldingIcon;
+        let maplatlng_type = workpermit_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(12.719, 101.147, 40) }), {})
+        console.log('maplatlng_type :>> ', maplatlng_type);
         for (const opp in item.data) {
           const obj = item.data[opp];
 
@@ -262,6 +266,7 @@ const WorkpermitPage = () => {
           });
           let getextentcenter = await findeArea?.queryExtent();
           var randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude ?? 12.719, getextentcenter?.extent?.center?.longitude ?? 101.147, 0)
+
           latlng.push({
             ...obj,
             "id": obj._id,
@@ -273,8 +278,9 @@ const WorkpermitPage = () => {
             "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
             // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
             "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
-            "latitude": randomlatlng?.latitude ?? null,
-            "longitude": randomlatlng?.longitude ?? null,
+            // "latitude": randomlatlng?.latitude ?? null,
+            // "longitude": randomlatlng?.longitude ?? null,
+            ...maplatlng_type[obj.WorkpermitTypeID],
             "locatoin": obj.SubAreaName,
             "work_type": obj.WorkpermitType,
           })
@@ -377,7 +383,7 @@ const WorkpermitPage = () => {
                 width: 1,
               },
             },
-            uniqueValueInfos: await gen_uniqueValueInfos(item.filter.WorkpermitTypeID, item.filter.WorkPermitStatusID)
+            uniqueValueInfos: await (await gen_uniqueValueInfos(item.filter.WorkpermitTypeID, item.filter.WorkPermitStatusID)).uniqueValueInfos
 
 
           },
@@ -490,61 +496,65 @@ const WorkpermitPage = () => {
         img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/OOjs_UI_icon_alert-warning.svg/1200px-OOjs_UI_icon_alert-warning.svg.png"
       },
     ]
+    if (status || type) {
+      var jsxsysmboleIcon = await Promise.all(scaffoldingIcon.map(async (item, index) => {
+        return <div className='sysmbole_table' key={index.toString()}>
+          <img src={item.img} alt="Avatar" className="avatar" />
+          <span>{item.detail}</span>
+        </div>
+      }));
+      var jsxsysmboleStatus = await Promise.all(scaffoldingStatusWork.map(async (item, index) => {
+        return item.img && <div className='sysmbole_table' key={index.toString()}>
+          <img src={item.img} alt="Avatar" className="avatar" />
+          <span>{item.detail}</span>
+        </div>
+      }));
+      var jsxsysmboleType = await Promise.all(open_close.map(async (item, index) => {
+        return item.img && <div className='sysmbole_table' key={index.toString()}>
+          <img src={item.img} alt="Avatar" className="avatar" />
+          <span>{item.detail}</span>
+        </div>
+      }));
 
-    var jsxsysmboleIcon = await Promise.all(scaffoldingIcon.map(async (item, index) => {
-      return <div className='sysmbole_table' key={index.toString()}>
-        <img src={item.img} alt="Avatar" className="avatar" />
-        <span>{item.detail}</span>
-      </div>
-    }));
-    var jsxsysmboleStatus = await Promise.all(scaffoldingStatusWork.map(async (item, index) => {
-      return item.img && <div className='sysmbole_table' key={index.toString()}>
-        <img src={item.img} alt="Avatar" className="avatar" />
-        <span>{item.detail}</span>
-      </div>
-    }));
-    var jsxsysmboleType = await Promise.all(open_close.map(async (item, index) => {
-      return item.img && <div className='sysmbole_table' key={index.toString()}>
-        <img src={item.img} alt="Avatar" className="avatar" />
-        <span>{item.detail}</span>
-      </div>
-    }));
+      setstateSysmbole([jsxsysmboleIcon, jsxsysmboleStatus, jsxsysmboleType]);
 
-    setstateSysmbole([jsxsysmboleIcon, jsxsysmboleStatus, jsxsysmboleType]);
-
-    for (const x in scaffoldingIcon) {
-      if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
-        const a = scaffoldingIcon[x];
-        for (const y in scaffoldingStatusWork) {
-          if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
-            const b = scaffoldingStatusWork[y];
-            for (const s in status) {
-              let typedraw;
-              if (open.some(i => i == status[s].Status_ID)) {
-                typedraw = 1
-              } else if (close.some(i => i == status[s].Status_ID)) {
-                typedraw = 2
-              } else {
-                typedraw = 1
+      for (const x in scaffoldingIcon) {
+        if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
+          const a = scaffoldingIcon[x];
+          for (const y in scaffoldingStatusWork) {
+            if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
+              const b = scaffoldingStatusWork[y];
+              for (const s in status) {
+                let typedraw;
+                if (open.some(i => i == status[s].Status_ID)) {
+                  typedraw = 1
+                } else if (close.some(i => i == status[s].Status_ID)) {
+                  typedraw = 2
+                } else {
+                  typedraw = 1
+                }
+                uniqueValueInfos.push({
+                  value: `${a.name}_${status[s].Status_ID}${b.name !== '' ? '_' + b.name : ''}`,
+                  symbol: {
+                    type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                    url: await CreateIcon(a.color, b.img, typedraw),
+                    width: '15px',
+                    height: '15px',
+                  },
+                })
               }
-              uniqueValueInfos.push({
-                value: `${a.name}_${status[s].Status_ID}${b.name !== '' ? '_' + b.name : ''}`,
-                symbol: {
-                  type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                  url: await CreateIcon(a.color, b.img, typedraw),
-                  width: '15px',
-                  height: '15px',
-                },
-              })
             }
           }
         }
       }
+
+      console.log("uniqueValueInfos", uniqueValueInfos)
     }
-
-    console.log("uniqueValueInfos", uniqueValueInfos)
-
-    return uniqueValueInfos
+    return {
+      scaffoldingIcon,
+      scaffoldingStatusWork,
+      uniqueValueInfos
+    }
 
   }
 
@@ -821,7 +831,7 @@ const WorkpermitPage = () => {
             <Panel header="ใช้สีแทนประเภทใบงาน" key="1">
               {stateSysmbole ? stateSysmbole[0] : <>กำลังรอข้อมูล...</>}
             </Panel>
-            {stateSysmbole && stateSysmbole[2] && <Panel header="ใช้สัญลักษณ์แทนการเปิดปิด" key="3">
+            {stateSysmbole && stateSysmbole[2] && <Panel header="ใช้สัญลักษณ์แทนการเปิด-ปิด" key="3">
               {stateSysmbole ? stateSysmbole[2] : <>กำลังรอข้อมูล...</>}
             </Panel>}
             <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
