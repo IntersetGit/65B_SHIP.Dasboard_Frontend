@@ -220,7 +220,7 @@ const ScaffoldingPage = () => {
       // let latlng = item.data;
       Status_cal(item.summary);
       // console.log('item', item)
-      console.log("data =>>>>>>>>>>>>>>>>>", item.data);
+      // console.log("data =>>>>>>>>>>>>>>>>>", item.data);
       // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
       if (isPlainObject(item.filter)) {
         if (isArray(item.filter.AgencyName)) setAgencyName(item.filter.AgencyName.map(e => { return { value: e.AgencyName } }))
@@ -543,13 +543,15 @@ const ScaffoldingPage = () => {
 
   const Status_cal = async (data) => {
     // console.log('data', data)
+
+
+    const Status = {}
+    if(data.all) Status["จำนวนจุด"] = { value: data.all, color: '#112345' };
+    if(data.normal) Status["ปกติ"] = { value: data.normal, color: '#17d149' };
+    if(data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F09234', img: '/assets/iconmap/status/warning-yellow.png' };
+    if(data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F54', img: '/assets/iconmap/status/warning-red.png' };
     dispatch(
-      setStatus({
-        "จำนวนจุด": { value: data.all, color: '#112345' },
-        "ปกติ": { value: data.normal, color: '#17d149' },
-        "ใกล้ Exp": { value: data.near_expire, color: '#F09234', img: '/assets/iconmap/status/warning-yellow.png' },
-        "หมด Exp": { value: data.expire, color: '#F54', img: '/assets/iconmap/status/warning-red.png' },
-      }),
+      setStatus(Status),
     );
 
   };
