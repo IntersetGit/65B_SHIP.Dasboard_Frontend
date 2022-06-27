@@ -207,7 +207,7 @@ const WorkpermitPage = () => {
 
     const resSf = await getWorkpermit({});
     setLayerpoint(resSf)
-    // console.log('resSf :>> ', resSf);
+    console.log('resSf :>> ', resSf);
     socket.on("workpermit", async (res) => {
       const resSf = await getWorkpermit(form.getFieldValue());
       setLayerpoint(resSf)
@@ -254,7 +254,7 @@ const WorkpermitPage = () => {
 
         let workpermit_type = await (await gen_uniqueValueInfos()).scaffoldingIcon;
         let maplatlng_type = workpermit_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(12.719, 101.147, 40) }), {})
-        console.log('maplatlng_type :>> ', maplatlng_type);
+        // console.log('maplatlng_type :>> ', maplatlng_type);
         for (const opp in item.data) {
           const obj = item.data[opp];
 
@@ -477,8 +477,13 @@ const WorkpermitPage = () => {
     const scaffoldingStatusWork = [
       {
         name: "Gas",
-        detail: "แจ้งเตือนแก๊ส",
-        img: "https://cdn0.iconfinder.com/data/icons/hazard-warning-signs-42-high-quality-hazard-symb-1/283/gas_mask-512.png",
+        detail: "แจ้งเตือนการตรวจวัดก๊าซ",
+        img: '/assets/iconmap/status/warning-yellow.png',
+      },
+      {
+        name: "Impairment",
+        detail: "อุปกรณ์ Impairment",
+        img: '/assets/iconmap/status/warning-red.png',
       },
       {
         name: "",
@@ -493,7 +498,12 @@ const WorkpermitPage = () => {
       {
         name: "expire",
         detail: "แจ้งเตือนหมดอายุ",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/OOjs_UI_icon_alert-warning.svg/1200px-OOjs_UI_icon_alert-warning.svg.png"
+        img: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
+      },
+      {
+        name: "warning_all",
+        detail: "แจ้งเตือนมากกว่า 1 รายการ",
+        img: '/assets/iconmap/status/warning-all.png'
       },
     ]
     if (status || type) {
@@ -565,10 +575,10 @@ const WorkpermitPage = () => {
     const Status = {}
     if (data.total) Status["Total"] = { value: data.total, color: '#112345' };
     if (data.open) Status["Open"] = { value: data.open, color: '#17d149' };
-    if (data.close) Status["Close"] = { value: data.close, color: '#F09234', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
-    if (data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/OOjs_UI_icon_alert-warning.svg/1200px-OOjs_UI_icon_alert-warning.svg.png" };
-    if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/OOjs_UI_icon_alert-warning.svg/1200px-OOjs_UI_icon_alert-warning.svg.png" };
-    if (data.gas) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F842', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/OOjs_UI_icon_alert-warning.svg/1200px-OOjs_UI_icon_alert-warning.svg.png" };
+    if (data.close) Status["Close"] = { value: data.close, color: '#F09234', };
+    if (data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54',img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
+    if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
+    if (data.gas) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F842', img: '/assets/iconmap/status/warning-yellow.png' };
     dispatch(
       setStatus(Status),
     );

@@ -485,7 +485,7 @@ const ScaffoldingPage = () => {
         {
           name: "expire",
           detail: "หมดอายุ",
-          img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/OOjs_UI_icon_alert-warning.svg/1200px-OOjs_UI_icon_alert-warning.svg.png"
+          img: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
         },
         {
           name: "normal",
@@ -550,7 +550,7 @@ const ScaffoldingPage = () => {
     if (data.all) Status["จำนวนจุด"] = { value: data.all, color: '#112345' };
     if (data.normal) Status["ปกติ"] = { value: data.normal, color: '#17d149' };
     if (data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F09234', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
-    if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/OOjs_UI_icon_alert-warning.svg/1200px-OOjs_UI_icon_alert-warning.svg.png" };
+    if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F54', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png"  };
     dispatch(
       setStatus(Status),
     );
