@@ -25,7 +25,6 @@ import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
 import { isArray, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
-
 const { Panel } = Collapse;
 
 
@@ -191,7 +190,7 @@ const ScaffoldingPage = () => {
 
     /* Layerpoint */
     const resSf = await getScaffolding({});
-    // console.log('resSf :>> ', resSf);
+    console.log('resSf :>> ', resSf);
     setLayerpoint(resSf)
     // socket.on("scaffolding", (res) => {
     //   // console.log('socket', res)
@@ -232,7 +231,6 @@ const ScaffoldingPage = () => {
 
       let latlng = item.data.map(obj => {
         // console.log('status_work', `A${obj.ScaffoldingTypeID}_${obj.Status.toLowerCase()}`)
-
         return {
           ...obj,
           "id": obj._id,
@@ -248,6 +246,7 @@ const ScaffoldingPage = () => {
           "longitude": obj.FeaturesPropertiesCentroid_Y,
           "locatoin": obj.SubAreaName,
           "work_type": obj.WorkpermitType,
+          "ExpiredDate":obj.ExpiredDate ? moment(new Date(obj.ExpiredDate)).format("DD/MM/YYYY HH:mm:ss"):'-'
         }
 
       })
@@ -258,6 +257,7 @@ const ScaffoldingPage = () => {
 
       const datageojson = await Geojson.CleateGeojson(latlng, 'Point');
       // console.log('datageojson:>> ', datageojson);
+
       const [FeatureLayer, GeoJSONLayer] = await loadModules([
         'esri/layers/FeatureLayer',
         'esri/layers/GeoJSONLayer',
@@ -295,7 +295,7 @@ const ScaffoldingPage = () => {
                 family: 'Noto Sans',
                 size: '18px',
               },
-              url: await CreateIcon('#ff7c44', 'warning'),
+              url: await CreateIcon('#ff7c44', false),
             },
 
             labelPlacement: 'center-center',
@@ -321,15 +321,15 @@ const ScaffoldingPage = () => {
               fieldInfos: [
                 {
                   fieldName: "WorkPermitNo",
-                  label:'เลข Work Permit'
+                  label: 'เลข Work Permit'
                 },
                 {
                   fieldName: "ExpiredDate",
-                  label:'วันหมดอายุสภาพนั่งร้าน'
+                  label: 'วันหมดอายุสภาพนั่งร้าน',
                 },
                 {
-                  fieldName: "status_work",
-                  label:'สถานะแจ้งเตือน'
+                  fieldName: "WarningStatus",
+                  label: 'สถานะแจ้งเตือน'
                 }
               ]
             }
@@ -360,6 +360,7 @@ const ScaffoldingPage = () => {
 
   const gen_uniqueValueInfos = async () => {
     try {
+
       const uniqueValueInfos = [];
       // debugger
       const scaffoldingIcon = [
@@ -479,12 +480,12 @@ const ScaffoldingPage = () => {
         {
           name: "near_expire",
           detail: "ใกล้หมดอายุ",
-          img: '/assets/iconmap/status/warning-yellow.png'
+          img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png"
         },
         {
           name: "expire",
           detail: "หมดอายุ",
-          img: '/assets/iconmap/status/warning-red.png'
+          img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/OOjs_UI_icon_alert-warning.svg/1200px-OOjs_UI_icon_alert-warning.svg.png"
         },
         {
           name: "normal",
@@ -492,6 +493,7 @@ const ScaffoldingPage = () => {
           img: false,
         },
       ]
+
       var jsxsysmboleIcon = await Promise.all(scaffoldingIcon.map(async (item, index) => {
         return <div className='sysmbole_table' key={index.toString()}>
           <img src={item.img} alt="Avatar" className="avatar" />
@@ -506,7 +508,6 @@ const ScaffoldingPage = () => {
       }));
 
       setstateSysmbole([jsxsysmboleIcon, jsxsysmboleStatus]);
-
       for (const x in scaffoldingIcon) {
         if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
           const a = scaffoldingIcon[x];
@@ -546,10 +547,10 @@ const ScaffoldingPage = () => {
 
 
     const Status = {}
-    if(data.all) Status["จำนวนจุด"] = { value: data.all, color: '#112345' };
-    if(data.normal) Status["ปกติ"] = { value: data.normal, color: '#17d149' };
-    if(data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F09234', img: '/assets/iconmap/status/warning-yellow.png' };
-    if(data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F54', img: '/assets/iconmap/status/warning-red.png' };
+    if (data.all) Status["จำนวนจุด"] = { value: data.all, color: '#112345' };
+    if (data.normal) Status["ปกติ"] = { value: data.normal, color: '#17d149' };
+    if (data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F09234', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
+    if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/OOjs_UI_icon_alert-warning.svg/1200px-OOjs_UI_icon_alert-warning.svg.png" };
     dispatch(
       setStatus(Status),
     );
