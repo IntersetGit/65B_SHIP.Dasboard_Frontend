@@ -88,7 +88,7 @@ const ScaffoldingPage = () => {
       title: 'วันหมดอายุ',
       key: 'ExpiredDate',
       dataIndex: 'ExpiredDate',
-      render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD") : "-",
+      // render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD") : "-",
       width: 150
     },
     {
@@ -135,6 +135,7 @@ const ScaffoldingPage = () => {
                   "ประเภทผู้ขอรายการ": record.OwnerType == 1 ? "พนักงาน ปตท." : record.OwnerType == 2 ? "ผู้รับเหมา" : "-",
                   "รหัสผู้ขอรายการ": record.WorkOwnerID ?? "-",
                   "ชื่อ นามสกุล": record.WorkName ?? "-",
+                  "เจ้าของพื้นที่": record.OwnerName ?? "-",
                   "เลขบัตรประชาชน": record.PersonalID ?? "-",
                   "เลข Work Permit": record.WorkPermitNo ?? "-",
                   "รหัสประเภทนั่งร้าน": record.ScaffoldingTypeID ?? "-",
@@ -246,7 +247,7 @@ const ScaffoldingPage = () => {
           "longitude": obj.FeaturesPropertiesCentroid_Y,
           "locatoin": obj.SubAreaName,
           "work_type": obj.WorkpermitType,
-          "ExpiredDate":obj.ExpiredDate ? moment(new Date(obj.ExpiredDate)).format("DD/MM/YYYY HH:mm:ss"):'-'
+          "ExpiredDate": obj.ExpiredDate ? moment(new Date(obj.ExpiredDate)).format("DD/MM/YYYY HH:mm:ss") : '-'
         }
 
       })
@@ -550,7 +551,7 @@ const ScaffoldingPage = () => {
     if (data.all) Status["จำนวนจุด"] = { value: data.all, color: '#112345' };
     if (data.normal) Status["ปกติ"] = { value: data.normal, color: '#17d149' };
     if (data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F09234', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
-    if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F54', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png"  };
+    if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F54', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
     dispatch(
       setStatus(Status),
     );

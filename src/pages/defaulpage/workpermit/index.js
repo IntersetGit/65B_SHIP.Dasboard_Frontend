@@ -246,7 +246,7 @@ const WorkpermitPage = () => {
 
     const resSf = await getWorkpermit({});
     setLayerpoint(resSf)
-    console.log('resSf :>> ', resSf);
+    // console.log('resSf :>> ', resSf);
     socket.on("workpermit", async (res) => {
       const resSf = await getWorkpermit(form.getFieldValue());
       setLayerpoint(resSf)
@@ -579,6 +579,7 @@ const WorkpermitPage = () => {
     if (data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
     if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
     if (data.gas) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F842', img: '/assets/iconmap/status/warning-yellow.png' };
+    if (data.impairment) Status["อุปกรณ์ Impairment"] = { value: data.impairment, color: '#800080' };
     dispatch(
       setStatus(Status),
     );
