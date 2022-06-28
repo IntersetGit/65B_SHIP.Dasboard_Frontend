@@ -157,7 +157,46 @@ const WorkpermitPage = () => {
       },
     },
   ];
+  const clusterConfig = {
+    type: "cluster",
+    clusterRadius: "40px",
+    labelsVisible: true,
+    popupTemplate: {
+      title: 'Cluster summary',
+      content: 'This cluster represents {cluster_count} earthquakes.',
+      fieldInfos: [
+        {
+          fieldName: 'cluster_count',
+          format: {
+            places: 0,
+            digitSeparator: true,
+          },
+        },
+      ],
+    },
+    clusterMinSize: "40px",
+    clusterMaxSize: "60px",
+    labelingInfo: [{
+      deconflictionStrategy: "none",
+      labelExpressionInfo: {
+        expression: "Text($feature.cluster_count, '#,###')"
+      },
+      symbol: {
+        type: "text",
+        color: "#FFF",
+        haloSize: "2px",
+        font: {
+          weight: "bold",
+          family: "Noto Sans",
+          size: "18px"
+        },
+        xoffset: 0,
+        yoffset: 0
+      },
+      labelPlacement: "center-center",
+    }],
 
+  };
   const [loading, setloading] = useState(false);
   const getWorkpermit = async (item, openTableBool) => {
     try {
@@ -253,7 +292,7 @@ const WorkpermitPage = () => {
         let latlng = []
 
         let workpermit_type = await (await gen_uniqueValueInfos()).scaffoldingIcon;
-        let maplatlng_type = workpermit_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(12.719, 101.147, 40) }), {})
+        let maplatlng_type = workpermit_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(12.719, 101.147, 60) }), {})
         // console.log('maplatlng_type :>> ', maplatlng_type);
         for (const opp in item.data) {
           const obj = item.data[opp];
@@ -266,7 +305,7 @@ const WorkpermitPage = () => {
           });
           let getextentcenter = await findeArea?.queryExtent();
           var randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude ?? 12.719, getextentcenter?.extent?.center?.longitude ?? 101.147, 0)
-
+          let getlatlng = maplatlng_type[obj.WorkpermitTypeID];
           latlng.push({
             ...obj,
             "id": obj._id,
@@ -280,53 +319,14 @@ const WorkpermitPage = () => {
             "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
             // "latitude": randomlatlng?.latitude ?? null,
             // "longitude": randomlatlng?.longitude ?? null,
-            ...maplatlng_type[obj.WorkpermitTypeID],
+            ...demodata.getRandomLocation(getlatlng.latitude, getlatlng.longitude, 3),
             "locatoin": obj.SubAreaName,
             "work_type": obj.WorkpermitType,
           })
 
           //})
         }
-        const clusterConfig = {
-          type: "cluster",
-          clusterRadius: "20px",
-          labelsVisible: true,
-          popupTemplate: {
-            title: 'Cluster summary',
-            content: 'This cluster represents {cluster_count} earthquakes.',
-            fieldInfos: [
-              {
-                fieldName: 'cluster_count',
-                format: {
-                  places: 0,
-                  digitSeparator: true,
-                },
-              },
-            ],
-          },
-          clusterMinSize: "40px",
-          clusterMaxSize: "60px",
-          labelingInfo: [{
-            deconflictionStrategy: "none",
-            labelExpressionInfo: {
-              expression: "Text($feature.cluster_count, '#,###')"
-            },
-            symbol: {
-              type: "text",
-              color: "#FFF",
-              haloSize: "2px",
-              font: {
-                weight: "bold",
-                family: "Noto Sans",
-                size: "18px"
-              },
-              xoffset: 0,
-              yoffset: 0
-            },
-            labelPlacement: "center-center",
-          }],
 
-        };
 
         console.log('latlng =>>>>>>>>>>>>>', latlng)
         setTabledata(latlng);
@@ -576,7 +576,7 @@ const WorkpermitPage = () => {
     if (data.total) Status["Total"] = { value: data.total, color: '#112345' };
     if (data.open) Status["Open"] = { value: data.open, color: '#17d149' };
     if (data.close) Status["Close"] = { value: data.close, color: '#F09234', };
-    if (data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54',img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
+    if (data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
     if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
     if (data.gas) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F842', img: '/assets/iconmap/status/warning-yellow.png' };
     dispatch(
@@ -631,10 +631,26 @@ const WorkpermitPage = () => {
 
     view.watch('zoom', zoomChanged);
     function zoomChanged(newValue, oldValue, property, object) {
-      // console.log("New value: ", newValue,
-      //   "<br>Old value: ", oldValue,
-      //   "<br>Watched property: ", property,
-      //   "<br>Watched object: ", object);
+      let maplayerCLuster = map.findLayerById('pointlayer');
+      if (newValue >= 20) {
+        if (maplayerCLuster) {
+          let fr = maplayerCLuster.featureReduction;
+          maplayerCLuster.featureReduction =
+            fr && fr.type === "cluster" && null;
+        }
+      } else if (newValue <= 20) {
+        if (maplayerCLuster) {
+          let fr = maplayerCLuster.featureReduction;
+          maplayerCLuster.featureReduction =
+            fr && fr.type === "cluster" ? clusterConfig : clusterConfig;
+        }
+        // console.log("New value: ", newValue,
+        //   "<br>Old value: ", oldValue,
+        //   "<br>Watched property: ", property,
+        //   "<br>Watched object: ", object);
+      }
+
+
     }
 
 
