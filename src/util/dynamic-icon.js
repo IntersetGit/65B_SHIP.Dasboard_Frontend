@@ -24,77 +24,85 @@ var ct = [
   "xor" // 11
 ];
 function CreateIcon(color = "red", type = false, isdraw = 1) {
-  const drawer = new Promise((resolve, reject) => {
-    var element = document.getElementById("canvas1");
-    if (element) {
-      element.remove();
-    }
-    var canvas = document.createElement("canvas");
-    canvas.id = "canvas1";
-    canvas.style.display = 'none';
-    canvas.width = 210;
-    canvas.height = 210;
-    var body = document.getElementsByTagName("body")[0];
-    body.appendChild(canvas);
-    var ctx = canvas.getContext("2d");
+  try {
 
 
-    if (type) {
-      const image = new Image();
+    const drawer = new Promise((resolve, reject) => {
+      var element = document.getElementById("canvas1");
+      if (element) {
+        element.remove();
+      }
+      var canvas = document.createElement("canvas");
+      canvas.id = "canvas1";
+      canvas.style.display = 'none';
+      canvas.width = 210;
+      canvas.height = 210;
+      var body = document.getElementsByTagName("body")[0];
+      body.appendChild(canvas);
+      var ctx = canvas.getContext("2d");
 
-      image.crossOrigin = "anonymous";
-      image.onload = async () => {
-        await ctx.save();
-        await ctx.beginPath();
-        ctx.globalCompositeOperation = ct[0];
-        ctx.fillStyle = "#FFF";
-        /* ctx.arc(150, 150, 130, 0, Math.PI * 2, false) */
-        await ctx.arc(200, 80, 100 /*50*/, 0, 2 * Math.PI);
-        ctx.strokeStyle = "#FFF";
-        //ctx.stroke()
-        await ctx.clip();
-        //ctx.fill();
-        /* ctx.drawImage(image, 50, -50,300,300) */
-        await ctx.drawImage(image, canvas.width / 2, 10, 100, 110);
-        // ctx.restore();
+
+      if (type) {
+        const image = new Image();
+
+        image.crossOrigin = "anonymous";
+        image.onload = async () => {
+          await ctx.save();
+          await ctx.beginPath();
+          ctx.globalCompositeOperation = ct[0];
+          ctx.fillStyle = "#FFF";
+          /* ctx.arc(150, 150, 130, 0, Math.PI * 2, false) */
+          await ctx.arc(200, 80, 100 /*50*/, 0, 2 * Math.PI);
+          ctx.strokeStyle = "#FFF";
+          //ctx.stroke()
+          await ctx.clip();
+          //ctx.fill();
+          /* ctx.drawImage(image, 50, -50,300,300) */
+          await ctx.drawImage(image, canvas.width / 2, 10, 100, 110);
+          // ctx.restore();
+          resolve();
+        };
+        image.src = type;
+      } else {
         resolve();
-      };
-      image.src = imgicon[type];
-    } else {
-      resolve();
-    }
-    // ctx.beginPath();
-    // ctx.globalCompositeOperation = ct[9];
-    // ctx.fillStyle = "#FFF";
-    // ctx.arc(200, 60, 50, 0, 2 * Math.PI);
-    // ctx.fill();
+      }
+      // ctx.beginPath();
+      // ctx.globalCompositeOperation = ct[9];
+      // ctx.fillStyle = "#FFF";
+      // ctx.arc(200, 60, 50, 0, 2 * Math.PI);
+      // ctx.fill();
 
-    ctx.beginPath();
-    ctx.globalCompositeOperation = ct[4];
-    ctx.fillStyle = color;
-    ctx.strokeStyle = "#FFF";
-    // ctx.lineWidth=5;
-    if (isdraw == 1) {
-      ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, 2 * Math.PI);
-    } else {
-      ctx.fillRect(20, 20, canvas.width, canvas.height);
-      ctx.strokeRect(20, 20, canvas.width, canvas.height);
-    }
-    ctx.fill();
-    ctx.stroke();
+      ctx.beginPath();
+      ctx.globalCompositeOperation = ct[4];
+      ctx.fillStyle = color;
+      ctx.strokeStyle = "#FFF";
+      // ctx.lineWidth=5;
+      if (isdraw == 1) {
+        ctx.arc(canvas.width / 2, canvas.height / 2, 100, 0, 2 * Math.PI);
+      } else {
+        ctx.fillRect(0, 3, canvas.width, canvas.height);
+        ctx.strokeRect(0, 3, canvas.width, canvas.height);
+      }
+      ctx.fill();
+      ctx.stroke();
 
-    // ctx.beginPath();
-    // ctx.globalCompositeOperation = ct[4];
-    // ctx.rect(0, 0, 300, 300);
-    // ctx.fillStyle = "#000";
-    // ctx.fill();
-  });
+      // ctx.beginPath();
+      // ctx.globalCompositeOperation = ct[4];
+      // ctx.rect(0, 0, 300, 300);
+      // ctx.fillStyle = "#000";
+      // ctx.fill();
+    });
 
-  return drawer.then(async () => {
-    var canvas = document.querySelector("#canvas1");
-    var dataURL = await canvas.toDataURL("image/png", 2.0);
-    return dataURL;
-  });
+    return drawer.then(async () => {
+      var canvas = document.querySelector("#canvas1");
+      var dataURL = await canvas.toDataURL("image/png", 2.0);
+      return dataURL;
+    });
+
+  } catch (error) {
+    console.error(error)
+    return error
+  }
 }
 
 async function CreateImgIcon(
@@ -147,7 +155,7 @@ async function CreateImgIcon(
           // await ctx.clip();
           ctx.fillStyle = "#FFF";
           ctx.strokeStyle = "#FFF";
-          ctx.lineWidth=5;
+          ctx.lineWidth = 5;
           await ctx.arc(
             canvas.width / 2,
             canvas.height / 2,
@@ -171,7 +179,7 @@ async function CreateImgIcon(
     var dataURL = canvas.toDataURL("image/png", 2.0);
     return dataURL;
   } catch (error) {
-    console.log('error', error)
+    console.error('error', error)
     return error
   }
 }

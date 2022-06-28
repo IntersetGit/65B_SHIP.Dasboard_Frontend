@@ -4,8 +4,8 @@ import Axios from 'axios';
 class PTTlayer {
     constructor() {
         (async () => {
-            this.GraphicLayer = await this.ADDAREALAYER();
-            return this.GraphicLayer;
+            // this.GraphicLayer = await this.ADDAREALAYER();
+            // return this.GraphicLayer;
         })();
     }
     AreaALL = [];
@@ -76,7 +76,7 @@ class PTTlayer {
                         field: "color",
                         defaultSymbol: {
                             type: "simple-fill",
-                            color: [0,255,222, 0.3],
+                            color: [0, 255, 222, 0.3],
                             outline: {
                                 color: [0, 255, 222],
                                 width: 1
@@ -176,9 +176,11 @@ class PTTlayer {
                 // return GraphicAll;
             }
 
-
+            return apiArea
+        }else{
+            console.error("API ERROR GISMAP REQUSE")
+            return null
         }
-        return apiArea
     }
 
     GET_ALLAREALAYERNAME = async (layername = "PLANT") => {
@@ -224,18 +226,20 @@ class PTTlayer {
         ])
         const geocodingServiceUrl = "https://geocode-api.arcgis.com/arcgis/rest/services/World/GeocodeServer";
         view.on("click", function (event) {
-            event.stopPropagation(); // overwrite default click-for-popup behavior
-            // console.log('event.mapPoint :>> ', event.mapPoint);
-            var lat = Math.round(event.mapPoint.latitude * 1000) / 1000;
-            var lon = Math.round(event.mapPoint.longitude * 1000) / 1000;
-            view.popup.open({
-                title: "ตำแหน่งที่ตั้ง: [" + lat + "," + lon + "]",
-                location: event.mapPoint // Set the location of the popup to the clicked location
-            });
-            // Display the popup
-            locator.locationToAddress(geocodingServiceUrl, { location: event.mapPoint }).then((res) => {
-                view.popup.content = res.address;
-            })
+            if (event.button === 2) {
+                event.stopPropagation(); // overwrite default click-for-popup behavior
+                // console.log('event.mapPoint :>> ', event.mapPoint);
+                var lat = Math.round(event.mapPoint.latitude * 1000) / 1000;
+                var lon = Math.round(event.mapPoint.longitude * 1000) / 1000;
+                view.popup.open({
+                    title: "ตำแหน่งที่ตั้ง: [" + lat + "," + lon + "]",
+                    location: event.mapPoint // Set the location of the popup to the clicked location
+                });
+                // Display the popup
+                locator.locationToAddress(geocodingServiceUrl, { location: event.mapPoint }).then((res) => {
+                    view.popup.content = res.address;
+                })
+            }
         });
     }
 

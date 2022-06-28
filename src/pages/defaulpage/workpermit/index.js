@@ -10,7 +10,7 @@ import {
   Row,
   Col,
   Modal,
-  Drawer,
+  Collapse,
   DatePicker
 } from 'antd';
 import { Map, WebScene } from '@esri/react-arcgis';
@@ -27,6 +27,8 @@ import API from '../../../util/Api'
 import { isArray, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 
+const { Panel } = Collapse;
+
 
 const WorkpermitPage = () => {
   const [stateMap, setStateMap] = useState(null);
@@ -40,7 +42,7 @@ const WorkpermitPage = () => {
   const demodata = new Demodata('workpermit');
   const Geojson = new WaGeojson();
   const PTTlayer = new PTTlayers();
-  const [state_WorkpermitType, setState_WorkpermitType] = useState();
+  const [stateSysmbole, setstateSysmbole] = useState(null);
 
   const columns = [
     {
@@ -205,7 +207,7 @@ const WorkpermitPage = () => {
 
     const resSf = await getWorkpermit({});
     setLayerpoint(resSf)
-    // console.log('resSf :>> ', resSf);
+    console.log('resSf :>> ', resSf);
     socket.on("workpermit", async (res) => {
       const resSf = await getWorkpermit(form.getFieldValue());
       setLayerpoint(resSf)
@@ -246,28 +248,25 @@ const WorkpermitPage = () => {
           }))
         }
 
-        let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
-        let getcenterarea = await GetAllArea[0].queryExtent();
-        // console.log('getcenterarea :>> ', getcenterarea.extent.center.latitude);
-
+        // let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
+        let GetAllArea = null;
         let latlng = []
+
+        let workpermit_type = await (await gen_uniqueValueInfos()).scaffoldingIcon;
+        let maplatlng_type = workpermit_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(12.719, 101.147, 40) }), {})
+        // console.log('maplatlng_type :>> ', maplatlng_type);
         for (const opp in item.data) {
           const obj = item.data[opp];
-          // let latlng = item.data.map(async obj => {
 
-          // console.log('obj', obj)
-          // let findeArea = GetAllArea.find((area) => area.attributes.UNITNAME == (obj.AreaName).replace(/#/i, ''));
-          let findeArea = GetAllArea.find(async (area) => {
+          let findeArea = GetAllArea?.find(async (area) => {
             let feature = await area.queryFeatures();
             if (feature.features[0].attributes.UNITNAME == (obj.AreaName).replace(/#/i, '')) {
               return area;
             }
           });
-          let getextentcenter = await findeArea.queryExtent();
-          // console.log('getextentcenter :>> ', getextentcenter.extent.center.latitude);
-          let randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude, getextentcenter?.extent?.center?.longitude, 40)
-          // console.log('randomlatlng :>> ', randomlatlng);
-          // console.log("ASdasdasdas", `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`)
+          let getextentcenter = await findeArea?.queryExtent();
+          var randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude ?? 12.719, getextentcenter?.extent?.center?.longitude ?? 101.147, 0)
+
           latlng.push({
             ...obj,
             "id": obj._id,
@@ -279,8 +278,9 @@ const WorkpermitPage = () => {
             "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
             // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
             "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
-            "latitude": randomlatlng.latitude,
-            "longitude": randomlatlng.longitude,
+            // "latitude": randomlatlng?.latitude ?? null,
+            // "longitude": randomlatlng?.longitude ?? null,
+            ...maplatlng_type[obj.WorkpermitTypeID],
             "locatoin": obj.SubAreaName,
             "work_type": obj.WorkpermitType,
           })
@@ -383,7 +383,7 @@ const WorkpermitPage = () => {
                 width: 1,
               },
             },
-            uniqueValueInfos: await gen_uniqueValueInfos(item.filter.WorkpermitTypeID, item.filter.WorkPermitStatusID)
+            uniqueValueInfos: await (await gen_uniqueValueInfos(item.filter.WorkpermitTypeID, item.filter.WorkPermitStatusID)).uniqueValueInfos
 
 
           },
@@ -402,20 +402,73 @@ const WorkpermitPage = () => {
     const scaffoldingIcon = [
       {
         name: "SF",
-        color: "rgba(106, 61, 154)"
+        color: "rgba(106, 61, 154)",
+        img: await CreateIcon("rgba(106, 61, 154)", false),
+        detail: 'ใบอนุญาติติดตั้ง/รื้อถอนนั่งร้าน'
       },
       {
         name: "CD",
-        color: "rgba(251, 154, 153)"
+        color: "rgba(251, 154, 153)",
+        img: await CreateIcon("rgba(251, 154, 153)", false),
+        detail: 'ใบอนุญาติทำงานธรรมดา'
+      },
+      {
+        name: "EL",
+        color: "rgba(11, 154, 153)",
+        img: await CreateIcon("rgba(11, 154, 153)", false),
+        detail: 'ใบอนุญาติทำงานไฟฟ้่า/ระบบควบคุม'
+      },
+      {
+        name: "EV",
+        color: "rgba(123, 154, 153)",
+        img: await CreateIcon("rgba(123, 154, 153)", false),
+        detail: 'ใบอนุญาติทำงานที่อับอากาศ'
+      },
+      {
+        name: "EX",
+        color: "rgba(12, 32, 153)",
+        img: await CreateIcon("rgba(12, 32, 153)", false),
+        detail: 'ใบอนุญาติทำงานขุดเจาะ'
       },
       {
         name: "HT1",
-        color: "rgba(255, 127, 0)"
+        color: "rgba(255, 127, 0)",
+        img: await CreateIcon("rgba(255, 127, 0)", false),
+        detail: 'ใบอนุญาติที่มีความร้อนประกายไฟ-I'
+      },
+      {
+        name: "HT2",
+        color: "rgba(255, 12, 0)",
+        img: await CreateIcon("rgba(255, 12, 0)", false),
+        detail: 'ใบอนุญาติที่มีความร้อนประกายไฟ-II'
+      },
+      {
+        name: "MC",
+        color: "rgba(51, 160, 44)",
+        img: await CreateIcon("rgba(51, 160, 44)", false),
+        detail: 'ใบอนุญาติใช้งานรถเครนชนิดเคลื่อนที่/รถเฮียบ'
       },
       {
         name: "RD",
-        color: "rgba(51, 160, 44)"
+        color: "rgba(122, 160, 44)",
+        img: await CreateIcon("rgba(122, 160, 44)", false),
+        detail: 'ใบอนุญาติทำงานรังสี'
       },
+    ]
+
+    const open_close = [
+      {
+        name: "open",
+        color: "rgba(233, 211, 333)",
+        img: await CreateIcon("rgba(233, 211, 333)", false, 1),
+        detail: 'ใบงานเปิด'
+      },
+      {
+        name: "close",
+        color: "rgba(233, 211, 333)",
+        img: await CreateIcon("rgba(233, 211, 333)", false, 2),
+        detail: 'ใบงานปิด'
+      }
     ]
 
     const open = ['W02', 'W03', 'W04', 'W07', 'W08', 'W09', 'W11', 'W12', 'W13', 'W15', 'W18', 'W19']
@@ -423,70 +476,114 @@ const WorkpermitPage = () => {
 
     const scaffoldingStatusWork = [
       {
-        name: "near_expire",
-        status: "warning",
+        name: "Gas",
+        detail: "แจ้งเตือนการตรวจวัดก๊าซ",
+        img: '/assets/iconmap/status/warning-yellow.png',
       },
       {
-        name: "Gas",
-        status: "warningGas",
+        name: "Impairment",
+        detail: "อุปกรณ์ Impairment",
+        img: '/assets/iconmap/status/warning-red.png',
       },
       {
         name: "",
-        status: false,
+        detail: 'ปกติ',
+        img: false,
+      },
+      {
+        name: "near_expire",
+        detail: "แจ้งเตือนใกล้หมดอายุ",
+        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png"
+      },
+      {
+        name: "expire",
+        detail: "แจ้งเตือนหมดอายุ",
+        img: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
+      },
+      {
+        name: "warning_all",
+        detail: "แจ้งเตือนมากกว่า 1 รายการ",
+        img: '/assets/iconmap/status/warning-all.png'
       },
     ]
+    if (status || type) {
+      var jsxsysmboleIcon = await Promise.all(scaffoldingIcon.map(async (item, index) => {
+        return <div className='sysmbole_table' key={index.toString()}>
+          <img src={item.img} alt="Avatar" className="avatar" />
+          <span>{item.detail}</span>
+        </div>
+      }));
+      var jsxsysmboleStatus = await Promise.all(scaffoldingStatusWork.map(async (item, index) => {
+        return item.img && <div className='sysmbole_table' key={index.toString()}>
+          <img src={item.img} alt="Avatar" className="avatar" />
+          <span>{item.detail}</span>
+        </div>
+      }));
+      var jsxsysmboleType = await Promise.all(open_close.map(async (item, index) => {
+        return item.img && <div className='sysmbole_table' key={index.toString()}>
+          <img src={item.img} alt="Avatar" className="avatar" />
+          <span>{item.detail}</span>
+        </div>
+      }));
 
+      setstateSysmbole([jsxsysmboleIcon, jsxsysmboleStatus, jsxsysmboleType]);
 
-    for (const x in scaffoldingIcon) {
-      if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
-        const a = scaffoldingIcon[x];
-        for (const y in scaffoldingStatusWork) {
-          if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
-            const b = scaffoldingStatusWork[y];
-            for (const s in status) {
-              let typedraw;
-              if (open.some(i => i == status[s])) {
-                typedraw = 1
-              } else if (close.some(i => i == status[s])) {
-                typedraw = 2
-              } else {
-                typedraw = 1
+      for (const x in scaffoldingIcon) {
+        if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
+          const a = scaffoldingIcon[x];
+          for (const y in scaffoldingStatusWork) {
+            if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
+              const b = scaffoldingStatusWork[y];
+              for (const s in status) {
+                let typedraw;
+                if (open.some(i => i == status[s].Status_ID)) {
+                  typedraw = 1
+                } else if (close.some(i => i == status[s].Status_ID)) {
+                  typedraw = 2
+                } else {
+                  typedraw = 1
+                }
+                uniqueValueInfos.push({
+                  value: `${a.name}_${status[s].Status_ID}${b.name !== '' ? '_' + b.name : ''}`,
+                  symbol: {
+                    type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                    url: await CreateIcon(a.color, b.img, typedraw),
+                    width: '15px',
+                    height: '15px',
+                  },
+                })
               }
-              uniqueValueInfos.push({
-                value: `${a.name}_${status[s]}${b.name !== '' ? '_' + b.name : ''}`,
-                symbol: {
-                  type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                  url: await CreateIcon(a.color, b.status, typedraw),
-                  width: '15px',
-                  height: '15px',
-                },
-              })
             }
           }
         }
       }
+
+      console.log("uniqueValueInfos", uniqueValueInfos)
     }
-
-    console.log("uniqueValueInfos", uniqueValueInfos)
-
-    return uniqueValueInfos
+    return {
+      scaffoldingIcon,
+      scaffoldingStatusWork,
+      uniqueValueInfos
+    }
 
   }
 
 
 
   const Status_cal = async (data) => {
-    dispatch(
-      setStatus({
-        "Total": data.total,
-        "Open": data.open,
-        "Close": data.close,
-        "⚠️ ใกล้ Exp": data.near_expire,
-        "‼️ หมด Exp": data.expire,
-        "ก๊าซที่ต้องตรวจวัด": data.gas,
 
-      }),
+    const Status = {}
+    if (data.total) Status["Total"] = { value: data.total, color: '#112345' };
+    if (data.open) Status["Open"] = { value: data.open, color: '#17d149' };
+    if (data.close) Status["Close"] = { value: data.close, color: '#F09234', };
+    if (data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54',img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
+    if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
+    if (data.gas) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F842', img: '/assets/iconmap/status/warning-yellow.png' };
+    dispatch(
+      setStatus(Status),
     );
+
+
   };
 
   const Onload = async (map, view) => {
@@ -544,7 +641,7 @@ const WorkpermitPage = () => {
 
     setStateMap(map);
     setStateView(view);
-
+    PTTlayer.CLICK_SHOWLATLONG(view);
     // PTTlayer.ADDPTTWMSLAYER(map, view)
     // map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
@@ -739,8 +836,21 @@ const WorkpermitPage = () => {
             </Form.Item>
           </Form>
         </div>
-        <div ref={refdetail} className='esri-widget'>
-          <div id="legendDiv"></div>
+        <div ref={refdetail} className='sysmbole esri-widget'>
+          <Collapse accordion >
+            <Panel header="ใช้สีแทนประเภทใบงาน" key="1">
+              {stateSysmbole ? stateSysmbole[0] : <>กำลังรอข้อมูล...</>}
+            </Panel>
+            {stateSysmbole && stateSysmbole[2] && <Panel header="ใช้สัญลักษณ์แทนการเปิด-ปิด" key="3">
+              {stateSysmbole ? stateSysmbole[2] : <>กำลังรอข้อมูล...</>}
+            </Panel>}
+            <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
+              {stateSysmbole ? stateSysmbole[1] : <>กำลังรอข้อมูล...</>}
+            </Panel>
+
+          </Collapse>
+          {/* <div id="legendDiv"></div> */}
+
         </div>
 
       </Map>

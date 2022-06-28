@@ -6,11 +6,12 @@ import React from 'react';
 import {PagesConfigs} from './defaulpage';
 import Error404 from './errorPages/Error404';
 import {profileConfig} from './profile';
+import {settingConfig} from './settingPage'
 
 const authorizedStructure = {
   fallbackPath: '/signin',
   unAuthorizedComponent: <Error403 />,
-  routes: [...PagesConfigs, ...profileConfig],
+  routes: [...PagesConfigs, ...profileConfig,...settingConfig],
 };
 
 const unAuthorizedStructure = {
