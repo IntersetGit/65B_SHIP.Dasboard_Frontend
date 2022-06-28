@@ -10,6 +10,7 @@ import ScaffoldingIcon from '../assets/icon/Scaffolding.png';
 import VechicleIcon from '../assets/icon/Vechicle.png';
 import WorkpermistIcon from '../assets/icon/Work Permit.png';
 import Icon from '@ant-design/icons';
+
 const routesConfig = [
   {
     id: 'app',
@@ -21,6 +22,7 @@ const routesConfig = [
         id: 'workpermit',
         title: 'workpermit',
         messageId: 'sidebar.sample.page1',
+        message: "Work Permit",
         type: 'item',
         icon: (
           <Icon
@@ -75,7 +77,7 @@ const routesConfig = [
         path: '/scaffolding',
       },
       {
-        id: 'peopleTracking',
+        id: 'peopletracking',
         title: 'peopleTracking',
         messageId: 'sidebar.sample.page5',
         type: 'item',
@@ -90,10 +92,10 @@ const routesConfig = [
             )}
           />
         ),
-        path: '/peopleTracking',
+        path: '/peopletracking',
       },
       {
-        id: 'acesscontrol',
+        id: 'accesscontrol',
         title: 'acesscontrol',
         messageId: 'sidebar.sample.page6',
         type: 'item',
@@ -104,7 +106,7 @@ const routesConfig = [
             )}
           />
         ),
-        path: '/acesscontrol',
+        path: '/accesscontrol',
       },
       // {
       //   id: 'page-7',

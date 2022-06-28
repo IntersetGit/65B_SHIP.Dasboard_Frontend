@@ -33,8 +33,8 @@ const SignInJwtAuth = () => {
           name='basic'
           initialValues={{
             remember: true,
-            email: 'scaffolding',
-            password: 'Scaf_Folding%001',
+            // email: 'admin',
+            // password: 'Admin%001',
           }}
           onFinish={signInUser}
           onFinishFailed={onFinishFailed}
@@ -76,9 +76,9 @@ const SignInJwtAuth = () => {
               <IntlMessages id='common.rememberMe' />
             </Checkbox>
 
-            <span className='sign-link' onClick={onGoToForgetPassword}>
+            {/* <span className='sign-link' onClick={onGoToForgetPassword}>
               <IntlMessages id='common.forgetPassword' />
-            </span>
+            </span> */}
           </div>
 
           <div className='form-btn-field'>

@@ -1,22 +1,23 @@
 import React from 'react';
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
-import {Avatar, Dropdown, List} from 'antd';
-import {FaChevronDown} from 'react-icons/fa';
+import { Avatar, Dropdown, List } from 'antd';
+import { FaChevronDown } from 'react-icons/fa';
 import './index.style.less';
-import {useThemeContext} from '../../../../utility/AppContextProvider/ThemeContextProvider';
-import {useAuthMethod, useAuthUser} from '../../../../utility/AuthHooks';
-import {useSidebarContext} from '../../../../utility/AppContextProvider/SidebarContextProvider';
+import { useThemeContext } from '../../../../utility/AppContextProvider/ThemeContextProvider';
+import { useAuthMethod, useAuthUser } from '../../../../utility/AuthHooks';
+import { useSidebarContext } from '../../../../utility/AppContextProvider/SidebarContextProvider';
 import PropTypes from 'prop-types';
-import {MenuFoldOutlined} from '@ant-design/icons';
+import { MenuFoldOutlined } from '@ant-design/icons';
+import { isPlainObject } from 'lodash';
 
-const UserInfo = ({hasColor, onToggleSidebar, children}) => {
-  const {themeMode} = useThemeContext();
-  const {logout} = useAuthMethod();
-  const {user} = useAuthUser();
+const UserInfo = ({ hasColor, onToggleSidebar, children }) => {
+  const { themeMode } = useThemeContext();
+  const { logout } = useAuthMethod();
+  const { user } = useAuthUser();
   const navigate = useNavigate();
-  const {sidebarColorSet} = useSidebarContext();
-  const {isSidebarBgImage} = useSidebarContext();
+  const { sidebarColorSet } = useSidebarContext();
+  const { isSidebarBgImage } = useSidebarContext();
 
   const getUserAvatar = () => {
     if (user.displayName) {
@@ -64,7 +65,7 @@ const UserInfo = ({hasColor, onToggleSidebar, children}) => {
                 </span>
                 <Avatar
                   onClick={onToggleSidebar}
-                  icon={<MenuFoldOutlined style={{fontSize: 20}} />}
+                  icon={<MenuFoldOutlined style={{ fontSize: 20 }} />}
                   className='cr-user-info-avatar'
                 />
               </a>
@@ -140,14 +141,14 @@ const UserInfo = ({hasColor, onToggleSidebar, children}) => {
                       light: themeMode === 'light',
                     })}
                   >
-                    {user.displayName ? user.displayName : 'admin user '}
+                    {user.displayName ? user.displayName : '-'}
                   </h3>
                   <span className='cr-user-arrow'>
                     <FaChevronDown />
                   </span>
                 </span>
                 <span className='cr-user-designation text-truncate'>
-                  System Manager
+                  {isPlainObject(user.group) ? user.group.group_name ?? "-" : '-'}
                 </span>
               </span>
             </a>

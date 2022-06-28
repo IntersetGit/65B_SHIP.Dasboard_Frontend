@@ -13,16 +13,14 @@ import {
   Modal,
 } from 'antd';
 import {Map, WebScene} from '@esri/react-arcgis';
-import {setDefaultOptions, loadModules, loadCss} from 'esri-loader';
+import {loadModules} from 'esri-loader';
 import './index.style.less';
 import io from 'socket.io-client';
-import DaraArea from './dataarea';
 import {useDispatch} from 'react-redux';
 import {setStatus} from '../../../redux/actions';
-import {object} from 'prop-types';
 import Demodata from '../../demodata';
+import PTTlayers from '../../../util/PTTlayer'
 
-setDefaultOptions({css: true});
 
 const options = [
   {value: 'gold'},
@@ -59,6 +57,7 @@ const Vehicle = () => {
   const [datamodal, setDatamodal] = useState(null);
   const dispatch = useDispatch();
   const datademo = new Demodata('equipment');
+  const PTTlayer = new PTTlayers();
 
   const columns = [
     {
@@ -148,7 +147,6 @@ const Vehicle = () => {
         console.log('Names of all child sublayers', names.join());
       });
       stateMap?.add(layer);
-      CreateArea();
 
       const {Graphic, GraphicsLayer} = await loadModules([
         'esri/Graphic',
@@ -210,10 +208,7 @@ const Vehicle = () => {
         let latlng = await datademo.getDemodata();
         Status_cal(latlng);
         setTabledata(latlng);
-        stateView?.ui?.add(
-          ['divtable', document.querySelector('.ant-table-wrapper')],
-          'bottom-left',
-        );
+
         // console.log('latlng :>> ', latlng);
         layerpoi.removeAll();
         latlng.map((data) => {
@@ -261,75 +256,8 @@ const Vehicle = () => {
     };
   }, [stateMap, stateView]);
 
-  loadModules([
-    'esri/config',
-    'esri/Map',
-    'esri/views/MapView',
-    'esri/layers/TileLayer',
-  ]).then(async ([esriConfig, Map, MapView, TileLayer]) => {
-    esriConfig.apiKey =
-      'AAPKf24959e55476492eb12c8cbaa4d1261etdgkaLK718fs8_EuvckemKt2gyRR-8p04PR7mC2G8Oi5oNli_65xV-C8u8BuPQTZ';
 
-    // var map = new Map({
-    //   basemap: "streets"
-    // });
 
-    // var view = new MapView({
-    //   container: "viewDiv",  // Reference to the DOM node that will contain the view
-    //   map: map               // References the map object created in step 3
-    // });
-
-    // const Fullscreen = await loadModules(["esri/widgets/Fullscreen"]).then(([Fullscreen]) => Fullscreen);
-    // const full = new Fullscreen({
-    //   view: view
-    // });
-    // console.log('full :>> ', full);
-    // view.ui.add(full, "top-left");
-  });
-
-  const CreateArea = async () => {
-    const {Graphic, GraphicsLayer, Polygon} = await loadModules([
-      'esri/Graphic',
-      'esri/layers/GraphicsLayer',
-      'esri/geometry/Polygon',
-    ]).then(([Graphic, GraphicsLayer, Polygon]) => {
-      return {Graphic, GraphicsLayer, Polygon};
-    });
-    for (const layer in DaraArea) {
-      // DaraArea.map( async(layer) => {
-      let layerArea = new GraphicsLayer({
-        id: DaraArea[layer].name,
-      });
-      stateMap?.add(layerArea, 0);
-
-      const polygon = new Polygon({
-        rings: DaraArea[layer].geomantry,
-      });
-
-      // Create a symbol for rendering the graphic
-      const fillSymbol = {
-        type: 'simple-fill', // autocasts as new SimpleFillSymbol()
-        color: DaraArea[layer].color,
-        outline: {
-          // autocasts as new SimpleLineSymbol()
-          color: [255, 255, 255],
-          width: 1,
-        },
-      };
-
-      // Add the geometry and symbol to a new graphic
-      const polygonGraphic = new Graphic({
-        geometry: polygon,
-        symbol: fillSymbol,
-      });
-      // stateView?.graphics?.addMany([polygonGraphic]);
-      await layerArea.add(polygonGraphic);
-
-      await stateView?.goTo(polygon.extent);
-
-      // })
-    }
-  };
 
   const Status_cal = async (data) => {
     let warning = data.filter((data, key) => data.status_warnning !== null);
@@ -345,16 +273,16 @@ const Vehicle = () => {
   };
 
   const Onload = async (map, view) => {
-    const {Fullscreen, UI, Zoom, Expand} = await loadModules([
+    const [Fullscreen, UI, Zoom, Expand] = await loadModules([
       'esri/widgets/Fullscreen',
       'esri/views/ui/UI',
       'esri/widgets/Zoom',
       'esri/widgets/Expand',
-    ]).then(([Fullscreen, UI, Zoom, Expand]) => {
-      return {Fullscreen, UI, Zoom, Expand};
-    });
+    ]);
     const fullscreenui = new Fullscreen({
       view: view,
+      element: document.querySelector("#pagediv"),
+      id: 'fullscreenwiget'
     });
     const zoomui = new Zoom({
       view: view,
@@ -378,25 +306,27 @@ const Vehicle = () => {
     view.ui.add(fullscreenui, 'top-right');
     view.ui.add(zoomui, 'top-right');
     view.ui.add(detaillayer, 'top-right');
-    view?.ui?.add(
-      ['divtable', document.querySelector('.ant-table-wrapper')],
-      'bottom-left',
-    );
+
 
     setStateMap(map);
     setStateView(view);
+
+
+    // PTTlayer.ADDPTTWMSLAYER(map, view)
+    // view.graphics.addMany(await PTTlayer.SHOW_AREALAYERNAME());
   };
   return (
-    <div style={{position: 'relative', width: '100%', height: '100%'}}>
+    <div id="pagediv">
       <Map
         className='Mapacrgis'
         onLoad={Onload}
         mapProperties={{
-          basemap: /*`${'arcgis-light-gray'?? 'arcgis-navigation'}`*/ {
-            portalItem: {
-              id: '8d91bd39e873417ea21673e0fee87604', // nova basemap
-            },
-          },
+          // basemap: /*`${'arcgis-light-gray'?? 'arcgis-navigation'}`*/ {
+          //   portalItem: {
+          //     id: '8d91bd39e873417ea21673e0fee87604', // nova basemap
+          //   },
+          // },
+          basemap: `${'arcgis-navigation'}`,
           autoResize: false,
         }}
         viewProperties={{
@@ -404,22 +334,22 @@ const Vehicle = () => {
           ui: {components: ['attribution', 'compass']},
         }}
       >
-        <div id='button-top' className='button-topleft'>
+         <div id='button-top' className='button-topleft'>
           <div
             className='esri-widget--button esri-icon-table'
             onClick={() => {
               if (
-                document.querySelector('.esri-ui-bottom-left').style.display ===
-                  'none' ||
-                document.querySelector('.esri-ui-bottom-left').style.display ===
-                  ''
+                document.querySelector('.ant-table-wrapper').style.display ===
+                'none' ||
+                document.querySelector('.ant-table-wrapper').style.display ===
+                ''
               ) {
                 document
-                  .querySelector('.esri-ui-bottom-left')
+                  .querySelector('.ant-table-wrapper')
                   .style.setProperty('display', 'block', 'important');
               } else {
                 document
-                  .querySelector('.esri-ui-bottom-left')
+                  .querySelector('.ant-table-wrapper')
                   .style.setProperty('display', 'none', 'important');
               }
             }}
@@ -527,23 +457,8 @@ const Vehicle = () => {
             </Col>
           </Row>
         </div>
-        <Table
-          id='divtable'
-          scroll={{y: '25vh'}}
-          size='small'
-          rowClassName={(record, index) =>
-            record?.status_warnning !== null &&
-            record?.status_warnning !== undefined
-              ? 'table-row-red'
-              : ''
-          }
-          rowKey={(i) => i.id}
-          columns={columns}
-          dataSource={tabledata}
-        />
-      </Map>
 
-      {/* <div id="viewDiv" style={{height:'70vh'}}></div> */}
+      </Map>
 
       <Modal
         title='รายละเอียด'
@@ -561,6 +476,21 @@ const Vehicle = () => {
             </Row>
           ))}
       </Modal>
+      <Table
+        id='divtable'
+        scroll={{ y: '25vh' }}
+        size='small'
+        style={{ position: 'absolute', bottom: 0, backgroundColor: 'white', display: 'none' }}
+        rowClassName={(record, index) =>
+          record?.status_warnning !== null &&
+            record?.status_warnning !== undefined
+            ? 'table-row-red'
+            : ''
+        }
+        rowKey={(i) => i.id}
+        columns={columns}
+        dataSource={tabledata}
+      />
     </div>
   );
 };

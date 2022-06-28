@@ -1,4 +1,5 @@
-import {authRole} from '../../../shared/constants/AppEnums';
+import { isArray, isPlainObject } from 'lodash';
+import { authRole } from '../../../shared/constants/AppEnums';
 
 export const getUserFromAuth0 = (user) => {
   if (user)
@@ -41,14 +42,17 @@ export const getUserFromAWS = (user) => {
 };
 
 export const getUserFromJwtAuth = (user) => {
+  // console.log('getUserFromJwtAuth ---->', user)
   if (user)
     return {
       id: 1,
       uid: user._id,
-      displayName: user.name,
+      displayName: user.username,
       email: user.email,
       photoURL: user.avatar,
       role: authRole.user,
+      group: isPlainObject(user.group_id) ? user.group_id : {},
+      menu: isArray(user.role) ? user.role : [],
     };
   return user;
 };
