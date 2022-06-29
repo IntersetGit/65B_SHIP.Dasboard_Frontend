@@ -265,10 +265,8 @@ const WorkpermitPage = () => {
     try {
       if (stateView) {
 
-        // let latlng = item.data;
         Status_cal(item.summary);
 
-        // console.log("data =>>>>>>>>>>>>>>>>>", item.data);
         if (isPlainObject(item.filter)) {
           if (isArray(item.filter.AgencyID)) setAgencyIDOptions(item.filter.AgencyID.map(e => { return { value: e.AgencyID } }))
           if (isArray(item.filter.AreaName)) setAreaNameOptions(item.filter.AreaName.map(e => { return { value: e.AreaName } }))
@@ -306,6 +304,12 @@ const WorkpermitPage = () => {
           let getextentcenter = await findeArea?.queryExtent();
           var randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude ?? 12.719, getextentcenter?.extent?.center?.longitude ?? 101.147, 0)
           let getlatlng = maplatlng_type[obj.WorkpermitTypeID];
+
+
+          let checkstatus = Object.keys(obj.notification);
+          let isstatus = checkstatus.filter((s) => obj.notification[s] == true)
+          // console.log('isstatus', isstatus)
+
           latlng.push({
             ...obj,
             "id": obj._id,
@@ -316,7 +320,8 @@ const WorkpermitPage = () => {
             "date_time_start": moment(new Date(obj.others.WorkingStart)).format("DD/MM/YYYY hh:mm:ss"),
             "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
             // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
-            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
+            // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
+            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isstatus && isstatus.length > 2 ? '_warning_all' : '_'+isstatus[0]}`,
             // "latitude": randomlatlng?.latitude ?? null,
             // "longitude": randomlatlng?.longitude ?? null,
             ...demodata.getRandomLocation(getlatlng.latitude, getlatlng.longitude, 3),
@@ -476,12 +481,12 @@ const WorkpermitPage = () => {
 
     const scaffoldingStatusWork = [
       {
-        name: "Gas",
+        name: "gas",
         detail: "แจ้งเตือนการตรวจวัดก๊าซ",
         img: '/assets/iconmap/status/warning-yellow.png',
       },
       {
-        name: "Impairment",
+        name: "impairment",
         detail: "อุปกรณ์ Impairment",
         img: '/assets/iconmap/status/warning-red.png',
       },
@@ -578,7 +583,8 @@ const WorkpermitPage = () => {
     if (data.close) Status["Close"] = { value: data.close, color: '#F09234', };
     if (data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
     if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
-    if (data.gas) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F842', img: '/assets/iconmap/status/warning-yellow.png' };
+    if (data.gas) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F024', img: '/assets/iconmap/status/warning-yellow.png' };
+    if (data.impairment) Status["Impairment"] = { value: data.impairment, color: '#548', };
     dispatch(
       setStatus(Status),
     );
@@ -658,8 +664,8 @@ const WorkpermitPage = () => {
     setStateMap(map);
     setStateView(view);
     PTTlayer.CLICK_SHOWLATLONG(view);
-    // PTTlayer.ADDPTTWMSLAYER(map, view)
-    // map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
+    PTTlayer.ADDPTTWMSLAYER(map, view)
+    map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
   };
 
