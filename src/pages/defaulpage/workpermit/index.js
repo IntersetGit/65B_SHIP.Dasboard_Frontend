@@ -246,7 +246,7 @@ const WorkpermitPage = () => {
 
     const resSf = await getWorkpermit({});
     setLayerpoint(resSf)
-    console.log('resSf :>> ', resSf);
+    // console.log('resSf :>> ', resSf);
     socket.on("workpermit", async (res) => {
       const resSf = await getWorkpermit(form.getFieldValue());
       setLayerpoint(resSf)
