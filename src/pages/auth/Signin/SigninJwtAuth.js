@@ -51,7 +51,7 @@ const SignInJwtAuth = () => {
                   <span>|</span>
                 </>
               }
-              placeholder={messages['common.email']}
+              placeholder={messages['common.user']}
             />
           </Form.Item>
 
