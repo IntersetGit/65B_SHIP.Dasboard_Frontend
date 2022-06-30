@@ -71,7 +71,7 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
               <Row >
                 {Object.keys(StatusMap).map((status,index) => {
                   return (
-                    <Col key={index.toString()} lg={8} md={8} sm={12} xs={12}>
+                    <Col key={index.toString()} lg={6} md={8} sm={12} xs={12}>
                       {/* <p>{status} : {StatusMap[status]}</p> */}
                       <IconLink
                         number={StatusMap[status].value}

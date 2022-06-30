@@ -319,9 +319,8 @@ const WorkpermitPage = () => {
             "supervisor": obj.OwnerName,
             "date_time_start": moment(new Date(obj.others.WorkingStart)).format("DD/MM/YYYY hh:mm:ss"),
             "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
-            // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
             // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
-            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isstatus && isstatus.length > 2 ? '_warning_all' : '_'+isstatus[0]}`,
+            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isstatus && isstatus.length > 2 ? '_warning_all' : '_' + isstatus[0]}`,
             // "latitude": randomlatlng?.latitude ?? null,
             // "longitude": randomlatlng?.longitude ?? null,
             ...demodata.getRandomLocation(getlatlng.latitude, getlatlng.longitude, 3),
@@ -337,6 +336,7 @@ const WorkpermitPage = () => {
         setTabledata(latlng);
 
         let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
+        console.log('datageojson', datageojson)
         setTabledata(latlng);
         const [FeatureLayer, GeoJSONLayer] = await loadModules([
           'esri/layers/FeatureLayer',
@@ -368,8 +368,8 @@ const WorkpermitPage = () => {
                     label: "สถานะใบงาน"
                   },
                   {
-                    fieldName: "GasMeasurement",
-                    label: "แจ้งเตือนแก๊ส"
+                    fieldName: "notification",
+                    label: "แจ้งเตือน"
                   }
                 ]
               }
@@ -395,6 +395,16 @@ const WorkpermitPage = () => {
         });
         await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
         stateMap?.add(layerpoint);
+        // let maplayerSerch = stateMap?.findLayerById('pointlayer');
+        // console.log('maplayerSerch :>> ', maplayerSerch);
+        // if (maplayerSerch) {
+        //   console.log('yes')
+        //   maplayerSerch.url = "blob:http://localhost:3000/9d390f7f-65a7-4d22-90e6-3776e07371d3";
+        //   maplayerSerch.refresh();
+        // } else {
+        //   stateMap?.add(layerpoint);
+        // }
+
       }
     } catch (error) {
       console.log('error', error)
@@ -584,7 +594,7 @@ const WorkpermitPage = () => {
     if (data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
     if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
     if (data.gas) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F024', img: '/assets/iconmap/status/warning-yellow.png' };
-    if (data.impairment) Status["Impairment"] = { value: data.impairment, color: '#548', };
+    if (data.impairment) Status["Impairment"] = { value: data.impairment, color: '#548',img: '/assets/iconmap/status/warning-red.png'  };
     dispatch(
       setStatus(Status),
     );
@@ -635,29 +645,29 @@ const WorkpermitPage = () => {
     view.ui.add(zoomui, 'top-right');
     view.ui.add(detaillayer, 'top-right');
 
-    view.watch('zoom', zoomChanged);
-    function zoomChanged(newValue, oldValue, property, object) {
-      let maplayerCLuster = map.findLayerById('pointlayer');
-      if (newValue >= 20) {
-        if (maplayerCLuster) {
-          let fr = maplayerCLuster.featureReduction;
-          maplayerCLuster.featureReduction =
-            fr && fr.type === "cluster" && null;
-        }
-      } else if (newValue <= 20) {
-        if (maplayerCLuster) {
-          let fr = maplayerCLuster.featureReduction;
-          maplayerCLuster.featureReduction =
-            fr && fr.type === "cluster" ? clusterConfig : clusterConfig;
-        }
-        // console.log("New value: ", newValue,
-        //   "<br>Old value: ", oldValue,
-        //   "<br>Watched property: ", property,
-        //   "<br>Watched object: ", object);
-      }
+    // view.watch('zoom', zoomChanged);
+    // function zoomChanged(newValue, oldValue, property, object) {
+    //   let maplayerCLuster = map.findLayerById('pointlayer');
+    //   if (newValue >= 20) {
+    //     if (maplayerCLuster) {
+    //       let fr = maplayerCLuster.featureReduction;
+    //       maplayerCLuster.featureReduction =
+    //         fr && fr.type === "cluster" && null;
+    //     }
+    //   } else if (newValue <= 20) {
+    //     if (maplayerCLuster) {
+    //       let fr = maplayerCLuster.featureReduction;
+    //       maplayerCLuster.featureReduction =
+    //         fr && fr.type === "cluster" ? clusterConfig : clusterConfig;
+    //     }
+    //     // console.log("New value: ", newValue,
+    //     //   "<br>Old value: ", oldValue,
+    //     //   "<br>Watched property: ", property,
+    //     //   "<br>Watched object: ", object);
+    //   }
 
 
-    }
+    // }
 
 
 
