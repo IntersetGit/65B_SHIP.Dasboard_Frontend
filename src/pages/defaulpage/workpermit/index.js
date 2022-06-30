@@ -256,6 +256,7 @@ const WorkpermitPage = () => {
   }
 
   const [AgencyIDOptions, setAgencyIDOptions] = useState([]);
+  const [AgencyNameOptions, setAgencyNameOptions] = useState([]);
   const [AreaNameOptions, setAreaNameOptions] = useState([]);
   const [PTTStaffIDOptions, setPTTStaffIDOptions] = useState([]);
   const [WorkPermitStatusIDOptions, setWorkPermitStatusIDOptions] = useState([]);
@@ -269,6 +270,7 @@ const WorkpermitPage = () => {
 
         if (isPlainObject(item.filter)) {
           if (isArray(item.filter.AgencyID)) setAgencyIDOptions(item.filter.AgencyID.map(e => { return { value: e.AgencyID } }))
+          if (isArray(item.filter.AgencyName)) setAgencyNameOptions(item.filter.AgencyName.map(e => { return { value: e.AgencyName } }))
           if (isArray(item.filter.AreaName)) setAreaNameOptions(item.filter.AreaName.map(e => { return { value: e.AreaName } }))
           if (isArray(item.filter.PTTStaffID)) setPTTStaffIDOptions(item.filter.PTTStaffID.map(e => { return { value: e.PTTStaffID } }))
           if (isArray(item.filter.WorkPermitStatusID)) setWorkPermitStatusIDOptions(item.filter.WorkPermitStatusID.map(e => {
@@ -594,7 +596,7 @@ const WorkpermitPage = () => {
     if (data.near_expire !== undefined) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
     if (data.expire !== undefined) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
     if (data.gas !== undefined) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F024', img: '/assets/iconmap/status/warning-yellow.png' };
-    if (data.impairment !== undefined) Status["Impairment"] = { value: data.impairment, color: '#548',img: '/assets/iconmap/status/warning-red.png'  };
+    if (data.impairment !== undefined) Status["Impairment"] = { value: data.impairment, color: '#548', img: '/assets/iconmap/status/warning-red.png' };
     dispatch(
       setStatus(Status),
     );
@@ -778,7 +780,7 @@ const WorkpermitPage = () => {
               />
             </Form.Item>
 
-            <Form.Item
+            {/* <Form.Item
               name="AgencyID"
               label='รหัสหน่วยงานผู้ควบคุม'
             >
@@ -787,6 +789,18 @@ const WorkpermitPage = () => {
                 showArrow
                 style={{ width: '100%' }}
                 options={AgencyIDOptions}
+              />
+            </Form.Item> */}
+
+            <Form.Item
+              name="AgencyName"
+              label='หน่วยงานผู้ควบคุม'
+            >
+              <Select
+                loading={loading}
+                showArrow
+                style={{ width: '100%' }}
+                options={AgencyNameOptions}
               />
             </Form.Item>
 
