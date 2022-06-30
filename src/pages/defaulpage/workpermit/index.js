@@ -588,13 +588,13 @@ const WorkpermitPage = () => {
   const Status_cal = async (data) => {
 
     const Status = {}
-    if (data.total) Status["Total"] = { value: data.total, color: '#112345' };
-    if (data.open) Status["Open"] = { value: data.open, color: '#17d149' };
-    if (data.close) Status["Close"] = { value: data.close, color: '#F09234', };
-    if (data.near_expire) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
-    if (data.expire) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
-    if (data.gas) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F024', img: '/assets/iconmap/status/warning-yellow.png' };
-    if (data.impairment) Status["Impairment"] = { value: data.impairment, color: '#548',img: '/assets/iconmap/status/warning-red.png'  };
+    if (data.total !== undefined) Status["Total"] = { value: data.total, color: '#112345' };
+    if (data.open !== undefined) Status["Open"] = { value: data.open, color: '#17d149' };
+    if (data.close !== undefined) Status["Close"] = { value: data.close, color: '#F09234', };
+    if (data.near_expire !== undefined) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
+    if (data.expire !== undefined) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
+    if (data.gas !== undefined) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F024', img: '/assets/iconmap/status/warning-yellow.png' };
+    if (data.impairment !== undefined) Status["Impairment"] = { value: data.impairment, color: '#548',img: '/assets/iconmap/status/warning-red.png'  };
     dispatch(
       setStatus(Status),
     );
