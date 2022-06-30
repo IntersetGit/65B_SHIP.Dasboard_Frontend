@@ -265,6 +265,7 @@
   "common.tag": "Tag",
   "common.labels": "Labels",
   "common.email": "Email",
+  "common.user": "Username",
   "common.phone": "Phone",
   "common.birthday": "Birthday",
   "common.selectLabel": "Select Label",
