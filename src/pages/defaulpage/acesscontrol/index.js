@@ -243,6 +243,12 @@ const AcessControlPage = () => {
         setLayerpoint(res.Message)
       }
     });
+    socket.on("accesscontroldevice", (res) => {
+      // console.log('socket', res)
+      if (res.Status == "success") {
+        setLayerpoint(res.Message)
+      }
+    });
 
 
   }
@@ -286,9 +292,11 @@ const AcessControlPage = () => {
 
         console.log('item.data', item.data)
 
-        for (const opp in item.data.filter(where => where.others.show_in_map)) {
+        const filter_show_in_map = item.data.filter(where => where.others.show_in_map);
+        console.log('filter_show_in_map', filter_show_in_map)
+        for (const opp in filter_show_in_map) {
           const obj = item.data[opp];
-       
+
           let findeArea = GetAllArea?.find(async (area) => {
             let feature = await area.queryFeatures();
             if (feature.features[0].attributes.UNITNAME == (obj.AreaName).replace(/#/i, '')) {
@@ -298,7 +306,7 @@ const AcessControlPage = () => {
           let getextentcenter = await findeArea?.queryExtent();
           var randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude ?? 12.719, getextentcenter?.extent?.center?.longitude ?? 101.147, 0)
           let getlatlng = maplatlng_type[obj.WorkpermitTypeID];
-        
+
           console.log('getlatlng', getlatlng)
 
           /* error ไม่มี notification */
