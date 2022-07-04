@@ -26,7 +26,7 @@ import Demodata from '../../demodata';
 import WaGeojson from '../../../util/WaGeojson';
 import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
-import { isArray, isPlainObject } from 'lodash';
+import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 const { Panel } = Collapse;
 
@@ -50,64 +50,64 @@ const AcessControlPage = () => {
       title: 'ชื่อ-สกุล ผู้รับเหมา',
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
-      render: (text) => text ?? "-",
+      render: (text, obj) => (obj.FirstName ?? "-") + " " + (obj.LastName ?? ""),
       width: 150
     },
     {
       title: 'ประเภทบุคคล',
-      dataIndex: 'WorkPermitNo',
-      key: 'WorkPermitNo',
-      render: (text) => text ?? "-",
+      dataIndex: 'PersonalTypeName',
+      key: 'PersonalTypeName',
+      render: (text) => text ? text.PersonalTypeName : "-",
       width: 150
     },
     {
       title: 'ผู้ควบคุมงาน',
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
-      render: (text) => text ?? "-",
-      width: 150
+      render: (text, obj) => (obj.PTTStaff_FName ?? "-") + " " + (obj.PTTStaff_LName ?? ""),
+      width: 200
     },
     {
       title: 'พื้นที่สแกนล่าสุด',
-      dataIndex: 'WorkPermitNo',
-      key: 'WorkPermitNo',
-      render: (text) => text ?? "-",
+      dataIndex: 'AccDevice',
+      key: 'AccDevice',
+      render: (text) => text ? text.AreaName : "-",
       width: 150
     },
     {
       title: 'ประเภทบัตรที่แลก',
-      dataIndex: 'WorkPermitNo',
-      key: 'WorkPermitNo',
-      render: (text) => text ?? "-",
+      dataIndex: 'others',
+      key: 'others',
+      render: (text) => text ? text.CardTypeName : "-",
       width: 150
     },
     {
       title: 'สถานะการสแกนล่าสุด',
-      dataIndex: 'WorkPermitNo',
-      key: 'WorkPermitNo',
-      render: (text) => text ?? "-",
+      dataIndex: 'others',
+      key: 'others',
+      render: (text) => text ? text.Scan_Status_Name : "-",
       width: 150
     },
     {
       title: 'วัน-เวลาสแกน',
-      dataIndex: 'WorkPermitNo',
-      key: 'WorkPermitNo',
-      render: (text) => text ?? "-",
+      dataIndex: 'others',
+      key: 'others',
+      render: (text) => text ? moment(text.scan_date_time).format("DD/MM/YYYY") : "-",
       width: 150
     },
     {
       title: 'สถานะการแลคบัตร',
-      dataIndex: 'WorkPermitNo',
-      key: 'WorkPermitNo',
-      render: (text) => text ?? "-",
+      dataIndex: 'others',
+      key: 'others',
+      render: (text) => text ? text.ExchangeCard_Status_Name : "-",
       width: 150
     },
     {
       title: 'วัน-เวลาแลคบัตร',
-      dataIndex: 'WorkPermitNo',
-      key: 'WorkPermitNo',
-      render: (text) => text ?? "-",
-      width: 150
+      dataIndex: 'ExchangeCard_Date',
+      key: 'ExchangeCard_Date',
+      render: (text, obj) => text ? moment(text).format("DD/MM/YYYY") + " " + obj.ExchangeCard_Time : "-",
+      width: 200
     },
     {
       title: '...',
@@ -261,7 +261,7 @@ const AcessControlPage = () => {
 
   const setLayerpoint = async (item) => {
     try {
-      console.log('stateView', stateView)
+      // console.log('stateView', stateView)
       if (stateView) {
 
         Status_cal(item.summary);
@@ -287,15 +287,17 @@ const AcessControlPage = () => {
         let GetAllArea = null;
         let latlng = []
         // console.log('item', item)
-        let workpermit_type = await (await gen_uniqueValueInfos()).scaffoldingIcon;
-        let maplatlng_type = workpermit_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(12.719, 101.147, 60) }), {});
+        let acesscontrol_type = await (await gen_uniqueValueInfos()).acessControlIcon;
+        // console.log('acesscontrol_type', acesscontrol_type)
+        let maplatlng_type = acesscontrol_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(12.719, 101.147, 60) }), {});
 
-        console.log('item.data', item.data)
+        // console.log('item.data', item.data)
 
         const filter_show_in_map = item.data.filter(where => where.others.show_in_map);
-        console.log('filter_show_in_map', filter_show_in_map)
+        // console.log('maplatlng_type :>> ', maplatlng_type);
+        // console.log('filter_show_in_map', filter_show_in_map)
         for (const opp in filter_show_in_map) {
-          const obj = item.data[opp];
+          const obj = filter_show_in_map[opp];
 
           let findeArea = GetAllArea?.find(async (area) => {
             let feature = await area.queryFeatures();
@@ -304,26 +306,23 @@ const AcessControlPage = () => {
             }
           });
           let getextentcenter = await findeArea?.queryExtent();
+
           var randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude ?? 12.719, getextentcenter?.extent?.center?.longitude ?? 101.147, 0)
-          let getlatlng = maplatlng_type[obj.WorkpermitTypeID];
-
-          console.log('getlatlng', getlatlng)
-
-          /* error ไม่มี notification */
-          // let checkstatus = Object.keys(obj.notification); /// 
-          // let isstatus = checkstatus.filter((s) => obj.notification[s] == true)
-          // // console.log('isstatus', isstatus)
+          let getlatlng = maplatlng_type[obj.PersonalTypeID];
 
 
-          // if (isPlainObject(obj.notification)) {
-          //   const arr = [];
-          //   if (obj.notification.near_expire) arr.push("⚠️ ใกล้ Exp");
-          //   if (obj.notification.expire) arr.push("‼️ หมด Exp");
-          //   if (obj.notification.gas) arr.push("ก๊าซที่ต้องตรวจวัด");
-          //   if (obj.notification.impairment) arr.push("Impairment");
-          //   obj.notification.list = arr;
-          // }
+          if (obj.PersonalTypeID) {
 
+            const { latitude, longitude } = demodata.getRandomLocation(getlatlng.latitude, getlatlng.longitude, 3)
+            obj.status_work = `personal_${obj.PersonalTypeID}`;
+            obj.latitude = latitude;
+            obj.longitude = longitude;
+          } else if ((obj.Lat && obj.Long)) {
+
+            obj.status_work = `device_${obj.notification.offline ? "offline" : "online"}`;
+            obj.latitude = obj.Lat;
+            obj.longitude = obj.Long;
+          }
 
           latlng.push({
             ...obj,
@@ -334,10 +333,9 @@ const AcessControlPage = () => {
             "supervisor": obj.OwnerName,
             "date_time_start": moment(new Date(obj.others.WorkingStart)).format("DD/MM/YYYY hh:mm:ss"),
             "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
-            // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isArray(obj.notification.list) && obj.notification.list.length > 1 ? '_warning_all' : '_' + isstatus[0]}`,
-            // "latitude": randomlatlng?.latitude ?? null,
-            // "longitude": randomlatlng?.longitude ?? null,
-            ...demodata.getRandomLocation(getlatlng.latitude, getlatlng.longitude, 3),
+            "status_work": obj.status_work,
+            "latitude": obj.latitude,
+            "longitude": obj.longitude,
             "locatoin": obj.SubAreaName,
             "work_type": obj.WorkpermitType,
           })
@@ -346,16 +344,17 @@ const AcessControlPage = () => {
         }
 
 
-        console.log('latlng =>>>>>>>>>>>>>', latlng)
+        // console.log('latlng =>>>>>>>>>>>>>', latlng)
         setTabledata(latlng);
 
         let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
-        console.log('datageojson', datageojson)
+        // console.log('datageojson', datageojson)
         setTabledata(latlng);
         const [FeatureLayer, GeoJSONLayer] = await loadModules([
           'esri/layers/FeatureLayer',
           'esri/layers/GeoJSONLayer',
         ]);
+        console.log('item', item)
         const layerpoint = new GeoJSONLayer({
           id: 'pointlayer',
           title: 'ใช้สีสัญลักษณ์แทนประเภท',
@@ -402,7 +401,7 @@ const AcessControlPage = () => {
                 width: 1,
               },
             },
-            uniqueValueInfos: await (await gen_uniqueValueInfos(item.filter.WorkpermitTypeID, item.filter.WorkPermitStatusID)).uniqueValueInfos
+            uniqueValueInfos: await (await gen_uniqueValueInfos(item.filter.PersonalTypeName)).uniqueValueInfos
 
 
           },
@@ -426,176 +425,123 @@ const AcessControlPage = () => {
 
   }
 
-  const gen_uniqueValueInfos = async (type, status) => {
-    const uniqueValueInfos = [];
+  const gen_uniqueValueInfos = async (type) => {
+    try {
+      const uniqueValueInfos = [];
 
-    const scaffoldingIcon = [
-      {
-        name: "SF",
-        color: "rgba(106, 61, 154)",
-        img: await CreateIcon("rgba(106, 61, 154)", false),
-        detail: 'ใบอนุญาติติดตั้ง/รื้อถอนนั่งร้าน'
-      },
-      {
-        name: "CD",
-        color: "rgba(251, 154, 153)",
-        img: await CreateIcon("rgba(251, 154, 153)", false),
-        detail: 'ใบอนุญาติทำงานธรรมดา'
-      },
-      {
-        name: "EL",
-        color: "rgba(11, 154, 153)",
-        img: await CreateIcon("rgba(11, 154, 153)", false),
-        detail: 'ใบอนุญาติทำงานไฟฟ้่า/ระบบควบคุม'
-      },
-      {
-        name: "EV",
-        color: "rgba(123, 154, 153)",
-        img: await CreateIcon("rgba(123, 154, 153)", false),
-        detail: 'ใบอนุญาติทำงานที่อับอากาศ'
-      },
-      {
-        name: "EX",
-        color: "rgba(12, 32, 153)",
-        img: await CreateIcon("rgba(12, 32, 153)", false),
-        detail: 'ใบอนุญาติทำงานขุดเจาะ'
-      },
-      {
-        name: "HT1",
-        color: "rgba(255, 127, 0)",
-        img: await CreateIcon("rgba(255, 127, 0)", false),
-        detail: 'ใบอนุญาติที่มีความร้อนประกายไฟ-I'
-      },
-      {
-        name: "HT2",
-        color: "rgba(255, 12, 0)",
-        img: await CreateIcon("rgba(255, 12, 0)", false),
-        detail: 'ใบอนุญาติที่มีความร้อนประกายไฟ-II'
-      },
-      {
-        name: "MC",
-        color: "rgba(51, 160, 44)",
-        img: await CreateIcon("rgba(51, 160, 44)", false),
-        detail: 'ใบอนุญาติใช้งานรถเครนชนิดเคลื่อนที่/รถเฮียบ'
-      },
-      {
-        name: "RD",
-        color: "rgba(122, 160, 44)",
-        img: await CreateIcon("rgba(122, 160, 44)", false),
-        detail: 'ใบอนุญาติทำงานรังสี'
-      },
-    ]
+      const acessControlIcon = [
+        {
+          name: "1",
+          color: "rgba(19, 255, 0)",
+          img: await CreateIcon("rgba(19, 255, 0)", false),
+          detail: 'ผู้รับเหมาประจำ'
+        },
+        {
+          name: "2",
+          color: "rgba(255, 139, 0)",
+          img: await CreateIcon("rgba(255, 139, 0)", false),
+          detail: 'ผู้รับเหมาชั่วคราว'
+        },
+        {
+          name: "3",
+          color: "rgba(255, 251, 0)",
+          img: await CreateIcon("rgba(255, 251, 0)", false),
+          detail: 'ผู้มาติดต่อ'
+        },
+        {
+          name: "4",
+          color: "rgba(255, 0, 232)",
+          img: await CreateIcon("rgba(255, 0, 232)", false),
+          detail: 'ผู้มาเยี่ยมชม'
+        },
+        {
+          name: "5",
+          color: "rgba(0, 93, 255)",
+          img: await CreateIcon("rgba(0, 93, 255)", false),
+          detail: 'พนักงาน ปตท.'
+        },
 
-    const open_close = [
-      {
-        name: "open",
-        color: "rgba(233, 211, 333)",
-        img: await CreateIcon("rgba(233, 211, 333)", false, 1),
-        detail: 'ใบงานเปิด'
-      },
-      {
-        name: "close",
-        color: "rgba(233, 211, 333)",
-        img: await CreateIcon("rgba(233, 211, 333)", false, 2),
-        detail: 'ใบงานปิด'
-      }
-    ]
+      ]
 
-    const open = ['W02', 'W03', 'W04', 'W07', 'W08', 'W09', 'W11', 'W12', 'W13', 'W15', 'W18', 'W19']
-    const close = ['W05', 'W06', 'W10']
+      const deviceStatusWork = [
+        {
+          name: "online",
+          detail: "อุปกรณ์ Online",
+          img: '/assets/iconmap/devices/online.svg',
+          // img: '/assets/iconmap/scaffolding/19.svg',
+        },
+        {
+          name: "offline",
+          detail: "อุปกรณ์ Offline",
+          img: '/assets/iconmap/devices/offline.svg',
+          // img: '/assets/iconmap/scaffolding/20.svg',
+        },
+      ]
 
-    const scaffoldingStatusWork = [
-      {
-        name: "gas",
-        detail: "แจ้งเตือนการตรวจวัดก๊าซ",
-        img: '/assets/iconmap/status/warning-yellow.png',
-      },
-      {
-        name: "impairment",
-        detail: "อุปกรณ์ Impairment",
-        img: '/assets/iconmap/status/warning-red.png',
-      },
-      {
-        name: "",
-        detail: 'ปกติ',
-        img: false,
-      },
-      {
-        name: "near_expire",
-        detail: "แจ้งเตือนใกล้หมดอายุ",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png"
-      },
-      {
-        name: "expire",
-        detail: "แจ้งเตือนหมดอายุ",
-        img: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
-      },
-      {
-        name: "warning_all",
-        detail: "แจ้งเตือนมากกว่า 1 รายการ",
-        img: '/assets/iconmap/status/warning-all.png'
-      },
-    ]
-    if (status || type) {
-      var jsxsysmboleIcon = await Promise.all(scaffoldingIcon.map(async (item, index) => {
-        return <div className='sysmbole_table' key={index.toString()}>
-          <img src={item.img} alt="Avatar" className="avatar" />
-          <span>{item.detail}</span>
-        </div>
-      }));
-      var jsxsysmboleStatus = await Promise.all(scaffoldingStatusWork.map(async (item, index) => {
-        return item.img && <div className='sysmbole_table' key={index.toString()}>
-          <img src={item.img} alt="Avatar" className="avatar" />
-          <span>{item.detail}</span>
-        </div>
-      }));
-      var jsxsysmboleType = await Promise.all(open_close.map(async (item, index) => {
-        return item.img && <div className='sysmbole_table' key={index.toString()}>
-          <img src={item.img} alt="Avatar" className="avatar" />
-          <span>{item.detail}</span>
-        </div>
-      }));
+      if (isArray(type)) {
 
-      setstateSysmbole([jsxsysmboleIcon, jsxsysmboleStatus, jsxsysmboleType]);
+        var jsxsysmboleIcon = await Promise.all(acessControlIcon.map(async (item, index) => {
+          return <div className='sysmbole_table' key={index.toString()}>
+            <img src={item.img} alt="Avatar" className="avatar" />
+            <span>{item.detail}</span>
+          </div>
+        }));
+        var jsxsysmboleStatus = await Promise.all(deviceStatusWork.map(async (item, index) => {
+          return item.img && <div className='sysmbole_table' key={index.toString()}>
+            <img src={item.img} alt="Avatar" className="avatar" />
+            <span>{item.detail}</span>
+          </div>
+        }));
 
-      for (const x in scaffoldingIcon) {
-        if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
-          const a = scaffoldingIcon[x];
-          for (const y in scaffoldingStatusWork) {
-            if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
-              const b = scaffoldingStatusWork[y];
-              for (const s in status) {
-                let typedraw;
-                if (open.some(i => i == status[s].Status_ID)) {
-                  typedraw = 1
-                } else if (close.some(i => i == status[s].Status_ID)) {
-                  typedraw = 2
-                } else {
-                  typedraw = 1
-                }
-                uniqueValueInfos.push({
-                  value: `${a.name}_${status[s].Status_ID}${b.name !== '' ? '_' + b.name : ''}`,
-                  symbol: {
-                    type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                    url: await CreateIcon(a.color, b.img, typedraw),
-                    width: '25px',
-                    height: '25px',
-                  },
-                })
-              }
+        setstateSysmbole([jsxsysmboleIcon, jsxsysmboleStatus]);
+
+        for (const key in type) {
+          if (Object.hasOwnProperty.call(type, key)) {
+            const a = type[key];
+            const find = acessControlIcon.find(where => where.name == a.PersonalTypeID);
+            if (isPlainObject(find)) {
+              /* เพิ่ม */
+              uniqueValueInfos.push({
+                value: `personal_${find.name}`,
+                symbol: {
+                  type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                  url: await CreateIcon(find.color, find.img, 1),
+                  width: '15px',
+                  height: '15px',
+                },
+              })
             }
           }
         }
+
+        for (const x in deviceStatusWork) {
+          if (Object.hasOwnProperty.call(deviceStatusWork, x)) {
+            const a = deviceStatusWork[x];
+            const url = await CreateImgIcon(a.img, a.name === "offline" ? "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" : false);
+            uniqueValueInfos.push({
+              value: `device_${a.name}`,
+              symbol: {
+                type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                url,
+                width: '30px',
+                height: '30px',
+              },
+            })
+          }
+        }
+
+
+
+        console.log("uniqueValueInfos -> accesscontrol", uniqueValueInfos)
+      }
+      return {
+        acessControlIcon,
+        uniqueValueInfos
       }
 
-      // console.log("uniqueValueInfos", uniqueValueInfos)
+    } catch (error) {
+      console.log('error', error)
     }
-    return {
-      scaffoldingIcon,
-      scaffoldingStatusWork,
-      uniqueValueInfos
-    }
-
   }
 
 
@@ -605,10 +551,13 @@ const AcessControlPage = () => {
     // console.log('data', data)
     dispatch(
       setStatus({
-        "จำนวนจุด": { value: data.all, color: '#112345' },
-        "ปกติ": { value: data.normal, color: '#F54' },
-        "ใกล้ Exp": { value: data.near_expire, color: '#F09234' },
-        "หมด Exp": { value: data.expire, color: '#F88' },
+        "In": { value: data.in, color: '#F88' },
+        "Out": { value: data.out, color: '#F88' },
+        "แลคบัตรเข้า": { value: data.exchange_card_in, color: '#F88' },
+        "บุคคลที่อยู่ในพื้นที่": { value: data.on_plant, color: '#F88' },
+        "แลกบัตรออก": { value: data.exchange_card_out, color: '#F88' },
+        "อุปกรณ์ Online": { value: data.online, color: '#112345' },
+        "อุปกรณ์ Offline": { value: data.offline, color: '#112345' },
       }),
     );
   };
@@ -849,7 +798,27 @@ const AcessControlPage = () => {
         </div>
 
       </Map>
-
+      <Modal
+        title='รายละเอียด'
+        okButtonProps={{ hidden: true }}
+        onCancel={() => setIsModalVisible(!isModalVisible)}
+        visible={isModalVisible}
+        bodyStyle={{
+          maxHeight: 600,
+          overflowX: "auto"
+        }}
+      >
+        {datamodal &&
+          Object.entries(datamodal).map(([key, value]) => (
+            !(typeof value == 'object') &&
+            <Row key={key}>
+              <Col span={12}>
+                <span style={{ color: "#0A8FDC" }}>{key}</span>
+              </Col>
+              <Col span={12}>{value ?? "-"}</Col>
+            </Row>
+          ))}
+      </Modal>
       <Table
         id='divtable'
         scroll={{ y: '25vh' }}
