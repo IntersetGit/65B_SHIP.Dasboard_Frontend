@@ -24,7 +24,7 @@ import Demodata from '../../demodata';
 import WaGeojson from '../../../util/WaGeojson';
 import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
-import { isArray, isPlainObject } from 'lodash';
+import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 
 const { Panel } = Collapse;
@@ -314,12 +314,13 @@ const WorkpermitPage = () => {
 
           if (isPlainObject(obj.notification)) {
             const arr = [];
-            if (obj.notification.near_expire) arr.push("⚠️ ใกล้ Exp");
-            if (obj.notification.expire) arr.push("‼️ หมด Exp");
-            if (obj.notification.gas) arr.push("ก๊าซที่ต้องตรวจวัด");
-            if (obj.notification.impairment) arr.push("Impairment");
+            if (isNumber(obj.notification.near_expire)) arr.push("⚠️ ใกล้ Exp");
+            if (isNumber(obj.notification.expire)) arr.push("‼️ หมด Exp");
+            if (isNumber(obj.notification.gas)) arr.push("ก๊าซที่ต้องตรวจวัด");
+            if (isNumber(obj.notification.impairment)) arr.push("Impairment");
             obj.notification.list = arr;
           }
+
           latlng.push({
             ...obj,
             "id": obj._id,
