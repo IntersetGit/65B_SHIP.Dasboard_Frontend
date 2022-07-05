@@ -24,7 +24,7 @@ import Demodata from '../../demodata';
 import WaGeojson from '../../../util/WaGeojson';
 import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
-import { isArray, isPlainObject } from 'lodash';
+import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 
 const { Panel } = Collapse;
@@ -43,6 +43,7 @@ const WorkpermitPage = () => {
   const Geojson = new WaGeojson();
   const PTTlayer = new PTTlayers();
   const [stateSysmbole, setstateSysmbole] = useState(null);
+
 
   const columns = [
     {
@@ -103,13 +104,11 @@ const WorkpermitPage = () => {
       title: 'สถานะแจ้งเตือน',
       dataIndex: 'notification',
       key: 'notification',
-      render: (text, record) => (
+      render: (text, record) => isArray(text.list) ? text.list.length > 1 ? (
         <>
-          {text.near_expire ? "⚠️ ใกล้ Exp" : ""}
-          {text.expire ? "‼️ หมด Exp" : ""}
-          {text.gas ? "ก๊าซที่ต้องตรวจวัด" : ""}
+          <img src='/assets/iconmap/status/warning-all.png' width={15} /> {text.list.toString()}
         </>
-      )
+      ) : text.list.toString() : "-"
     },
     {
       title: '...',
@@ -256,6 +255,7 @@ const WorkpermitPage = () => {
   }
 
   const [AgencyIDOptions, setAgencyIDOptions] = useState([]);
+  const [AgencyNameOptions, setAgencyNameOptions] = useState([]);
   const [AreaNameOptions, setAreaNameOptions] = useState([]);
   const [PTTStaffIDOptions, setPTTStaffIDOptions] = useState([]);
   const [WorkPermitStatusIDOptions, setWorkPermitStatusIDOptions] = useState([]);
@@ -269,6 +269,7 @@ const WorkpermitPage = () => {
 
         if (isPlainObject(item.filter)) {
           if (isArray(item.filter.AgencyID)) setAgencyIDOptions(item.filter.AgencyID.map(e => { return { value: e.AgencyID } }))
+          if (isArray(item.filter.AgencyName)) setAgencyNameOptions(item.filter.AgencyName.map(e => { return { value: e.AgencyName } }))
           if (isArray(item.filter.AreaName)) setAreaNameOptions(item.filter.AreaName.map(e => { return { value: e.AreaName } }))
           if (isArray(item.filter.PTTStaffID)) setPTTStaffIDOptions(item.filter.PTTStaffID.map(e => { return { value: e.PTTStaffID } }))
           if (isArray(item.filter.WorkPermitStatusID)) setWorkPermitStatusIDOptions(item.filter.WorkPermitStatusID.map(e => {
@@ -310,6 +311,16 @@ const WorkpermitPage = () => {
           let isstatus = checkstatus.filter((s) => obj.notification[s] == true)
           // console.log('isstatus', isstatus)
 
+
+          if (isPlainObject(obj.notification)) {
+            const arr = [];
+            if (isNumber(obj.notification.near_expire)) arr.push("⚠️ ใกล้ Exp");
+            if (isNumber(obj.notification.expire)) arr.push("‼️ หมด Exp");
+            if (isNumber(obj.notification.gas)) arr.push("ก๊าซที่ต้องตรวจวัด");
+            if (isNumber(obj.notification.impairment)) arr.push("Impairment");
+            obj.notification.list = arr;
+          }
+
           latlng.push({
             ...obj,
             "id": obj._id,
@@ -320,7 +331,8 @@ const WorkpermitPage = () => {
             "date_time_start": moment(new Date(obj.others.WorkingStart)).format("DD/MM/YYYY hh:mm:ss"),
             "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
             // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
-            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isstatus && isstatus.length > 2 ? '_warning_all' : '_' + isstatus[0]}`,
+            // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isstatus && isstatus.length > 2 ? '_warning_all' : '_' + isstatus[0]}`,
+            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isArray(obj.notification.list) && obj.notification.list.length > 1 ? '_warning_all' : '_' + isstatus[0]}`,
             // "latitude": randomlatlng?.latitude ?? null,
             // "longitude": randomlatlng?.longitude ?? null,
             ...demodata.getRandomLocation(getlatlng.latitude, getlatlng.longitude, 3),
@@ -563,8 +575,8 @@ const WorkpermitPage = () => {
                   symbol: {
                     type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
                     url: await CreateIcon(a.color, b.img, typedraw),
-                    width: '15px',
-                    height: '15px',
+                    width: '25px',
+                    height: '25px',
                   },
                 })
               }
@@ -573,7 +585,7 @@ const WorkpermitPage = () => {
         }
       }
 
-      console.log("uniqueValueInfos", uniqueValueInfos)
+      // console.log("uniqueValueInfos", uniqueValueInfos)
     }
     return {
       scaffoldingIcon,
@@ -594,7 +606,7 @@ const WorkpermitPage = () => {
     if (data.near_expire !== undefined) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
     if (data.expire !== undefined) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
     if (data.gas !== undefined) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F024', img: '/assets/iconmap/status/warning-yellow.png' };
-    if (data.impairment !== undefined) Status["Impairment"] = { value: data.impairment, color: '#548',img: '/assets/iconmap/status/warning-red.png'  };
+    if (data.impairment !== undefined) Status["Impairment"] = { value: data.impairment, color: '#548', img: '/assets/iconmap/status/warning-red.png' };
     dispatch(
       setStatus(Status),
     );
@@ -778,7 +790,7 @@ const WorkpermitPage = () => {
               />
             </Form.Item>
 
-            <Form.Item
+            {/* <Form.Item
               name="AgencyID"
               label='รหัสหน่วยงานผู้ควบคุม'
             >
@@ -787,6 +799,18 @@ const WorkpermitPage = () => {
                 showArrow
                 style={{ width: '100%' }}
                 options={AgencyIDOptions}
+              />
+            </Form.Item> */}
+
+            <Form.Item
+              name="AgencyName"
+              label='หน่วยงานผู้ควบคุม'
+            >
+              <Select
+                loading={loading}
+                showArrow
+                style={{ width: '100%' }}
+                options={AgencyNameOptions}
               />
             </Form.Item>
 

@@ -11,6 +11,7 @@ import {
   Col,
   Modal,
   Drawer,
+  Collapse,
   DatePicker
 } from 'antd';
 import { Map, WebScene } from '@esri/react-arcgis';
@@ -25,9 +26,9 @@ import Demodata from '../../demodata';
 import WaGeojson from '../../../util/WaGeojson';
 import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
-import { isArray } from 'lodash';
+import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
-
+const { Panel } = Collapse;
 
 const AcessControlPage = () => {
   const [stateMap, setStateMap] = useState(null);
@@ -38,84 +39,118 @@ const AcessControlPage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [datamodal, setDatamodal] = useState(null);
   const dispatch = useDispatch();
-  const datademo = new Demodata('workpermit');
   const Geojson = new WaGeojson();
-  const PTTlayer = new PTTlayers();
+  const demodata = new Demodata('access_control');
+  const [stateSysmbole, setstateSysmbole] = useState(null);
+
+  const [form] = Form.useForm()
 
   const columns = [
     {
-      title: 'เลข work',
+      title: 'ชื่อ-สกุล ผู้รับเหมา',
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
-      render: (text) => <a>{text}</a>,
-
+      render: (text, obj) => (obj.FirstName ?? "-") + " " + (obj.LastName ?? ""),
+      width: 150
     },
     {
-      title: 'ผู้รับเหมา',
-      dataIndex: 'VendorName',
-      key: 'VendorName',
-
-
-    },
-    {
-      title: 'เจ้าของพื้นที่',
-      dataIndex: 'OwnerName',
-      key: 'OwnerName',
-
+      title: 'ประเภทบุคคล',
+      dataIndex: 'PersonalTypeName',
+      key: 'PersonalTypeName',
+      render: (text) => text ? text.PersonalTypeName : "-",
+      width: 150
     },
     {
       title: 'ผู้ควบคุมงาน',
-      dataIndex: 'PTTStaff',
-      key: 'PTTStaff',
-
+      dataIndex: 'WorkPermitNo',
+      key: 'WorkPermitNo',
+      render: (text, obj) => (obj.PTTStaff_FName ?? "-") + " " + (obj.PTTStaff_LName ?? ""),
+      width: 200
     },
     {
-      title: 'ประเภทใบอนุญาต',
-      key: 'WorkpermitType',
-      dataIndex: 'WorkpermitType',
-
+      title: 'พื้นที่สแกนล่าสุด',
+      dataIndex: 'AccDevice',
+      key: 'AccDevice',
+      render: (text) => text ? text.AreaName : "-",
+      width: 150
     },
     {
-      title: 'สถานที่ติดตั้ง',
-      key: 'AreaName',
-      dataIndex: 'AreaName',
-
+      title: 'ประเภทบัตรที่แลก',
+      dataIndex: 'others',
+      key: 'others',
+      render: (text) => text ? text.CardTypeName : "-",
+      width: 150
     },
     {
-      title: 'วัน-เวลา เริ่มต้น',
-      dataIndex: 'date_time_start',
-      key: 'date_time_start',
-
+      title: 'สถานะการสแกนล่าสุด',
+      dataIndex: 'others',
+      key: 'others',
+      render: (text) => text ? text.Scan_Status_Name : "-",
+      width: 150
     },
     {
-      title: 'วัน-เวลา สิ้นสุด',
-      dataIndex: 'date_time_end',
-      key: 'date_time_end',
-
+      title: 'วัน-เวลาสแกน',
+      dataIndex: 'others',
+      key: 'others',
+      render: (text) => text ? moment(text.scan_date_time).format("DD/MM/YYYY") : "-",
+      width: 150
     },
     {
-      title: 'สถานะ work',
-      dataIndex: 'WorkPermitStatus',
-      key: 'WorkPermitStatus',
-
+      title: 'สถานะการแลคบัตร',
+      dataIndex: 'others',
+      key: 'others',
+      render: (text) => text ? text.ExchangeCard_Status_Name : "-",
+      width: 150
     },
     {
-      title: 'สถานะแจ้งเตือน',
-      dataIndex: 'WarningStatus',
-      key: 'WarningStatus',
-
+      title: 'วัน-เวลาแลคบัตร',
+      dataIndex: 'ExchangeCard_Date',
+      key: 'ExchangeCard_Date',
+      render: (text, obj) => text ? moment(text).format("DD/MM/YYYY") + " " + obj.ExchangeCard_Time : "-",
+      width: 200
     },
     {
       title: '...',
       key: '',
-
+      width: 100,
       render: (text, record) => {
         return (
           <Space size='middle'>
             <Button
               type='primary'
               onClick={() => {
-                setDatamodal(record), setIsModalVisible(!isModalVisible);
+                setDatamodal({
+
+                  "เลขที่นั่งร้าน": record.ScaffoldingCode ?? "-",
+                  "ประเภทผู้ขอรายการ": record.OwnerType == 1 ? "พนักงาน ปตท." : record.OwnerType == 2 ? "ผู้รับเหมา" : "-",
+                  "รหัสผู้ขอรายการ": record.WorkOwnerID ?? "-",
+                  "ชื่อ นามสกุล": record.WorkName ?? "-",
+                  "เจ้าของพื้นที่": record.OwnerName ?? "-",
+                  "เลขบัตรประชาชน": record.PersonalID ?? "-",
+                  "เลข Work Permit": record.WorkPermitNo ?? "-",
+                  "รหัสประเภทนั่งร้าน": record.ScaffoldingTypeID ?? "-",
+                  "ชื่องาน": record.Title ?? "-",
+                  "รายละเอียดของงาน": record.Description ?? "-",
+                  "วัตถุประสงค์": record.Objective ?? "-",
+                  "วันหมดอายุสภาพนั่งร้าน": record.ExpiredDate ? moment(new Date(record.ExpiredDate)).format("YYYY-MM-DD") : "-",
+                  "รหัสสถานที่ปฏิบัติงานหลัก": record.Area ?? "-",
+                  "ชื่อสถานที่ปฏิบัติงานหลัก": record.AreaName ?? "-",
+                  "รหัสสถานที่ปฏิบัติงานย่อย": record.SubArea ?? "-",
+                  "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubAreaName ?? "-",
+                  "วัน เวลา เริ่มต้นการปฏิบัติงาน": record.WorkingStartDate ? moment(new Date(record.WorkingStartDate)).format("YYYY-MM-DD HH:mm:ss") : "-",
+                  "วัน เวลา สิ้นสุดการปฏิบัติงาน": record.WorkingEndDate ? moment(new Date(record.WorkingEndDate)).format("YYYY-MM-DD HH:mm:ss") : "-",
+                  "รหัสบริษัท": record.VendorCode ?? "-",
+                  "ชื่อบริษัท": record.VendorName ?? "-",
+                  "รหัสผู้ควบคุมงาน": record.PTTStaffCode ?? "-",
+                  "ชื่อผู้ควบคุมงาน": record.PTTStaff ?? "-",
+                  "รหัสหน่วยงานผู้ควบคุม": record.AgencyID ?? "-",
+                  "ชื่อหน่วยงานผู้ควบคุม": record.AgencyName ?? "-",
+                  "รหัสเจ้าของพื้นที่": record.Owner ?? "-",
+                  "ประเภทของ Work": record.WorkpermitType ?? "-",
+                  "สถานะใบงาน": record.StatusName ?? "-",
+                  "สถานะแจ้งเตือน": record.others.StatusName ?? "-",
+
+                }), setIsModalVisible(!isModalVisible);
               }}
             >
               Detail
@@ -125,25 +160,63 @@ const AcessControlPage = () => {
       },
     },
   ];
+  const clusterConfig = {
+    type: "cluster",
+    clusterRadius: "40px",
+    labelsVisible: true,
+    popupTemplate: {
+      title: 'Cluster summary',
+      content: 'This cluster represents {cluster_count} earthquakes.',
+      fieldInfos: [
+        {
+          fieldName: 'cluster_count',
+          format: {
+            places: 0,
+            digitSeparator: true,
+          },
+        },
+      ],
+    },
+    clusterMinSize: "40px",
+    clusterMaxSize: "60px",
+    labelingInfo: [{
+      deconflictionStrategy: "none",
+      labelExpressionInfo: {
+        expression: "Text($feature.cluster_count, '#,###')"
+      },
+      symbol: {
+        type: "text",
+        color: "#FFF",
+        haloSize: "2px",
+        font: {
+          weight: "bold",
+          family: "Noto Sans",
+          size: "18px"
+        },
+        xoffset: 0,
+        yoffset: 0
+      },
+      labelPlacement: "center-center",
+    }],
 
-  const getWorkpermit = async (item) => {
-    let url = `/workpermit/all?`;
+  };
+
+  const getAcessControls = async (item, openTableBool) => {
+    let url = `/accesscontrol/all?`;
     if (item.PTTStaffCode) url += `&PTTStaffCode=${item.PTTStaffCode}`;
-    if (item.VendorCode) url += `&VendorCode=${item.VendorCode}`;
-    if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
-    if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
-    if (item.AreaID) url += `&AreaID=${item.AreaID}`;
-    if (isArray(item.ScaffoldingType)) {
-      url += `&ScaffoldingType=${item.ScaffoldingType.toString()}`;
+    if (item.AgencyName) url += `&AgencyName=${item.AgencyName}`;
+    if (item.Scan_Date_Time_Start) url += `&Scan_Date_Time_Start=${item.Scan_Date_Time_Start}`;
+    if (item.Scan_Date_Time_End) url += `&Scan_Date_Time_End=${item.Scan_Date_Time_End}`;
+    if (item.AccDeviceName) url += `&AccDeviceName=${item.AccDeviceName}`;
+    if (isArray(item.PersonalTypeName)) {
+      url += `&PersonalTypeName=${item.PersonalTypeName.toString()}`;
     }
     const { data } = await API.get(url);
+    if (openTableBool) openTable();
     return data.Status === 'success' ? data.Message : {
       data: [],
-      summary: {
-        all: 0,
-        expire: 0,
-        near_expire: 0,
-      }
+      filter: {},
+      summary: {}
     }
   }
 
@@ -162,9 +235,15 @@ const AcessControlPage = () => {
 
   const initMap = async (socket) => {
 
-    const resSf = await getWorkpermit({});
+    const resSf = await getAcessControls({});
     setLayerpoint(resSf)
-    socket.on("workpermit", (res) => {
+    socket.on("accesscontrol", (res) => {
+      // console.log('socket', res)
+      if (res.Status == "success") {
+        setLayerpoint(res.Message)
+      }
+    });
+    socket.on("accesscontroldevice", (res) => {
       // console.log('socket', res)
       if (res.Status == "success") {
         setLayerpoint(res.Message)
@@ -174,202 +253,295 @@ const AcessControlPage = () => {
 
   }
 
+
+  const [AccDeviceNameOptions, setAccDeviceNameOptions] = useState([]);
+  const [AgencyNameOptions, setAgencyNameOptions] = useState([]);
+  const [PersonalTypeNameOptions, setPersonalTypeNameOptions] = useState([]);
+  const [PTTStaffCodeOptions, setPTTStaffCodeOptions] = useState([]);
+
   const setLayerpoint = async (item) => {
+    try {
+      // console.log('stateView', stateView)
+      if (stateView) {
 
-    if (stateView) {
+        Status_cal(item.summary);
 
-      // let latlng = item.data;
-      Status_cal(item.summary);
-
-      console.log("data =>>>>>>>>>>>>>>>>>", item.data);
-      // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
-      if (isArray(item.filter)) {
-        const _filter = item.filter.map(e => {
-          return {
-            value: e._id
-          }
-        });
-        // console.log('_filter', _filter)
-        setScaffoldingTypeOptions(_filter)
-      }
-
-      let latlng = item.data.map(obj => {
-        // console.log('obj', obj)
-        return {
-          ...obj,
-          "id": obj._id,
-          "work_number": obj.WorkPermitNo,
-          "name": obj.Name,
-          "licensor": obj.PTTStaff,
-          "supervisor": obj.OwnerName,
-          "date_time_start": moment(new Date(obj.EndDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-          "date_time_end": moment(new Date(obj.StartDateTime)).format("DD/MM/YYYY hh:mm:ss"),
-          // "status_work": obj.WorkPermitStatus.toLowerCase()+'_normal',
-          "status_work": `${obj.WorkPermitStatus}_normal`,
-          "latitude": obj.FeaturesPropertiesCentroid_X,
-          "longitude": obj.FeaturesPropertiesCentroid_Y,
-          "locatoin": obj.SubAreaName,
-          "work_type": obj.WorkpermitType,
+        if (isPlainObject(item.filter)) {
+          if (isArray(item.filter.AccDeviceName)) setAccDeviceNameOptions(item.filter.AccDeviceName.map(e => {
+            return {
+              id: e.AccDeviceID,
+              value: e.AccDeviceName
+            }
+          }))
+          if (isArray(item.filter.AgencyName)) setAgencyNameOptions(item.filter.AgencyName.map(e => { return { value: e.AgencyName } }))
+          if (isArray(item.filter.PTTStaffCode)) setPTTStaffCodeOptions(item.filter.PTTStaffCode.map(e => { return { value: e.PTTStaffCode } }))
+          if (isArray(item.filter.PersonalTypeName)) setPersonalTypeNameOptions(item.filter.PersonalTypeName.map(e => {
+            return {
+              id: e.PersonalTypeID,
+              value: e.PersonalTypeName
+            }
+          }))
         }
 
-      })
+        // let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
+        let GetAllArea = null;
+        let latlng = []
+        // console.log('item', item)
+        let acesscontrol_type = await (await gen_uniqueValueInfos()).acessControlIcon;
+        // console.log('acesscontrol_type', acesscontrol_type)
+        let maplatlng_type = acesscontrol_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(12.719, 101.147, 60) }), {});
+
+        // console.log('item.data', item.data)
+
+        const filter_show_in_map = item.data.filter(where => where.others.show_in_map);
+        // console.log('maplatlng_type :>> ', maplatlng_type);
+        // console.log('filter_show_in_map', filter_show_in_map)
+        for (const opp in filter_show_in_map) {
+          const obj = filter_show_in_map[opp];
+
+          let findeArea = GetAllArea?.find(async (area) => {
+            let feature = await area.queryFeatures();
+            if (feature.features[0].attributes.UNITNAME == (obj.AreaName).replace(/#/i, '')) {
+              return area;
+            }
+          });
+          let getextentcenter = await findeArea?.queryExtent();
+
+          var randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude ?? 12.719, getextentcenter?.extent?.center?.longitude ?? 101.147, 0)
+          let getlatlng = maplatlng_type[obj.PersonalTypeID];
 
 
+          if (obj.PersonalTypeID) {
+
+            const { latitude, longitude } = demodata.getRandomLocation(getlatlng.latitude, getlatlng.longitude, 3)
+            obj.status_work = `personal_${obj.PersonalTypeID}`;
+            obj.latitude = latitude;
+            obj.longitude = longitude;
+          } else if ((obj.Lat && obj.Long)) {
+
+            obj.status_work = `device_${obj.notification.offline ? "offline" : "online"}`;
+            obj.latitude = obj.Lat;
+            obj.longitude = obj.Long;
+          }
+
+          latlng.push({
+            ...obj,
+            "id": obj._id,
+            "work_number": obj.WorkPermitNo,
+            "name": obj.Name,
+            "licensor": obj.PTTStaff,
+            "supervisor": obj.OwnerName,
+            "date_time_start": moment(new Date(obj.others.WorkingStart)).format("DD/MM/YYYY hh:mm:ss"),
+            "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
+            "status_work": obj.status_work,
+            "latitude": obj.latitude,
+            "longitude": obj.longitude,
+            "locatoin": obj.SubAreaName,
+            "work_type": obj.WorkpermitType,
+          })
+
+          //})
+        }
 
 
-      const [FeatureLayer, GeoJSONLayer] = await loadModules([
-        'esri/layers/FeatureLayer',
-        'esri/layers/GeoJSONLayer',
-      ]);
+        // console.log('latlng =>>>>>>>>>>>>>', latlng)
+        setTabledata(latlng);
 
-      const clusterConfig = {
-        type: "cluster",
-        clusterRadius: "20px",
-        popupTemplate: {
-          title: 'Cluster summary',
-          content: 'This cluster represents {cluster_count} earthquakes.',
-          fieldInfos: [
-            {
-              fieldName: 'cluster_count',
-              format: {
-                places: 0,
-                digitSeparator: true,
-              },
-            },
-          ],
-        },
-        clusterMinSize: "40px",
-        clusterMaxSize: "60px",
-        labelingInfo: [
-          {
-            deconflictionStrategy: 'none',
-            labelExpressionInfo: {
-              expression: "Text($feature.cluster_count, '#,###')",
-            },
-            symbol: {
-              type: 'text',
-              color: '#ffffff',
-              font: {
-                weight: 'bold',
-                family: 'Noto Sans',
-                size: '18px',
-              },
-              url: await CreateIcon('#ff7c44', 'warning'),
-            },
-
-            labelPlacement: 'center-center',
-          },
-
-        ],
-
-      };
-      let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
-      Status_cal(latlng);
-      setTabledata(latlng);
-
-      const layerpoint = new GeoJSONLayer({
-        id: 'pointlayer',
-        title: 'ใช้สีสัญลักษณ์แทนประเภท',
-        url: datageojson,
-        copyright: 'USGS Earthquakes',
-        field: 'status_work',
-        featureReduction: clusterConfig,
-        popupTemplate: {
-          title: 'name {name}',
-          content: 'name {name}',
-          fieldInfos: [
-            {
-              fieldName: 'time',
-              format: {
-                dateFormat: 'short-date-short-time',
-              },
-            },
-          ],
-        },
-        renderer: {
-          type: 'unique-value',
+        let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
+        // console.log('datageojson', datageojson)
+        setTabledata(latlng);
+        const [FeatureLayer, GeoJSONLayer] = await loadModules([
+          'esri/layers/FeatureLayer',
+          'esri/layers/GeoJSONLayer',
+        ]);
+        console.log('item', item)
+        const layerpoint = new GeoJSONLayer({
+          id: 'pointlayer',
+          title: 'ใช้สีสัญลักษณ์แทนประเภท',
+          url: datageojson,
+          copyright: 'USGS Earthquakes',
           field: 'status_work',
-          symbol: {
-            field: 'status_work',
-            type: 'simple-marker',
-            size: 15,
-            color: [226, 255, 40],
-            outline: {
-              color: '#000',
-              width: 1,
-            },
+          featureReduction: clusterConfig,
+          popupTemplate: {
+            title: "ชื่อผู้รับเหมา: {Name}",
+            content: [
+              {
+                type: "fields",
+                fieldInfos: [
+                  {
+                    fieldName: "WorkPermitNo",
+                    label: "เลข Workpermit"
+                  },
+                  {
+                    fieldName: "WorkPermitType",
+                    label: "ประเภทใบงาน"
+                  },
+                  {
+                    fieldName: "WorkPermitStatus",
+                    label: "สถานะใบงาน"
+                  },
+                  {
+                    fieldName: "notification",
+                    label: "แจ้งเตือน"
+                  }
+                ]
+              }
+            ]
           },
-          uniqueValueInfos: await gen_uniqueValueInfos()
+          renderer: {
+            type: 'unique-value',
+            field: 'status_work',
+            symbol: {
+              field: 'status_work',
+              type: 'simple-marker',
+              size: 15,
+              color: [226, 255, 40],
+              outline: {
+                color: '#000',
+                width: 1,
+              },
+            },
+            uniqueValueInfos: await (await gen_uniqueValueInfos(item.filter.PersonalTypeName)).uniqueValueInfos
 
 
-        },
-      });
-      await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
-      stateMap?.add(layerpoint);
+          },
+        });
+        await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
+        stateMap?.add(layerpoint);
+        // let maplayerSerch = stateMap?.findLayerById('pointlayer');
+        // console.log('maplayerSerch :>> ', maplayerSerch);
+        // if (maplayerSerch) {
+        //   console.log('yes')
+        //   maplayerSerch.url = "blob:http://localhost:3000/9d390f7f-65a7-4d22-90e6-3776e07371d3";
+        //   maplayerSerch.refresh();
+        // } else {
+        //   stateMap?.add(layerpoint);
+        // }
+
+      }
+    } catch (error) {
+      console.log('error', error)
     }
+
   }
-  const gen_uniqueValueInfos = async () => {
 
-    const uniqueValueInfos = [];
+  const gen_uniqueValueInfos = async (type) => {
+    try {
+      const uniqueValueInfos = [];
 
-    const scaffoldingIcon = [
-      {
-        name: "Reject by Allower",
-        img: '/assets/iconmap/scaffolding/0001.png'
-      },
-      {
-        name: "Waiting for Close (Allower)",
-        img: '/assets/iconmap/scaffolding/0002.png'
-      },
-      {
-        name: "Reject by Approver",
-        img: '/assets/iconmap/scaffolding/0003.png'
-      },
-      {
-        name: "Waiting for QSHE",
-        img: '/assets/iconmap/scaffolding/0004.png'
-      },
-    ]
-    const scaffoldingStatusWork = [
-      {
-        name: "near_expire",
-        status: "warning",
-      },
-      {
-        name: "expire",
-        status: "warningWork",
-      },
-      {
-        name: "normal",
-        status: false,
-      },
-    ]
+      const acessControlIcon = [
+        {
+          name: "1",
+          color: "rgba(19, 255, 0)",
+          img: await CreateIcon("rgba(19, 255, 0)", false),
+          detail: 'ผู้รับเหมาประจำ'
+        },
+        {
+          name: "2",
+          color: "rgba(255, 139, 0)",
+          img: await CreateIcon("rgba(255, 139, 0)", false),
+          detail: 'ผู้รับเหมาชั่วคราว'
+        },
+        {
+          name: "3",
+          color: "rgba(255, 251, 0)",
+          img: await CreateIcon("rgba(255, 251, 0)", false),
+          detail: 'ผู้มาติดต่อ'
+        },
+        {
+          name: "4",
+          color: "rgba(255, 0, 232)",
+          img: await CreateIcon("rgba(255, 0, 232)", false),
+          detail: 'ผู้มาเยี่ยมชม'
+        },
+        {
+          name: "5",
+          color: "rgba(0, 93, 255)",
+          img: await CreateIcon("rgba(0, 93, 255)", false),
+          detail: 'พนักงาน ปตท.'
+        },
 
+      ]
 
-    for (const x in scaffoldingIcon) {
-      if (Object.hasOwnProperty.call(scaffoldingIcon, x)) {
-        const a = scaffoldingIcon[x];
-        for (const y in scaffoldingStatusWork) {
-          if (Object.hasOwnProperty.call(scaffoldingStatusWork, y)) {
-            const b = scaffoldingStatusWork[y];
+      const deviceStatusWork = [
+        {
+          name: "online",
+          detail: "อุปกรณ์ Online",
+          img: '/assets/iconmap/devices/online.svg',
+          // img: '/assets/iconmap/scaffolding/19.svg',
+        },
+        {
+          name: "offline",
+          detail: "อุปกรณ์ Offline",
+          img: '/assets/iconmap/devices/offline.svg',
+          // img: '/assets/iconmap/scaffolding/20.svg',
+        },
+      ]
+
+      if (isArray(type)) {
+
+        var jsxsysmboleIcon = await Promise.all(acessControlIcon.map(async (item, index) => {
+          return <div className='sysmbole_table' key={index.toString()}>
+            <img src={item.img} alt="Avatar" className="avatar" />
+            <span>{item.detail}</span>
+          </div>
+        }));
+        var jsxsysmboleStatus = await Promise.all(deviceStatusWork.map(async (item, index) => {
+          return item.img && <div className='sysmbole_table' key={index.toString()}>
+            <img src={item.img} alt="Avatar" className="avatar" />
+            <span>{item.detail}</span>
+          </div>
+        }));
+
+        setstateSysmbole([jsxsysmboleIcon, jsxsysmboleStatus]);
+
+        for (const key in type) {
+          if (Object.hasOwnProperty.call(type, key)) {
+            const a = type[key];
+            const find = acessControlIcon.find(where => where.name == a.PersonalTypeID);
+            if (isPlainObject(find)) {
+              /* เพิ่ม */
+              uniqueValueInfos.push({
+                value: `personal_${find.name}`,
+                symbol: {
+                  type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
+                  url: await CreateIcon(find.color, find.img, 1),
+                  width: '15px',
+                  height: '15px',
+                },
+              })
+            }
+          }
+        }
+
+        for (const x in deviceStatusWork) {
+          if (Object.hasOwnProperty.call(deviceStatusWork, x)) {
+            const a = deviceStatusWork[x];
+            const url = await CreateImgIcon(a.img, a.name === "offline" ? "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" : false);
             uniqueValueInfos.push({
-              value: `${a.name}_${b.name}`,
+              value: `device_${a.name}`,
               symbol: {
                 type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
-                url: await CreateImgIcon(a.img, b.status),
-                width: '35px',
-                height: '35px',
+                url,
+                width: '30px',
+                height: '30px',
               },
             })
           }
         }
+
+
+
+        console.log("uniqueValueInfos -> accesscontrol", uniqueValueInfos)
       }
+      return {
+        acessControlIcon,
+        uniqueValueInfos
+      }
+
+    } catch (error) {
+      console.log('error', error)
     }
-
-    console.log("uniqueValueInfos", uniqueValueInfos)
-
-    return uniqueValueInfos
-
   }
 
 
@@ -379,10 +551,13 @@ const AcessControlPage = () => {
     // console.log('data', data)
     dispatch(
       setStatus({
-        "จำนวนจุด": { value: data.all, color: '#112345' },
-        "ปกติ": { value: data.normal, color: '#F54' },
-        "ใกล้ Exp": { value: data.near_expire, color: '#F09234' },
-        "หมด Exp": { value: data.expire, color: '#F88' },
+        "In": { value: data.in, color: '#F88' },
+        "Out": { value: data.out, color: '#F88' },
+        "แลคบัตรเข้า": { value: data.exchange_card_in, color: '#F88' },
+        "บุคคลที่อยู่ในพื้นที่": { value: data.on_plant, color: '#F88' },
+        "แลกบัตรออก": { value: data.exchange_card_out, color: '#F88' },
+        "อุปกรณ์ Online": { value: data.online, color: '#112345' },
+        "อุปกรณ์ Offline": { value: data.offline, color: '#112345' },
       }),
     );
   };
@@ -456,8 +631,8 @@ const AcessControlPage = () => {
       }
       // console.log('model', model)
 
-      // console.log('first', getWorkpermit(model))
-      setLayerpoint(await getWorkpermit(model))
+      // console.log('first', getAcessControls(model))
+      setLayerpoint(await getAcessControls(model, true))
 
     } catch (error) {
       console.log('error', error)
@@ -468,9 +643,13 @@ const AcessControlPage = () => {
     console.log('error', error)
   }
 
-  const [visible, setVisible] = useState(false);
-  const [scaffoldingTypeOptions, setScaffoldingTypeOptions] = useState([]);
-  const [form] = Form.useForm()
+  const openTable = () => {
+    document.querySelector('.ant-table-wrapper').style.setProperty('display', 'block', 'important');
+  }
+
+  const closeTable = () => {
+    document.querySelector('.ant-table-wrapper').style.setProperty('display', 'none', 'important');
+  }
 
   return (
     <div id="pagediv">
@@ -496,13 +675,15 @@ const AcessControlPage = () => {
                 document.querySelector('.ant-table-wrapper').style.display ===
                 ''
               ) {
-                document
-                  .querySelector('.ant-table-wrapper')
-                  .style.setProperty('display', 'block', 'important');
+                // document
+                //   .querySelector('.ant-table-wrapper')
+                //   .style.setProperty('display', 'block', 'important');
+                openTable()
               } else {
-                document
-                  .querySelector('.ant-table-wrapper')
-                  .style.setProperty('display', 'none', 'important');
+                // document
+                //   .querySelector('.ant-table-wrapper')
+                //   .style.setProperty('display', 'none', 'important');
+                closeTable()
               }
             }}
           />
@@ -514,24 +695,32 @@ const AcessControlPage = () => {
         >
           <Form
             form={form}
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 18 }}
+            labelCol={{ span: 10 }}
+            wrapperCol={{ span: 16 }}
             name='nest-messages'
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
           >
             <Form.Item
               name="PTTStaffCode"
-              label='รหัสพนักงานผู้ควบคุม'
+              label='รหัสพนักงานผู้ควบคุมงาน'
             >
-              <Input />
+              <Select
+                showArrow
+                style={{ width: '100%' }}
+                options={PTTStaffCodeOptions}
+              />
             </Form.Item>
 
             <Form.Item
-              name="PTTStaffCode"
-              label='หน่วยงานผู้ควบคุม'
+              name="AgencyName"
+              label='หน่วยงานผู้ควบคุมงาน'
             >
-              <Input />
+              <Select
+                showArrow
+                style={{ width: '100%' }}
+                options={AgencyNameOptions}
+              />
             </Form.Item>
 
             <Form.Item
@@ -555,34 +744,28 @@ const AcessControlPage = () => {
             </Form.Item>
 
             <Form.Item
-              name="AreaID"
-              label='สถานที่ปฏิบัติงาน'
+              name="AccDeviceName"
+              label='อุปกรณ์ Access Control'
             >
-              <Input />
+              <Select
+                showArrow
+                style={{ width: '100%' }}
+              >
+                {AccDeviceNameOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
+              </Select>
             </Form.Item>
 
             <Form.Item
-              name="ScaffoldingType"
-              label='ประเภทใบอนุญาต'
+              name="PersonalTypeName"
+              label='ประเภทกลุ่มบุคคล'
             >
               <Select
                 mode='multiple'
                 showArrow
                 style={{ width: '100%' }}
-                options={scaffoldingTypeOptions}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="ScaffoldingType"
-              label='หัวหน้าการค้นหา'
-            >
-              <Select
-                mode='multiple'
-                showArrow
-                style={{ width: '100%' }}
-                options={scaffoldingTypeOptions}
-              />
+              >
+                {PersonalTypeNameOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
+              </Select>
             </Form.Item>
 
             <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
@@ -597,12 +780,45 @@ const AcessControlPage = () => {
             </Form.Item>
           </Form>
         </div>
-        <div ref={refdetail} className='esri-widget'>
-          <div id="legendDiv"></div>
+        <div ref={refdetail} className='sysmbole esri-widget'>
+          <Collapse accordion >
+            <Panel header="ใช้สีแทนประเภทใบงาน" key="1">
+              {stateSysmbole ? stateSysmbole[0] : <>กำลังรอข้อมูล...</>}
+            </Panel>
+            {stateSysmbole && stateSysmbole[2] && <Panel header="ใช้สัญลักษณ์แทนการเปิด-ปิด" key="3">
+              {stateSysmbole ? stateSysmbole[2] : <>กำลังรอข้อมูล...</>}
+            </Panel>}
+            <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
+              {stateSysmbole ? stateSysmbole[1] : <>กำลังรอข้อมูล...</>}
+            </Panel>
+
+          </Collapse>
+          {/* <div id="legendDiv"></div> */}
+
         </div>
 
       </Map>
-
+      <Modal
+        title='รายละเอียด'
+        okButtonProps={{ hidden: true }}
+        onCancel={() => setIsModalVisible(!isModalVisible)}
+        visible={isModalVisible}
+        bodyStyle={{
+          maxHeight: 600,
+          overflowX: "auto"
+        }}
+      >
+        {datamodal &&
+          Object.entries(datamodal).map(([key, value]) => (
+            !(typeof value == 'object') &&
+            <Row key={key}>
+              <Col span={12}>
+                <span style={{ color: "#0A8FDC" }}>{key}</span>
+              </Col>
+              <Col span={12}>{value ?? "-"}</Col>
+            </Row>
+          ))}
+      </Modal>
       <Table
         id='divtable'
         scroll={{ y: '25vh' }}
