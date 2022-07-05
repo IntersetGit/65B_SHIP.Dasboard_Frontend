@@ -24,7 +24,7 @@ import Demodata from '../../demodata';
 import WaGeojson from '../../../util/WaGeojson';
 import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
-import { isArray, isPlainObject } from 'lodash';
+import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 
 const { Panel } = Collapse;
@@ -43,6 +43,7 @@ const WorkpermitPage = () => {
   const Geojson = new WaGeojson();
   const PTTlayer = new PTTlayers();
   const [stateSysmbole, setstateSysmbole] = useState(null);
+
 
   const columns = [
     {
@@ -103,13 +104,11 @@ const WorkpermitPage = () => {
       title: 'สถานะแจ้งเตือน',
       dataIndex: 'notification',
       key: 'notification',
-      render: (text, record) => (
+      render: (text, record) => isArray(text.list) ? text.list.length > 1 ? (
         <>
-          {text.near_expire ? "⚠️ ใกล้ Exp" : ""}
-          {text.expire ? "‼️ หมด Exp" : ""}
-          {text.gas ? "ก๊าซที่ต้องตรวจวัด" : ""}
+          <img src='/assets/iconmap/status/warning-all.png' width={15} /> {text.list.toString()}
         </>
-      )
+      ) : text.list.toString() : "-"
     },
     {
       title: '...',
@@ -256,6 +255,7 @@ const WorkpermitPage = () => {
   }
 
   const [AgencyIDOptions, setAgencyIDOptions] = useState([]);
+  const [AgencyNameOptions, setAgencyNameOptions] = useState([]);
   const [AreaNameOptions, setAreaNameOptions] = useState([]);
   const [PTTStaffIDOptions, setPTTStaffIDOptions] = useState([]);
   const [WorkPermitStatusIDOptions, setWorkPermitStatusIDOptions] = useState([]);
@@ -269,6 +269,7 @@ const WorkpermitPage = () => {
 
         if (isPlainObject(item.filter)) {
           if (isArray(item.filter.AgencyID)) setAgencyIDOptions(item.filter.AgencyID.map(e => { return { value: e.AgencyID } }))
+          if (isArray(item.filter.AgencyName)) setAgencyNameOptions(item.filter.AgencyName.map(e => { return { value: e.AgencyName } }))
           if (isArray(item.filter.AreaName)) setAreaNameOptions(item.filter.AreaName.map(e => { return { value: e.AreaName } }))
           if (isArray(item.filter.PTTStaffID)) setPTTStaffIDOptions(item.filter.PTTStaffID.map(e => { return { value: e.PTTStaffID } }))
           if (isArray(item.filter.WorkPermitStatusID)) setWorkPermitStatusIDOptions(item.filter.WorkPermitStatusID.map(e => {
@@ -285,30 +286,59 @@ const WorkpermitPage = () => {
           }))
         }
 
-        // let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
-        let GetAllArea = null;
+        let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
+        var Arealatlng = await Promise.all(GetAllArea.map(async (area, index) => {
+          let extent = await area?.queryExtent();
+          let feature = await area.queryFeatures();
+          let namearea = feature?.features[0]?.attributes?.UNITNAME;
+          let workpermit_type = await (await gen_uniqueValueInfos()).scaffoldingIcon;
+          let maplatlng_type = workpermit_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(extent?.extent?.center?.latitude, extent?.extent?.center?.longitude, 60) }), {})
+          return {
+            name: namearea,
+            center: extent?.extent?.center,
+            typelatlng: maplatlng_type
+          }
+        }));
+
+        // console.log('Arealatlng', Arealatlng)
+        // let GetAllArea = null;
         let latlng = []
 
-        let workpermit_type = await (await gen_uniqueValueInfos()).scaffoldingIcon;
-        let maplatlng_type = workpermit_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(12.719, 101.147, 60) }), {})
-        // console.log('maplatlng_type :>> ', maplatlng_type);
+
         for (const opp in item.data) {
           const obj = item.data[opp];
-
-          let findeArea = GetAllArea?.find(async (area) => {
-            let feature = await area.queryFeatures();
-            if (feature.features[0].attributes.UNITNAME == (obj.AreaName).replace(/#/i, '')) {
-              return area;
+          let findeArea = Arealatlng?.find((area) => {
+            if (area.name == (obj.AreaName).replace(/#/i, '')) {
+              let latlng_type = area.typelatlng[obj.WorkpermitTypeID];
+              // console.log('latlng_type', latlng_type)
+              return area
+            } else {
+              return {
+                name: "defaul",
+                center: {
+                  latitude: 12.719,
+                  longitude: 101.147
+                },
+                typelatlng: area.typelatlng
+              }
             }
           });
-          let getextentcenter = await findeArea?.queryExtent();
-          var randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude ?? 12.719, getextentcenter?.extent?.center?.longitude ?? 101.147, 0)
-          let getlatlng = maplatlng_type[obj.WorkpermitTypeID];
-
+          let getlatlng_byarea = findeArea.typelatlng[obj.WorkpermitTypeID];
+          // console.log('getlatlng_byarea :>> ', getlatlng_byarea);
 
           let checkstatus = Object.keys(obj.notification);
           let isstatus = checkstatus.filter((s) => obj.notification[s] == true)
           // console.log('isstatus', isstatus)
+
+
+          if (isPlainObject(obj.notification)) {
+            const arr = [];
+            if (isNumber(obj.notification.near_expire)) arr.push("⚠️ ใกล้ Exp");
+            if (isNumber(obj.notification.expire)) arr.push("‼️ หมด Exp");
+            if (isNumber(obj.notification.gas)) arr.push("ก๊าซที่ต้องตรวจวัด");
+            if (isNumber(obj.notification.impairment)) arr.push("Impairment");
+            obj.notification.list = arr;
+          }
 
           latlng.push({
             ...obj,
@@ -320,12 +350,14 @@ const WorkpermitPage = () => {
             "date_time_start": moment(new Date(obj.others.WorkingStart)).format("DD/MM/YYYY hh:mm:ss"),
             "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
             // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
-            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isstatus && isstatus.length > 2 ? '_warning_all' : '_' + isstatus[0]}`,
+            // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isstatus && isstatus.length > 2 ? '_warning_all' : '_' + isstatus[0]}`,
+            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isArray(obj.notification.list) && obj.notification.list.length > 1 ? '_warning_all' : '_' + isstatus[0]}`,
             // "latitude": randomlatlng?.latitude ?? null,
             // "longitude": randomlatlng?.longitude ?? null,
-            ...demodata.getRandomLocation(getlatlng.latitude, getlatlng.longitude, 3),
+            ...demodata.getRandomLocation(getlatlng_byarea.latitude, getlatlng_byarea.longitude, 3),
             "locatoin": obj.SubAreaName,
             "work_type": obj.WorkpermitType,
+            "warning":obj.others.WorkPermitStatusID
           })
 
           //})
@@ -368,7 +400,7 @@ const WorkpermitPage = () => {
                     label: "สถานะใบงาน"
                   },
                   {
-                    fieldName: "notification",
+                    fieldName: "warning",
                     label: "แจ้งเตือน"
                   }
                 ]
@@ -563,8 +595,8 @@ const WorkpermitPage = () => {
                   symbol: {
                     type: 'picture-marker', // autocasts as new PictureMarkerSymbol()
                     url: await CreateIcon(a.color, b.img, typedraw),
-                    width: '15px',
-                    height: '15px',
+                    width: '25px',
+                    height: '25px',
                   },
                 })
               }
@@ -573,7 +605,7 @@ const WorkpermitPage = () => {
         }
       }
 
-      console.log("uniqueValueInfos", uniqueValueInfos)
+      // console.log("uniqueValueInfos", uniqueValueInfos)
     }
     return {
       scaffoldingIcon,
@@ -594,7 +626,7 @@ const WorkpermitPage = () => {
     if (data.near_expire !== undefined) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
     if (data.expire !== undefined) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
     if (data.gas !== undefined) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F024', img: '/assets/iconmap/status/warning-yellow.png' };
-    if (data.impairment !== undefined) Status["Impairment"] = { value: data.impairment, color: '#548',img: '/assets/iconmap/status/warning-red.png'  };
+    if (data.impairment !== undefined) Status["Impairment"] = { value: data.impairment, color: '#548', img: '/assets/iconmap/status/warning-red.png' };
     dispatch(
       setStatus(Status),
     );
@@ -778,7 +810,7 @@ const WorkpermitPage = () => {
               />
             </Form.Item>
 
-            <Form.Item
+            {/* <Form.Item
               name="AgencyID"
               label='รหัสหน่วยงานผู้ควบคุม'
             >
@@ -787,6 +819,18 @@ const WorkpermitPage = () => {
                 showArrow
                 style={{ width: '100%' }}
                 options={AgencyIDOptions}
+              />
+            </Form.Item> */}
+
+            <Form.Item
+              name="AgencyName"
+              label='หน่วยงานผู้ควบคุม'
+            >
+              <Select
+                loading={loading}
+                showArrow
+                style={{ width: '100%' }}
+                options={AgencyNameOptions}
               />
             </Form.Item>
 

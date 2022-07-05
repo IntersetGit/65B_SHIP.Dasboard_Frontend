@@ -598,8 +598,8 @@ const ScaffoldingPage = () => {
     setStateMap(map);
     setStateView(view);
 
-    // PTTlayer.ADDPTTWMSLAYER(map, view)
-    // map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
+    PTTlayer.ADDPTTWMSLAYER(map, view)
+    map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
 
 
