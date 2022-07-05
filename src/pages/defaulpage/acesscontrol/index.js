@@ -42,6 +42,7 @@ const AcessControlPage = () => {
   const Geojson = new WaGeojson();
   const demodata = new Demodata('access_control');
   const [stateSysmbole, setstateSysmbole] = useState(null);
+  const PTTlayer = new PTTlayers();
 
   const [form] = Form.useForm()
 
@@ -283,13 +284,25 @@ const AcessControlPage = () => {
           }))
         }
 
-        // let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
-        let GetAllArea = null;
+        let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
+        var Arealatlng = await Promise.all(GetAllArea.map(async (area, index) => {
+          let extent = await area?.queryExtent();
+          let feature = await area.queryFeatures();
+          let namearea = feature?.features[0]?.attributes?.UNITNAME;
+          let acesscontrol_type = await (await gen_uniqueValueInfos()).acessControlIcon;
+          let maplatlng_type = acesscontrol_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(extent?.extent?.center?.latitude, extent?.extent?.center?.longitude, 60) }), {})
+          return {
+            name: namearea,
+            center: extent?.extent?.center,
+            typelatlng: maplatlng_type
+          }
+        }));
+        // console.log('Arealatlng', Arealatlng)
         let latlng = []
         // console.log('item', item)
-        let acesscontrol_type = await (await gen_uniqueValueInfos()).acessControlIcon;
+        // let acesscontrol_type = await (await gen_uniqueValueInfos()).acessControlIcon;
         // console.log('acesscontrol_type', acesscontrol_type)
-        let maplatlng_type = acesscontrol_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(12.719, 101.147, 60) }), {});
+        // let maplatlng_type = acesscontrol_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(12.719, 101.147, 60) }), {});
 
         // console.log('item.data', item.data)
 
@@ -299,18 +312,25 @@ const AcessControlPage = () => {
         for (const opp in filter_show_in_map) {
           const obj = filter_show_in_map[opp];
 
-          let findeArea = GetAllArea?.find(async (area) => {
-            let feature = await area.queryFeatures();
-            if (feature.features[0].attributes.UNITNAME == (obj.AreaName).replace(/#/i, '')) {
-              return area;
+
+          let findeArea = Arealatlng?.find((area) => {
+            if (area.name == (obj.AreaName).replace(/#/i, '')) {
+              let latlng_type = area.typelatlng[obj.PersonalTypeID];
+              // console.log('latlng_type', latlng_type)
+              return area
+            } else {
+              return {
+                name: "defaul",
+                center: {
+                  latitude: 12.719,
+                  longitude: 101.147
+                },
+                typelatlng: area.typelatlng
+              }
             }
           });
-          let getextentcenter = await findeArea?.queryExtent();
-
-          var randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude ?? 12.719, getextentcenter?.extent?.center?.longitude ?? 101.147, 0)
-          let getlatlng = maplatlng_type[obj.PersonalTypeID];
-
-
+          console.log('findeArea :>> ', findeArea);
+          let getlatlng = findeArea?.typelatlng[obj.PersonalTypeID];
           if (obj.PersonalTypeID) {
 
             const { latitude, longitude } = demodata.getRandomLocation(getlatlng.latitude, getlatlng.longitude, 3)
@@ -552,11 +572,11 @@ const AcessControlPage = () => {
     dispatch(
       setStatus({
         "In": { value: data.in, color: '#F88' },
-        "Out": { value: data.out, color: '#F88' },
-        "แลคบัตรเข้า": { value: data.exchange_card_in, color: '#F88' },
-        "บุคคลที่อยู่ในพื้นที่": { value: data.on_plant, color: '#F88' },
-        "แลกบัตรออก": { value: data.exchange_card_out, color: '#F88' },
-        "อุปกรณ์ Online": { value: data.online, color: '#112345' },
+        "Out": { value: data.out, color: '#F48' },
+        "แลคบัตรเข้า": { value: data.exchange_card_in, color: '#F82' },
+        "บุคคลที่อยู่ในพื้นที่": { value: data.on_plant, color: '#F445' },
+        "แลกบัตรออก": { value: data.exchange_card_out, color: '#F89' },
+        "อุปกรณ์ Online": { value: data.online, color: '#112341' },
         "อุปกรณ์ Offline": { value: data.offline, color: '#112345' },
       }),
     );
@@ -611,8 +631,9 @@ const AcessControlPage = () => {
     setStateMap(map);
     setStateView(view);
 
-    // PTTlayer.ADDPTTWMSLAYER(map, view)
-    // view.graphics.addMany(await PTTlayer.SHOW_AREALAYERNAME());
+    PTTlayer.CLICK_SHOWLATLONG(view);
+    PTTlayer.ADDPTTWMSLAYER(map, view)
+    map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
   };
 

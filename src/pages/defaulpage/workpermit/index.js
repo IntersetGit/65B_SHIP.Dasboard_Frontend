@@ -304,7 +304,6 @@ const WorkpermitPage = () => {
         // let GetAllArea = null;
         let latlng = []
 
-        let workpermit_type = await (await gen_uniqueValueInfos()).scaffoldingIcon;
 
         for (const opp in item.data) {
           const obj = item.data[opp];
@@ -313,9 +312,18 @@ const WorkpermitPage = () => {
               let latlng_type = area.typelatlng[obj.WorkpermitTypeID];
               // console.log('latlng_type', latlng_type)
               return area
+            } else {
+              return {
+                name: "defaul",
+                center: {
+                  latitude: 12.719,
+                  longitude: 101.147
+                },
+                typelatlng: area.typelatlng
+              }
             }
           });
-          let getlatlng_byarea =  findeArea.typelatlng[obj.WorkpermitTypeID];
+          let getlatlng_byarea = findeArea.typelatlng[obj.WorkpermitTypeID];
           // console.log('getlatlng_byarea :>> ', getlatlng_byarea);
 
           let checkstatus = Object.keys(obj.notification);
@@ -349,6 +357,7 @@ const WorkpermitPage = () => {
             ...demodata.getRandomLocation(getlatlng_byarea.latitude, getlatlng_byarea.longitude, 3),
             "locatoin": obj.SubAreaName,
             "work_type": obj.WorkpermitType,
+            "warning":obj.others.WorkPermitStatusID
           })
 
           //})
@@ -391,7 +400,7 @@ const WorkpermitPage = () => {
                     label: "สถานะใบงาน"
                   },
                   {
-                    fieldName: "notification",
+                    fieldName: "warning",
                     label: "แจ้งเตือน"
                   }
                 ]

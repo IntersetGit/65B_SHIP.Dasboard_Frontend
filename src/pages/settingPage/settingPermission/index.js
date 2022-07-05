@@ -16,12 +16,12 @@ const columns = [
     fixed: 'left',
     filters: [
       {
-        text: 'Joe',
-        value: 'Joe',
+        text: 'on',
+        value: 'on',
       },
       {
-        text: 'John',
-        value: 'John',
+        text: 'off',
+        value: 'off',
       },
     ],
     onFilter: (value, record) => record.name.indexOf(value) === 0,
