@@ -16,18 +16,33 @@ class PTTlayer {
             'esri/geometry/Extent',
             "esri/layers/MapImageLayer"
         ]);
-        var layer = new MapImageLayer({
-            url: 'https://nonpttarcgisserver.pttplc.com/arcgis/rest/services/PTT_SHIP/PTT_SHIP_MAP/MapServer',
-        });
-        if (map && view) {
-            layer.when(async (data) => {
-                // console.log('extent', data.fullExtent.toJSON())
-                let extent = new Extent(data.fullExtent.toJSON());
-                await view?.goTo(extent)
+        try {
+            var layer = new MapImageLayer({
+                url: 'https://nonpttarcgisserver.pttplc.com/arcgis/rest/services/PTT_SHIP/PTT_SHIP_MAP/MapServer',
             });
+            if (map && view) {
+                layer.when(async (data) => {
+                    // console.log('extent', data.fullExtent.toJSON())
+                    let extent = new Extent(data.fullExtent.toJSON());
+                    // console.log('extent', data.fullExtent.toJSON())
+                    await view?.goTo(extent)
+                });
+            }
+            map.add(layer)
+            return layer;
+        } catch (error) {
+            let extent = {
+                spatialReference: { latestWkid: 32647, wkid: 32647 },
+                xmax: 733175.5896,
+                xmin: 732417.1658,
+                ymax: 1407627.0716,
+                ymin: 1406522.6592,
+            }
+            let CreateExtent = new Extent(extent);
+            await view?.goTo(CreateExtent)
+            return;
+
         }
-        map.add(layer)
-        return layer;
     }
 
     ADDAREALAYER = async (layername = "PLANT") => {
@@ -177,7 +192,7 @@ class PTTlayer {
             }
 
             return apiArea
-        }else{
+        } else {
             console.error("API ERROR GISMAP REQUSE")
             return null
         }
