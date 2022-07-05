@@ -286,26 +286,37 @@ const WorkpermitPage = () => {
           }))
         }
 
-        // let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
-        let GetAllArea = null;
+        let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
+        var Arealatlng = await Promise.all(GetAllArea.map(async (area, index) => {
+          let extent = await area?.queryExtent();
+          let feature = await area.queryFeatures();
+          let namearea = feature?.features[0]?.attributes?.UNITNAME;
+          let workpermit_type = await (await gen_uniqueValueInfos()).scaffoldingIcon;
+          let maplatlng_type = workpermit_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(extent?.extent?.center?.latitude, extent?.extent?.center?.longitude, 60) }), {})
+          return {
+            name: namearea,
+            center: extent?.extent?.center,
+            typelatlng: maplatlng_type
+          }
+        }));
+
+        // console.log('Arealatlng', Arealatlng)
+        // let GetAllArea = null;
         let latlng = []
 
         let workpermit_type = await (await gen_uniqueValueInfos()).scaffoldingIcon;
-        let maplatlng_type = workpermit_type.reduce((a, v) => ({ ...a, [v.name]: demodata.getRandomLocation(12.719, 101.147, 60) }), {})
-        // console.log('maplatlng_type :>> ', maplatlng_type);
+
         for (const opp in item.data) {
           const obj = item.data[opp];
-
-          let findeArea = GetAllArea?.find(async (area) => {
-            let feature = await area.queryFeatures();
-            if (feature.features[0].attributes.UNITNAME == (obj.AreaName).replace(/#/i, '')) {
-              return area;
+          let findeArea = Arealatlng?.find((area) => {
+            if (area.name == (obj.AreaName).replace(/#/i, '')) {
+              let latlng_type = area.typelatlng[obj.WorkpermitTypeID];
+              // console.log('latlng_type', latlng_type)
+              return area
             }
           });
-          let getextentcenter = await findeArea?.queryExtent();
-          var randomlatlng = demodata.getRandomLocation(getextentcenter?.extent?.center?.latitude ?? 12.719, getextentcenter?.extent?.center?.longitude ?? 101.147, 0)
-          let getlatlng = maplatlng_type[obj.WorkpermitTypeID];
-
+          let getlatlng_byarea =  findeArea.typelatlng[obj.WorkpermitTypeID];
+          // console.log('getlatlng_byarea :>> ', getlatlng_byarea);
 
           let checkstatus = Object.keys(obj.notification);
           let isstatus = checkstatus.filter((s) => obj.notification[s] == true)
@@ -335,7 +346,7 @@ const WorkpermitPage = () => {
             "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isArray(obj.notification.list) && obj.notification.list.length > 1 ? '_warning_all' : '_' + isstatus[0]}`,
             // "latitude": randomlatlng?.latitude ?? null,
             // "longitude": randomlatlng?.longitude ?? null,
-            ...demodata.getRandomLocation(getlatlng.latitude, getlatlng.longitude, 3),
+            ...demodata.getRandomLocation(getlatlng_byarea.latitude, getlatlng_byarea.longitude, 3),
             "locatoin": obj.SubAreaName,
             "work_type": obj.WorkpermitType,
           })
