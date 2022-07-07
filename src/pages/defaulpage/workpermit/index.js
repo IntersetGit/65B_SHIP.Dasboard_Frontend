@@ -348,7 +348,7 @@ const WorkpermitPage = () => {
             obj.notification.list = arr;
             obj.notification.list2 = arr2;
           }
-          console.log('obj', obj)
+          // console.log('obj', obj)
 
           latlng.push({
             ...obj,
