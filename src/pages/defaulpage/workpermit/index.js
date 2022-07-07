@@ -59,7 +59,7 @@ const WorkpermitPage = () => {
 
     },
     {
-      title: 'เจ้าของพื้นที่',
+      title: 'ผู้อนุญาต/เจ้าของพื้นที่',
       dataIndex: 'OwnerName',
       key: 'OwnerName',
 
@@ -83,13 +83,13 @@ const WorkpermitPage = () => {
 
     },
     {
-      title: 'วัน-เวลา เริ่มต้น',
+      title: 'วัน-เวลา เริ่มต้นของใบงาน',
       dataIndex: 'date_time_start',
       key: 'date_time_start',
 
     },
     {
-      title: 'วัน-เวลา สิ้นสุด',
+      title: 'วัน-เวลา สิ้นสุดของใบงาน',
       dataIndex: 'date_time_end',
       key: 'date_time_end',
 
@@ -131,16 +131,16 @@ const WorkpermitPage = () => {
                   "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubAreaName,
                   "วันที่เริ่มต้นของใบงาน": record.WorkingDateStart,
                   "วันที่สิ้นสุดของใบงาน": record.WorkingDateEnd,
-                  "เวลาเริ่มต้นการปฏิบัติงาน": record.WorkingTimeStart,
-                  "เวลาสิ้นสุดการปฏิบัติงาน": record.WorkingTimeEnd,
+                  "เวลาเริ่มต้นของใบงาน": record.WorkingTimeStart,
+                  "เวลาสิ้นสุดของใบงาน": record.WorkingTimeEnd,
                   "รหัสบริษัท": record.VendorID,
                   "ชื่อบริษัท": record.VendorName,
                   "รหัสผู้ควบคุมงาน": record.PTTStaffID,
                   "ชื่อผู้ควบคุมงาน": record.PTTStaffName,
                   "รหัสหน่วยงานผู้ควบคุม": record.AgencyID,
                   "ชื่อหน่วยงานผู้ควบคุม": record.AgencyName,
-                  "รหัสเจ้าของพื้นที่": record.OwnerID,
-                  "ชื่อเจ้าของพื้นที่": record.OwnerName,
+                  "รหัสผู้อนุญาต/เจ้าของพื้นที่": record.OwnerID,
+                  "ชื่อผู้อนุญาต/เจ้าของพื้นที่": record.OwnerName,
                   "รหัสสถานะใบงาน": record.WorkPermitStatusID,
                   "สถานะใบงาน": record.others.WorkPermitStatusID,
                   "เวลาการตรวจวัดก๊าซล่าสุด": record.GasMeasurement,
@@ -285,10 +285,12 @@ const WorkpermitPage = () => {
             }
           }))
         }
-
         let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
         var Arealatlng = await Promise.all(GetAllArea.map(async (area, index) => {
           let extent = await area?.queryExtent();
+          // console.log('extent', extent.extent)
+          // let test = await PTTlayer.RandomInArea(extent.extent);
+
           let feature = await area.queryFeatures();
           let namearea = feature?.features[0]?.attributes?.UNITNAME;
           let workpermit_type = await (await gen_uniqueValueInfos()).scaffoldingIcon;
@@ -620,7 +622,7 @@ const WorkpermitPage = () => {
   const Status_cal = async (data) => {
 
     const Status = {}
-    if (data.total !== undefined) Status["Total"] = { value: data.total, color: '#112345' };
+    if (data.total !== undefined) Status["ใบงานทั้งหมด"] = { value: data.total, color: '#112345' };
     if (data.open !== undefined) Status["Open"] = { value: data.open, color: '#17d149' };
     if (data.close !== undefined) Status["Close"] = { value: data.close, color: '#F09234', };
     if (data.near_expire !== undefined) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
@@ -707,7 +709,7 @@ const WorkpermitPage = () => {
     setStateView(view);
     PTTlayer.CLICK_SHOWLATLONG(view);
     PTTlayer.ADDPTTWMSLAYER(map, view)
-    map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
+    // map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
   };
 

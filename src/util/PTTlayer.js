@@ -1,6 +1,7 @@
 import { loadModules } from 'esri-loader';
 import Axios from 'axios';
-
+import Point from "@arcgis/core/geometry/Point";
+import { randomPoint ,booleanPointInPolygon,} from '@turf/turf';
 class PTTlayer {
     constructor() {
         (async () => {
@@ -256,6 +257,43 @@ class PTTlayer {
                 })
             }
         });
+    }
+
+    RandomInArea = (extent) => {
+        var x_max = extent.xmax;
+        var x_min = extent.xmin;
+        var y_max = extent.ymax;
+        var y_min = extent.ymin;
+        // var lat = y_min + (Math.random() * (y_max - y_min));
+        // var lng = x_min + (Math.random() * (x_max - x_min));
+        // let point = new Point({ latitude: parseFloat(lat), longitude: parseFloat(lng) });
+        // let contains = extent.contains(point);
+        // console.log('extent :>> ', extent);
+        // console.log('point :>> ', point);
+        // console.log('lat', lat)
+        // console.log('lng', lng)
+        var points = randomPoint(1, { bbox: [x_min, y_min, x_max, y_max] })
+        let getlatlng = points.features[0].geometry.coordinates;
+        console.log('getlatlng :>> ', getlatlng);
+        let point = new Point({ latitude: getlatlng[1], longitude: getlatlng[0] });
+        let contains = extent.contains(point);
+        console.log('contains :>> ', contains);
+        return {
+            latitude: getlatlng[1],
+            longitude: getlatlng[0]
+        }
+        // if (contains == true) {
+        //     console.log('containstrue :>> ', contains);
+
+        //     return {
+        //         latitude: lat,
+        //         longitude: lng
+        //     }
+        // } else {
+        //     console.log('containsfalse :>> ', contains);
+
+        //     return this.RandomInArea(extent)
+        // }
     }
 
 }

@@ -51,7 +51,7 @@ const AcessControlPage = () => {
       title: 'ชื่อ-สกุล ผู้รับเหมา',
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
-      render: (text, obj) => (obj.FirstName ?? "-") + " " + (obj.LastName ?? ""),
+      render: (text, obj) => (obj.TitleName ?? "-") + " " +(obj.FirstName ?? "-") + " " + (obj.LastName ?? ""),
       width: 150
     },
     {
@@ -563,9 +563,9 @@ const AcessControlPage = () => {
     // console.log('data', data)
     dispatch(
       setStatus({
-        "In": { value: data.in, color: '#F88' },
-        "Out": { value: data.out, color: '#F48' },
-        "แลคบัตรเข้า": { value: data.exchange_card_in, color: '#F82' },
+        "สแกนเข้า": { value: data.in, color: '#F88' },
+        "สแกนออก": { value: data.out, color: '#F48' },
+        "แลกบัตรเข้า": { value: data.exchange_card_in, color: '#F82' },
         "บุคคลที่อยู่ในพื้นที่": { value: data.on_plant, color: '#F445' },
         "แลกบัตรออก": { value: data.exchange_card_out, color: '#F89' },
         "อุปกรณ์ Online": { value: data.online, color: '#112341' },
@@ -736,7 +736,7 @@ const AcessControlPage = () => {
               />
             </Form.Item>
 
-            <Form.Item
+            {/* <Form.Item
               name="StartDateTime"
               label='วัน-เวลา เริ่มต้น'
             >
@@ -744,9 +744,9 @@ const AcessControlPage = () => {
                 showTime={{ format: 'HH:mm' }}
                 format="DD/MM/YYYY HH:mm"
                 style={{ width: '100%' }} />
-            </Form.Item>
+            </Form.Item> */}
 
-            <Form.Item
+            {/* <Form.Item
               name="EndDateTime"
               label='วัน-เวลา สิ้นสุด'
             >
@@ -754,7 +754,7 @@ const AcessControlPage = () => {
                 showTime={{ format: 'HH:mm' }}
                 format="DD/MM/YYYY HH:mm"
                 style={{ width: '100%' }} />
-            </Form.Item>
+            </Form.Item> */}
 
             <Form.Item
               name="AccDeviceName"
