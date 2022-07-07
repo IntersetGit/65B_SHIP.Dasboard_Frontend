@@ -1,7 +1,7 @@
 import { loadModules } from 'esri-loader';
 import Axios from 'axios';
 import Point from "@arcgis/core/geometry/Point";
-import { randomPoint ,booleanPointInPolygon,} from '@turf/turf';
+import { randomPoint, randomPosition, booleanPointInPolygon, bboxPolygon, point } from '@turf/turf';
 class PTTlayer {
     constructor() {
         (async () => {
@@ -272,12 +272,17 @@ class PTTlayer {
         // console.log('point :>> ', point);
         // console.log('lat', lat)
         // console.log('lng', lng)
-        var points = randomPoint(1, { bbox: [x_min, y_min, x_max, y_max] })
-        let getlatlng = points.features[0].geometry.coordinates;
-        console.log('getlatlng :>> ', getlatlng);
-        let point = new Point({ latitude: getlatlng[1], longitude: getlatlng[0] });
-        let contains = extent.contains(point);
-        console.log('contains :>> ', contains);
+        // var points = randomPosition([x_min, y_min, x_max, y_max] )
+        // var pt = point(points);
+        var pt = randomPoint(1, {bbox:[x_min, y_min, x_max, y_max] });
+        let getlatlng = pt.features[0].geometry.coordinates;
+        var poly = bboxPolygon([x_min, y_min, x_max, y_max]);
+        let check = booleanPointInPolygon(getlatlng,poly,{ignoreBoundary:true})
+        console.log('check :>> ', check);
+        // console.log('getlatlng :>> ', getlatlng);
+        // let point = new Point({ latitude: getlatlng[1], longitude: getlatlng[0] });
+        // let contains = extent.contains(point);
+        // console.log('contains :>> ', contains);
         return {
             latitude: getlatlng[1],
             longitude: getlatlng[0]

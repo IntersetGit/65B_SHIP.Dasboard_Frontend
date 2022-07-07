@@ -288,8 +288,8 @@ const WorkpermitPage = () => {
         let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
         var Arealatlng = await Promise.all(GetAllArea.map(async (area, index) => {
           let extent = await area?.queryExtent();
-          // console.log('extent', extent.extent)
-          // let test = await PTTlayer.RandomInArea(extent.extent);
+          let test = await PTTlayer.RandomInArea(extent.extent);
+          console.log('test', test)
 
           let feature = await area.queryFeatures();
           let namearea = feature?.features[0]?.attributes?.UNITNAME;
@@ -335,12 +335,20 @@ const WorkpermitPage = () => {
 
           if (isPlainObject(obj.notification)) {
             const arr = [];
+            const arr2 = [];
+            if (obj.notification.near_expire) arr2.push("near_expire");
+            if (obj.notification.expire) arr2.push("expire");
+            if (obj.notification.gas) arr2.push("gas");
+            if (obj.notification.impairment) arr2.push("impairment");
+
             if (isNumber(obj.notification.near_expire)) arr.push("⚠️ ใกล้ Exp");
             if (isNumber(obj.notification.expire)) arr.push("‼️ หมด Exp");
             if (isNumber(obj.notification.gas)) arr.push("ก๊าซที่ต้องตรวจวัด");
             if (isNumber(obj.notification.impairment)) arr.push("Impairment");
             obj.notification.list = arr;
+            obj.notification.list2 = arr2;
           }
+          console.log('obj', obj)
 
           latlng.push({
             ...obj,
@@ -353,7 +361,7 @@ const WorkpermitPage = () => {
             "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
             // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
             // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isstatus && isstatus.length > 2 ? '_warning_all' : '_' + isstatus[0]}`,
-            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isArray(obj.notification.list) && obj.notification.list.length > 1 ? '_warning_all' : '_' + isstatus[0]}`,
+            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isArray(obj.notification.list2) && obj.notification.list2.length > 1 ? '_warning_all' : '_' + isstatus[0]}`,
             // "latitude": randomlatlng?.latitude ?? null,
             // "longitude": randomlatlng?.longitude ?? null,
             ...demodata.getRandomLocation(getlatlng_byarea.latitude, getlatlng_byarea.longitude, 3),
