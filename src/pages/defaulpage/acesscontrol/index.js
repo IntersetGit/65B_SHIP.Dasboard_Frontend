@@ -155,7 +155,7 @@ const AcessControlPage = () => {
   ];
   const clusterConfig = {
     type: "cluster",
-    clusterRadius: "40px",
+    clusterRadius: "30px",
     labelsVisible: true,
     popupTemplate: {
       title: 'Cluster summary',

@@ -26,6 +26,7 @@ import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
 import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
+import { circle } from '@turf/turf';
 
 const { Panel } = Collapse;
 
@@ -43,7 +44,6 @@ const WorkpermitPage = () => {
   const Geojson = new WaGeojson();
   const PTTlayer = new PTTlayers();
   const [stateSysmbole, setstateSysmbole] = useState(null);
-
 
   const columns = [
     {
@@ -158,7 +158,7 @@ const WorkpermitPage = () => {
   ];
   const clusterConfig = {
     type: "cluster",
-    clusterRadius: "40px",
+    clusterRadius: "30px",
     labelsVisible: true,
     popupTemplate: {
       title: 'Cluster summary',
@@ -367,7 +367,7 @@ const WorkpermitPage = () => {
             ...demodata.getRandomLocation(getlatlng_byarea.latitude, getlatlng_byarea.longitude, 3),
             "locatoin": obj.SubAreaName,
             "work_type": obj.WorkpermitType,
-            "warning":obj.others.WorkPermitStatusID
+            "warning": obj.others.WorkPermitStatusID
           })
 
           //})
@@ -380,10 +380,12 @@ const WorkpermitPage = () => {
         let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
         console.log('datageojson', datageojson)
         setTabledata(latlng);
-        const [FeatureLayer, GeoJSONLayer] = await loadModules([
+        const [FeatureLayer, GeoJSONLayer, reactiveUtils] = await loadModules([
           'esri/layers/FeatureLayer',
           'esri/layers/GeoJSONLayer',
+          "esri/core/reactiveUtils",
         ]);
+        let layerView;
         const layerpoint = new GeoJSONLayer({
           id: 'pointlayer',
           title: 'ใช้สีสัญลักษณ์แทนประเภท',
@@ -435,6 +437,26 @@ const WorkpermitPage = () => {
 
           },
         });
+        layerpoint
+          .when()
+          .then(clusterConfig)
+          .then(async (featureReduction) => {
+            //console.log('featureReduction :>> ', featureReduction);
+            // layerpoint.featureReduction = featureReduction;
+            // layerView = await stateView?.whenLayerView(layerpoint);
+
+            reactiveUtils.watch(
+              () => stateView?.scale,
+              (scale) => {
+                layerpoint.featureReduction  =
+                scale > 80 ? clusterConfig : null;
+                // console.log('scale :>> ', scale);
+              }
+            );
+          })
+          .catch((error) => {
+            console.error(error);
+          });
         await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
         stateMap?.add(layerpoint);
         // let maplayerSerch = stateMap?.findLayerById('pointlayer');
@@ -700,15 +722,13 @@ const WorkpermitPage = () => {
     //     if (maplayerCLuster) {
     //       let fr = maplayerCLuster.featureReduction;
     //       maplayerCLuster.featureReduction =
-    //         fr && fr.type === "cluster" ? clusterConfig : clusterConfig;
+    //         fr && fr.type === null ? clusterConfig : clusterConfig;
     //     }
     //     // console.log("New value: ", newValue,
     //     //   "<br>Old value: ", oldValue,
     //     //   "<br>Watched property: ", property,
     //     //   "<br>Watched object: ", object);
     //   }
-
-
     // }
 
 
@@ -972,6 +992,35 @@ const WorkpermitPage = () => {
             ? 'table-row-red'
             : ''
         }
+        onRow={(record, rowIndex) => {
+          return {
+            onClick: async () => {
+              const [GeoJSONLayer] = await loadModules([
+                'esri/layers/GeoJSONLayer',
+              ]);
+              let cicle = circle([record.longitude, record.latitude], 0.001);
+              const blob = new Blob([JSON.stringify(cicle)], {
+                type: 'application/json',
+              });
+              const url = URL.createObjectURL(blob);
+              const geojsonlayer = new GeoJSONLayer({
+                url: url,
+                copyright: "PTT POINTGENARATE"
+              });
+              let extent = await geojsonlayer.queryExtent();
+
+              // const polygon = new Polygon({
+              //   hasZ: true,
+              //   hasM: true,
+              //   rings: [cicle.geometry.coordinates],
+              //   spatialReference: { wkid: 4326 }
+              // });
+              // console.log(polygon);
+
+              stateView?.goTo(extent.extent)
+            }, // click row
+          };
+        }}
         rowKey={(i) => i.id}
         columns={columns}
         dataSource={tabledata}
