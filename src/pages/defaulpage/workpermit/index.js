@@ -26,6 +26,7 @@ import { CreateIcon, CreateImgIcon } from '../../../util/dynamic-icon'
 import API from '../../../util/Api'
 import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
+import { circle } from '@turf/turf';
 
 const { Panel } = Collapse;
 
@@ -44,7 +45,6 @@ const WorkpermitPage = () => {
   const PTTlayer = new PTTlayers();
   const [stateSysmbole, setstateSysmbole] = useState(null);
 
-
   const columns = [
     {
       title: 'เลข work',
@@ -59,7 +59,7 @@ const WorkpermitPage = () => {
 
     },
     {
-      title: 'เจ้าของพื้นที่',
+      title: 'ผู้อนุญาต/เจ้าของพื้นที่',
       dataIndex: 'OwnerName',
       key: 'OwnerName',
 
@@ -83,13 +83,13 @@ const WorkpermitPage = () => {
 
     },
     {
-      title: 'วัน-เวลา เริ่มต้น',
+      title: 'วัน-เวลา เริ่มต้นของใบงาน',
       dataIndex: 'date_time_start',
       key: 'date_time_start',
 
     },
     {
-      title: 'วัน-เวลา สิ้นสุด',
+      title: 'วัน-เวลา สิ้นสุดของใบงาน',
       dataIndex: 'date_time_end',
       key: 'date_time_end',
 
@@ -131,16 +131,16 @@ const WorkpermitPage = () => {
                   "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubAreaName,
                   "วันที่เริ่มต้นของใบงาน": record.WorkingDateStart,
                   "วันที่สิ้นสุดของใบงาน": record.WorkingDateEnd,
-                  "เวลาเริ่มต้นการปฏิบัติงาน": record.WorkingTimeStart,
-                  "เวลาสิ้นสุดการปฏิบัติงาน": record.WorkingTimeEnd,
+                  "เวลาเริ่มต้นของใบงาน": record.WorkingTimeStart,
+                  "เวลาสิ้นสุดของใบงาน": record.WorkingTimeEnd,
                   "รหัสบริษัท": record.VendorID,
                   "ชื่อบริษัท": record.VendorName,
                   "รหัสผู้ควบคุมงาน": record.PTTStaffID,
                   "ชื่อผู้ควบคุมงาน": record.PTTStaffName,
                   "รหัสหน่วยงานผู้ควบคุม": record.AgencyID,
                   "ชื่อหน่วยงานผู้ควบคุม": record.AgencyName,
-                  "รหัสเจ้าของพื้นที่": record.OwnerID,
-                  "ชื่อเจ้าของพื้นที่": record.OwnerName,
+                  "รหัสผู้อนุญาต/เจ้าของพื้นที่": record.OwnerID,
+                  "ชื่อผู้อนุญาต/เจ้าของพื้นที่": record.OwnerName,
                   "รหัสสถานะใบงาน": record.WorkPermitStatusID,
                   "สถานะใบงาน": record.others.WorkPermitStatusID,
                   "เวลาการตรวจวัดก๊าซล่าสุด": record.GasMeasurement,
@@ -158,7 +158,7 @@ const WorkpermitPage = () => {
   ];
   const clusterConfig = {
     type: "cluster",
-    clusterRadius: "40px",
+    clusterRadius: "30px",
     labelsVisible: true,
     popupTemplate: {
       title: 'Cluster summary',
@@ -285,10 +285,12 @@ const WorkpermitPage = () => {
             }
           }))
         }
-
         let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
         var Arealatlng = await Promise.all(GetAllArea.map(async (area, index) => {
           let extent = await area?.queryExtent();
+          let test = await PTTlayer.RandomInArea(extent.extent);
+          console.log('test', test)
+
           let feature = await area.queryFeatures();
           let namearea = feature?.features[0]?.attributes?.UNITNAME;
           let workpermit_type = await (await gen_uniqueValueInfos()).scaffoldingIcon;
@@ -333,12 +335,20 @@ const WorkpermitPage = () => {
 
           if (isPlainObject(obj.notification)) {
             const arr = [];
+            const arr2 = [];
+            if (obj.notification.near_expire) arr2.push("near_expire");
+            if (obj.notification.expire) arr2.push("expire");
+            if (obj.notification.gas) arr2.push("gas");
+            if (obj.notification.impairment) arr2.push("impairment");
+
             if (isNumber(obj.notification.near_expire)) arr.push("⚠️ ใกล้ Exp");
             if (isNumber(obj.notification.expire)) arr.push("‼️ หมด Exp");
             if (isNumber(obj.notification.gas)) arr.push("ก๊าซที่ต้องตรวจวัด");
             if (isNumber(obj.notification.impairment)) arr.push("Impairment");
             obj.notification.list = arr;
+            obj.notification.list2 = arr2;
           }
+          // console.log('obj', obj)
 
           latlng.push({
             ...obj,
@@ -351,13 +361,13 @@ const WorkpermitPage = () => {
             "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
             // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
             // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isstatus && isstatus.length > 2 ? '_warning_all' : '_' + isstatus[0]}`,
-            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isArray(obj.notification.list) && obj.notification.list.length > 1 ? '_warning_all' : '_' + isstatus[0]}`,
+            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isArray(obj.notification.list2) && obj.notification.list2.length > 1 ? '_warning_all' : '_' + isstatus[0]}`,
             // "latitude": randomlatlng?.latitude ?? null,
             // "longitude": randomlatlng?.longitude ?? null,
             ...demodata.getRandomLocation(getlatlng_byarea.latitude, getlatlng_byarea.longitude, 3),
             "locatoin": obj.SubAreaName,
             "work_type": obj.WorkpermitType,
-            "warning":obj.others.WorkPermitStatusID
+            "warning": obj.others.WorkPermitStatusID
           })
 
           //})
@@ -370,10 +380,12 @@ const WorkpermitPage = () => {
         let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
         console.log('datageojson', datageojson)
         setTabledata(latlng);
-        const [FeatureLayer, GeoJSONLayer] = await loadModules([
+        const [FeatureLayer, GeoJSONLayer, reactiveUtils] = await loadModules([
           'esri/layers/FeatureLayer',
           'esri/layers/GeoJSONLayer',
+          "esri/core/reactiveUtils",
         ]);
+        let layerView;
         const layerpoint = new GeoJSONLayer({
           id: 'pointlayer',
           title: 'ใช้สีสัญลักษณ์แทนประเภท',
@@ -425,6 +437,26 @@ const WorkpermitPage = () => {
 
           },
         });
+        layerpoint
+          .when()
+          .then(clusterConfig)
+          .then(async (featureReduction) => {
+            //console.log('featureReduction :>> ', featureReduction);
+            // layerpoint.featureReduction = featureReduction;
+            // layerView = await stateView?.whenLayerView(layerpoint);
+
+            reactiveUtils.watch(
+              () => stateView?.scale,
+              (scale) => {
+                layerpoint.featureReduction  =
+                scale > 80 ? clusterConfig : null;
+                // console.log('scale :>> ', scale);
+              }
+            );
+          })
+          .catch((error) => {
+            console.error(error);
+          });
         await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
         stateMap?.add(layerpoint);
         // let maplayerSerch = stateMap?.findLayerById('pointlayer');
@@ -620,7 +652,7 @@ const WorkpermitPage = () => {
   const Status_cal = async (data) => {
 
     const Status = {}
-    if (data.total !== undefined) Status["Total"] = { value: data.total, color: '#112345' };
+    if (data.total !== undefined) Status["ใบงานทั้งหมด"] = { value: data.total, color: '#112345' };
     if (data.open !== undefined) Status["Open"] = { value: data.open, color: '#17d149' };
     if (data.close !== undefined) Status["Close"] = { value: data.close, color: '#F09234', };
     if (data.near_expire !== undefined) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
@@ -690,15 +722,13 @@ const WorkpermitPage = () => {
     //     if (maplayerCLuster) {
     //       let fr = maplayerCLuster.featureReduction;
     //       maplayerCLuster.featureReduction =
-    //         fr && fr.type === "cluster" ? clusterConfig : clusterConfig;
+    //         fr && fr.type === null ? clusterConfig : clusterConfig;
     //     }
     //     // console.log("New value: ", newValue,
     //     //   "<br>Old value: ", oldValue,
     //     //   "<br>Watched property: ", property,
     //     //   "<br>Watched object: ", object);
     //   }
-
-
     // }
 
 
@@ -707,7 +737,7 @@ const WorkpermitPage = () => {
     setStateView(view);
     PTTlayer.CLICK_SHOWLATLONG(view);
     PTTlayer.ADDPTTWMSLAYER(map, view)
-    map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
+    // map.addMany(await PTTlayer.SHOW_AREALAYERNAME());
 
   };
 
@@ -962,6 +992,35 @@ const WorkpermitPage = () => {
             ? 'table-row-red'
             : ''
         }
+        onRow={(record, rowIndex) => {
+          return {
+            onClick: async () => {
+              const [GeoJSONLayer] = await loadModules([
+                'esri/layers/GeoJSONLayer',
+              ]);
+              let cicle = circle([record.longitude, record.latitude], 0.001);
+              const blob = new Blob([JSON.stringify(cicle)], {
+                type: 'application/json',
+              });
+              const url = URL.createObjectURL(blob);
+              const geojsonlayer = new GeoJSONLayer({
+                url: url,
+                copyright: "PTT POINTGENARATE"
+              });
+              let extent = await geojsonlayer.queryExtent();
+
+              // const polygon = new Polygon({
+              //   hasZ: true,
+              //   hasM: true,
+              //   rings: [cicle.geometry.coordinates],
+              //   spatialReference: { wkid: 4326 }
+              // });
+              // console.log(polygon);
+
+              stateView?.goTo(extent.extent)
+            }, // click row
+          };
+        }}
         rowKey={(i) => i.id}
         columns={columns}
         dataSource={tabledata}

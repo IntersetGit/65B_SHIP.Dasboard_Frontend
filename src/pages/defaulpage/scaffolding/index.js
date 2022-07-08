@@ -57,7 +57,7 @@ const ScaffoldingPage = () => {
 
     },
     {
-      title: 'เจ้าของพื้นที่',
+      title: 'ผู้อนุญาต/เจ้าของพื้นที่',
       dataIndex: 'OwnerName',
       key: 'OwnerName',
       render: (text) => text ?? "-",
@@ -84,22 +84,22 @@ const ScaffoldingPage = () => {
       render: (text) => text ?? "-",
       width: 150
     },
+    // {
+    //   title: 'วันหมดอายุ',
+    //   key: 'ExpiredDate',
+    //   dataIndex: 'ExpiredDate',
+    //   // render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD") : "-",
+    //   width: 150
+    // },
     {
-      title: 'วันหมดอายุ',
-      key: 'ExpiredDate',
-      dataIndex: 'ExpiredDate',
-      // render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD") : "-",
-      width: 150
-    },
-    {
-      title: 'วัน-เวลา เริ่มต้น',
+      title: 'วัน-เวลา นำเข้าพื้นที่',
       dataIndex: 'WorkingStartDate',
       key: 'WorkingStartDate',
       render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD HH:mm:ss") : "-",
       width: 200
     },
     {
-      title: 'วัน-เวลา สิ้นสุด',
+      title: 'วัน-เวลา หมดอายุนั่งร้าน',
       dataIndex: 'WorkingEndDate',
       key: 'WorkingEndDate',
       render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD HH:mm:ss") : "-",
@@ -135,7 +135,8 @@ const ScaffoldingPage = () => {
                   "ประเภทผู้ขอรายการ": record.OwnerType == 1 ? "พนักงาน ปตท." : record.OwnerType == 2 ? "ผู้รับเหมา" : "-",
                   "รหัสผู้ขอรายการ": record.WorkOwnerID ?? "-",
                   "ชื่อ นามสกุล": record.WorkName ?? "-",
-                  "เจ้าของพื้นที่": record.OwnerName ?? "-",
+                  "รหัสผู้อนุญาต/เจ้าของพื้นที่": record.Owner ?? "-",
+                  "ชื่อผู้อนุญาต/เจ้าของพื้นที่": record.OwnerName ?? "-",
                   "เลขบัตรประชาชน": record.PersonalID ?? "-",
                   "เลข Work Permit": record.WorkPermitNo ?? "-",
                   "รหัสประเภทนั่งร้าน": record.ScaffoldingTypeID ?? "-",
@@ -157,7 +158,6 @@ const ScaffoldingPage = () => {
                   "ชื่อผู้ควบคุมงาน": record.PTTStaff ?? "-",
                   "รหัสหน่วยงานผู้ควบคุม": record.AgencyID ?? "-",
                   "ชื่อหน่วยงานผู้ควบคุม": record.AgencyName ?? "-",
-                  "รหัสเจ้าของพื้นที่": record.Owner ?? "-",
                   "ประเภทของ Work": record.WorkpermitType ?? "-",
                   "สถานะใบงาน": record.StatusName ?? "-",
                   "สถานะแจ้งเตือน": record.others.StatusName ?? "-",
@@ -548,7 +548,7 @@ const ScaffoldingPage = () => {
 
 
     const Status = {}
-    if (data.all !== undefined) Status["จำนวนจุด"] = { value: data.all, color: '#112345' };
+    if (data.all !== undefined) Status["นั่งร้านในพื้นที่"] = { value: data.all, color: '#112345' };
     if (data.normal !== undefined) Status["ปกติ"] = { value: data.normal, color: '#17d149' };
     if  (data.near_expire !== undefined) Status["ใกล้ Exp"] = { value: data.near_expire ?? 0, color: '#F09234', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
     if (data.expire !== undefined) Status["หมด Exp"] = { value: data.expire, color: '#F54', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };

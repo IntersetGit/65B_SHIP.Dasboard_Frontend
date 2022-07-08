@@ -51,7 +51,7 @@ const AcessControlPage = () => {
       title: 'ชื่อ-สกุล ผู้รับเหมา',
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
-      render: (text, obj) => (obj.FirstName ?? "-") + " " + (obj.LastName ?? ""),
+      render: (text, obj) => (obj.TitleName ?? "-") + " " +(obj.FirstName ?? "-") + " " + (obj.LastName ?? ""),
       width: 150
     },
     {
@@ -121,36 +121,28 @@ const AcessControlPage = () => {
               type='primary'
               onClick={() => {
                 setDatamodal({
-
-                  "เลขที่นั่งร้าน": record.ScaffoldingCode ?? "-",
-                  "ประเภทผู้ขอรายการ": record.OwnerType == 1 ? "พนักงาน ปตท." : record.OwnerType == 2 ? "ผู้รับเหมา" : "-",
-                  "รหัสผู้ขอรายการ": record.WorkOwnerID ?? "-",
-                  "ชื่อ นามสกุล": record.WorkName ?? "-",
-                  "เจ้าของพื้นที่": record.OwnerName ?? "-",
-                  "เลขบัตรประชาชน": record.PersonalID ?? "-",
-                  "เลข Work Permit": record.WorkPermitNo ?? "-",
-                  "รหัสประเภทนั่งร้าน": record.ScaffoldingTypeID ?? "-",
-                  "ชื่องาน": record.Title ?? "-",
-                  "รายละเอียดของงาน": record.Description ?? "-",
-                  "วัตถุประสงค์": record.Objective ?? "-",
-                  "วันหมดอายุสภาพนั่งร้าน": record.ExpiredDate ? moment(new Date(record.ExpiredDate)).format("YYYY-MM-DD") : "-",
-                  "รหัสสถานที่ปฏิบัติงานหลัก": record.Area ?? "-",
-                  "ชื่อสถานที่ปฏิบัติงานหลัก": record.AreaName ?? "-",
-                  "รหัสสถานที่ปฏิบัติงานย่อย": record.SubArea ?? "-",
-                  "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubAreaName ?? "-",
-                  "วัน เวลา เริ่มต้นการปฏิบัติงาน": record.WorkingStartDate ? moment(new Date(record.WorkingStartDate)).format("YYYY-MM-DD HH:mm:ss") : "-",
-                  "วัน เวลา สิ้นสุดการปฏิบัติงาน": record.WorkingEndDate ? moment(new Date(record.WorkingEndDate)).format("YYYY-MM-DD HH:mm:ss") : "-",
-                  "รหัสบริษัท": record.VendorCode ?? "-",
-                  "ชื่อบริษัท": record.VendorName ?? "-",
+                  "ชื่อ-สกุล": `${record.FirstName ?? "-"} ${record.LastName ?? ""}`,
+                  "เลขบัตรประชาชน": `${record.PersonalID ?? "-"}`,
+                  "ตำแหน่ง": `${record.Position ?? "-"}`,
+                  "เลข Work Permit": `${record.WorkPermitID ?? "-"}`,
+                  "เลขที่บัตรแสดงตัว/เลขที่บัตรที่แลก": `${record.SecureCard_ID ?? "-"}`,
+                  "ประเภทบัตรที่แลก": `${record.others?.CardTypeName ?? "-"}`,
+                  "ประเภทบุคคล": `${record.others?.PersonalTypeName ?? "-"}`,
+                  "รหัสอุปกรณ์ที่แกน": `${record.ACC_ID ?? "-"}`,
+                  "ชื่ออุปกรณ์ที่สแกน": `${record.AccDevice?.AccDeviceName ?? "-"}`,
+                  "พื้นที่ที่ทำการสแกน": `${record.AreaName ?? "-"}`,
+                  "สถานะการสแกน": `${record.others?.Scan_Status_Name ?? "-"}`,
+                  "วันที่ที่ทำการสแกน": record.others.scan_date_time ? moment(record.others.scan_date_time).format("DD/MM/YYYY") : "-",
+                  "เวลาที่ที่ทำการสแกน": record.others.scan_date_time ? moment(record.others.scan_date_time).format("HH:mm:ss") : "-",
+                  "เลขที่อุปกรณ์ดิดตามตัว": `${record.PersonGPS_ID ?? "-"}`,
+                  "เลขที่อุปกรณ์ติดตามยานพาหนะ": `${record.VehicleGPS_ID ?? "-"}`,
+                  "วันที่ทำการแลกบัตร": record.ExchangeCard_Date ? moment(record.ExchangeCard_Date).format("DD/MM/YYYY") : "-",
+                  "เวลาทำการแลกบัตร": record.ExchangeCard_Time ?? "-",
+                  "สถานะการแลกบัตร": record.others?.ExchangeCard_Status_Name ?? "-",
                   "รหัสผู้ควบคุมงาน": record.PTTStaffCode ?? "-",
-                  "ชื่อผู้ควบคุมงาน": record.PTTStaff ?? "-",
-                  "รหัสหน่วยงานผู้ควบคุม": record.AgencyID ?? "-",
-                  "ชื่อหน่วยงานผู้ควบคุม": record.AgencyName ?? "-",
-                  "รหัสเจ้าของพื้นที่": record.Owner ?? "-",
-                  "ประเภทของ Work": record.WorkpermitType ?? "-",
-                  "สถานะใบงาน": record.StatusName ?? "-",
-                  "สถานะแจ้งเตือน": record.others.StatusName ?? "-",
-
+                  "ชื่อผู้ควบคุมงาน": `${record.PTTStaff_FName ?? "-"} ${record.PTTStaff_LName ?? ""}`,
+                  "รหัสหน่วยงานผู้ควบคุม": `${record.AgencyCode ?? "-"}`,
+                  "ชื่อหน่วยงานผู้ควบคุม": `${record.AgencyName ?? "-"}`,
                 }), setIsModalVisible(!isModalVisible);
               }}
             >
@@ -163,7 +155,7 @@ const AcessControlPage = () => {
   ];
   const clusterConfig = {
     type: "cluster",
-    clusterRadius: "40px",
+    clusterRadius: "30px",
     labelsVisible: true,
     popupTemplate: {
       title: 'Cluster summary',
@@ -571,9 +563,9 @@ const AcessControlPage = () => {
     // console.log('data', data)
     dispatch(
       setStatus({
-        "In": { value: data.in, color: '#F88' },
-        "Out": { value: data.out, color: '#F48' },
-        "แลคบัตรเข้า": { value: data.exchange_card_in, color: '#F82' },
+        "สแกนเข้า": { value: data.in, color: '#F88' },
+        "สแกนออก": { value: data.out, color: '#F48' },
+        "แลกบัตรเข้า": { value: data.exchange_card_in, color: '#F82' },
         "บุคคลที่อยู่ในพื้นที่": { value: data.on_plant, color: '#F445' },
         "แลกบัตรออก": { value: data.exchange_card_out, color: '#F89' },
         "อุปกรณ์ Online": { value: data.online, color: '#112341' },
@@ -744,7 +736,7 @@ const AcessControlPage = () => {
               />
             </Form.Item>
 
-            <Form.Item
+            {/* <Form.Item
               name="StartDateTime"
               label='วัน-เวลา เริ่มต้น'
             >
@@ -752,9 +744,9 @@ const AcessControlPage = () => {
                 showTime={{ format: 'HH:mm' }}
                 format="DD/MM/YYYY HH:mm"
                 style={{ width: '100%' }} />
-            </Form.Item>
+            </Form.Item> */}
 
-            <Form.Item
+            {/* <Form.Item
               name="EndDateTime"
               label='วัน-เวลา สิ้นสุด'
             >
@@ -762,7 +754,7 @@ const AcessControlPage = () => {
                 showTime={{ format: 'HH:mm' }}
                 format="DD/MM/YYYY HH:mm"
                 style={{ width: '100%' }} />
-            </Form.Item>
+            </Form.Item> */}
 
             <Form.Item
               name="AccDeviceName"
@@ -772,7 +764,7 @@ const AcessControlPage = () => {
                 showArrow
                 style={{ width: '100%' }}
               >
-                {AccDeviceNameOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
+                {AccDeviceNameOptions.map((e) => <Select.Option key={e.value}>{`${e.id}-${e.value}`}</Select.Option>)}
               </Select>
             </Form.Item>
 
@@ -785,7 +777,7 @@ const AcessControlPage = () => {
                 showArrow
                 style={{ width: '100%' }}
               >
-                {PersonalTypeNameOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
+                {PersonalTypeNameOptions.map((e) => <Select.Option key={e.value}>{`${e.id}-${e.value}`}</Select.Option>)}
               </Select>
             </Form.Item>
 
