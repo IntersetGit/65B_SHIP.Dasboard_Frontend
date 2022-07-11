@@ -51,7 +51,7 @@ const AcessControlPage = () => {
       title: 'ชื่อ-สกุล ผู้รับเหมา',
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
-      render: (text, obj) => (obj.TitleName ?? "-") + " " +(obj.FirstName ?? "-") + " " + (obj.LastName ?? ""),
+      render: (text, obj) => (obj.TitleName ?? "-") + " " + (obj.FirstName ?? "-") + " " + (obj.LastName ?? ""),
       width: 150
     },
     {
@@ -357,11 +357,13 @@ const AcessControlPage = () => {
 
 
         // console.log('latlng =>>>>>>>>>>>>>', latlng)
-        setTabledata(latlng);
+        const new_latlng = latlng.filter(w => w.others.on_table);
+        // console.log('new_latlng', new_latlng)
+        setTabledata(new_latlng);
 
         let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
         // console.log('datageojson', datageojson)
-        setTabledata(latlng);
+
         const [FeatureLayer, GeoJSONLayer] = await loadModules([
           'esri/layers/FeatureLayer',
           'esri/layers/GeoJSONLayer',
