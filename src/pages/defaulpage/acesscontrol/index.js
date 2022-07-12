@@ -357,7 +357,7 @@ const AcessControlPage = () => {
 
 
         // console.log('latlng =>>>>>>>>>>>>>', latlng)
-        const new_latlng = latlng.filter(w => w.others.on_table);
+        const new_latlng =  item.data.filter(w => w.others.on_table == true);
         // console.log('new_latlng', new_latlng)
         setTabledata(new_latlng);
 
