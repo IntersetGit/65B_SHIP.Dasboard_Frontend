@@ -51,60 +51,65 @@ const WorkpermitPage = () => {
       title: 'เลข work',
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
+      align: "center",
+      width: 150
     },
     {
       title: 'ชื่อ - สกุล ผู้รับเหมา',
       dataIndex: 'Name',
       key: 'Name',
-
-
+      width: 150
     },
     {
       title: 'ผู้อนุญาต/เจ้าของพื้นที่',
       dataIndex: 'OwnerName',
       key: 'OwnerName',
-
+      width: 150
     },
     {
       title: 'ผู้ควบคุมงาน',
       dataIndex: 'PTTStaffName',
       key: 'PTTStaffName',
-
+      width: 150
     },
     {
       title: 'ประเภทงาน',
       key: 'WorkpermitType',
       dataIndex: 'WorkpermitType',
-
+      width: 150
     },
     {
       title: 'สถานที่ปฏิบัติงาน',
       key: 'AreaName',
       dataIndex: 'AreaName',
-
+      align: "center",
+      width: 150
     },
     {
       title: 'วัน-เวลา เริ่มต้นของใบงาน',
       dataIndex: 'date_time_start',
       key: 'date_time_start',
-
+      width: 200
     },
     {
       title: 'วัน-เวลา สิ้นสุดของใบงาน',
       dataIndex: 'date_time_end',
       key: 'date_time_end',
-
+      width: 200
     },
     {
       title: 'สถานะ work',
       dataIndex: 'others',
       key: 'others',
+      width: 150,
+      align: "center",
       render: (text, record) => text.WorkPermitStatusID
     },
     {
       title: 'สถานะแจ้งเตือน',
       dataIndex: 'notification',
       key: 'notification',
+      width: 150,
       render: (text, record) => isArray(text.list) ? text.list.length > 1 ? (
         <>
           <img src='/assets/iconmap/status/warning-all.png' width={15} /> {text.list.toString()}
@@ -114,7 +119,8 @@ const WorkpermitPage = () => {
     {
       title: '...',
       key: '',
-
+      width: 150,
+      align: "center",
       render: (text, record) => {
         return (
           <Space size='middle'>
@@ -146,6 +152,7 @@ const WorkpermitPage = () => {
                   "สถานะใบงาน": record.others.WorkPermitStatusID,
                   "เวลาการตรวจวัดก๊าซล่าสุด": record.GasMeasurement,
                   "อุปกรณ์ที่ Impairment": record.impairmentName,
+                  "สถานะแจ้งเตือน": isArray(record.notification.list) ? record.notification.list.length > 1 ? record.notification.list.toString() : record.notification.list.toString() : "-"
                 }),
                   setIsModalVisible(!isModalVisible);
               }}
@@ -289,8 +296,8 @@ const WorkpermitPage = () => {
         let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
         var Arealatlng = await Promise.all(GetAllArea.map(async (area, index) => {
           let extent = await area?.queryExtent();
-          let test = await PTTlayer.RandomInArea(extent.extent);
-          console.log('test', test)
+          // let test = await PTTlayer.RandomInArea(extent.extent);
+          // console.log('test', test)
 
           let feature = await area.queryFeatures();
           let namearea = feature?.features[0]?.attributes?.UNITNAME;
@@ -342,14 +349,13 @@ const WorkpermitPage = () => {
             if (obj.notification.gas) arr2.push("gas");
             if (obj.notification.impairment) arr2.push("impairment");
 
-            if (isNumber(obj.notification.near_expire)) arr.push("⚠️ ใกล้ Exp");
-            if (isNumber(obj.notification.expire)) arr.push("‼️ หมด Exp");
-            if (isNumber(obj.notification.gas)) arr.push("ก๊าซที่ต้องตรวจวัด");
-            if (isNumber(obj.notification.impairment)) arr.push("Impairment");
+            if ((obj.notification.near_expire === true)) arr.push("⚠️ ใกล้ Exp");
+            if ((obj.notification.expire === true)) arr.push("‼️ หมด Exp");
+            if ((obj.notification.gas === true)) arr.push("ก๊าซที่ต้องตรวจวัด");
+            if ((obj.notification.impairment === true)) arr.push("Impairment");
             obj.notification.list = arr;
             obj.notification.list2 = arr2;
           }
-          // console.log('obj', obj)
 
           latlng.push({
             ...obj,
