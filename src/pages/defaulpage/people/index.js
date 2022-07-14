@@ -377,8 +377,8 @@ const PeoplePage = () => {
       setStatus({
         "จำนวนจุด": { value: data.all, color: '#112345' },
         "ปกติ": { value: data.normal, color: '#F54' },
-        "ใกล้ Exp": { value: data.near_expire, color: '#F09234' },
-        "หมด Exp": { value: data.expire, color: '#F88' },
+        "ใกล้ Exp.": { value: data.near_expire, color: '#F09234' },
+        "Exp.": { value: data.expire, color: '#F88' },
       }),
     );
 

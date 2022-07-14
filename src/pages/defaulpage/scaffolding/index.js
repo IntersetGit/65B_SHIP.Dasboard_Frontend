@@ -551,8 +551,8 @@ const ScaffoldingPage = () => {
     const Status = {}
     if (data.all !== undefined) Status["นั่งร้านในพื้นที่"] = { value: data.all, color: '#112345' };
     if (data.normal !== undefined) Status["ปกติ"] = { value: data.normal, color: '#17d149' };
-    if (data.near_expire !== undefined) Status["ใกล้ Exp"] = { value: data.near_expire ?? 0, color: '#F09234', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
-    if (data.expire !== undefined) Status["หมด Exp"] = { value: data.expire, color: '#F54', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
+    if (data.near_expire !== undefined) Status["ใกล้ Exp."] = { value: data.near_expire ?? 0, color: '#F09234', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
+    if (data.expire !== undefined) Status["Exp."] = { value: data.expire, color: '#F54', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
 
     dispatch(
       setStatus(Status),

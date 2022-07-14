@@ -349,10 +349,10 @@ const WorkpermitPage = () => {
             if (obj.notification.gas) arr2.push("gas");
             if (obj.notification.impairment) arr2.push("impairment");
 
-            if ((obj.notification.near_expire === true)) arr.push("⚠️ ใกล้ Exp");
-            if ((obj.notification.expire === true)) arr.push("‼️ หมด Exp");
-            if ((obj.notification.gas === true)) arr.push("ก๊าซที่ต้องตรวจวัด");
-            if ((obj.notification.impairment === true)) arr.push("Impairment");
+            if ((obj.notification.near_expire === true)) arr.push(" ใกล้ Exp.");
+            if ((obj.notification.expire === true)) arr.push(" Exp.");
+            if ((obj.notification.gas === true)) arr.push(" ก๊าซที่ต้องตรวจวัด");
+            if ((obj.notification.impairment === true)) arr.push(" Impairment");
             obj.notification.list = arr;
             obj.notification.list2 = arr2;
           }
@@ -374,14 +374,14 @@ const WorkpermitPage = () => {
             ...demodata.getRandomLocation(getlatlng_byarea.latitude, getlatlng_byarea.longitude, 3),
             "locatoin": obj.SubAreaName,
             "work_type": obj.WorkpermitType,
-            "warning": obj.others.WorkPermitStatusID
+            "warning": obj.notification.list.toString()
           })
 
           //})
         }
 
 
-        console.log('latlng =>>>>>>>>>>>>>', latlng)
+        // console.log('latlng =>>>>>>>>>>>>>', latlng)
         setTabledata(latlng);
 
         let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
@@ -494,8 +494,8 @@ const WorkpermitPage = () => {
       },
       {
         name: "CD",
-        color: "rgba(251, 154, 153)",
-        img: await CreateIcon("rgba(251, 154, 153)", false),
+        color: "#228B22",
+        img: await CreateIcon("#228B22", false),
         detail: 'ใบอนุญาติทำงานธรรมดา'
       },
       {
@@ -506,8 +506,8 @@ const WorkpermitPage = () => {
       },
       {
         name: "EV",
-        color: "rgba(123, 154, 153)",
-        img: await CreateIcon("rgba(123, 154, 153)", false),
+        color: "#93FFE8",
+        img: await CreateIcon("#93FFE8", false),
         detail: 'ใบอนุญาติทำงานที่อับอากาศ'
       },
       {
@@ -518,26 +518,26 @@ const WorkpermitPage = () => {
       },
       {
         name: "HT1",
-        color: "rgba(255, 127, 0)",
-        img: await CreateIcon("rgba(255, 127, 0)", false),
+        color: "#EE9A4D",
+        img: await CreateIcon("#EE9A4D", false),
         detail: 'ใบอนุญาติที่มีความร้อนประกายไฟ-I'
       },
       {
         name: "HT2",
-        color: "rgba(255, 12, 0)",
-        img: await CreateIcon("rgba(255, 12, 0)", false),
+        color: "#A70D2A",
+        img: await CreateIcon("#A70D2A", false),
         detail: 'ใบอนุญาติที่มีความร้อนประกายไฟ-II'
       },
       {
         name: "MC",
-        color: "rgba(51, 160, 44)",
-        img: await CreateIcon("rgba(51, 160, 44)", false),
+        color: "#9D00FF",
+        img: await CreateIcon("#9D00FF", false),
         detail: 'ใบอนุญาติใช้งานรถเครนชนิดเคลื่อนที่/รถเฮียบ'
       },
       {
         name: "RD",
-        color: "rgba(122, 160, 44)",
-        img: await CreateIcon("rgba(122, 160, 44)", false),
+        color: "#F778A1",
+        img: await CreateIcon("#F778A1", false),
         detail: 'ใบอนุญาติทำงานรังสี'
       },
     ]
@@ -579,12 +579,12 @@ const WorkpermitPage = () => {
       {
         name: "near_expire",
         detail: "แจ้งเตือนใกล้หมดอายุ",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png"
+        img: "/assets/iconmap/status/warning-yellow-2.png"
       },
       {
         name: "expire",
         detail: "แจ้งเตือนหมดอายุ",
-        img: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
+        img: "/assets/iconmap/status/warning-red-2.png"
       },
       {
         name: "warning_all",
@@ -662,8 +662,8 @@ const WorkpermitPage = () => {
     if (data.total !== undefined) Status["ใบงานทั้งหมด"] = { value: data.total, color: '#112345' };
     if (data.open !== undefined) Status["Open"] = { value: data.open, color: '#17d149' };
     if (data.close !== undefined) Status["Close"] = { value: data.close, color: '#F09234', };
-    if (data.near_expire !== undefined) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
-    if (data.expire !== undefined) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
+    if (data.near_expire !== undefined) Status["ใกล้ Exp."] = { value: data.near_expire, color: '#F54', img: "/assets/iconmap/status/warning-yellow-2.png" };
+    if (data.expire !== undefined) Status["Exp."] = { value: data.expire, color: '#F89', img: "/assets/iconmap/status/warning-red-2.png" };
     if (data.gas !== undefined) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F024', img: '/assets/iconmap/status/warning-yellow.png' };
     if (data.impairment !== undefined) Status["Impairment"] = { value: data.impairment, color: '#548', img: '/assets/iconmap/status/warning-red.png' };
     dispatch(
