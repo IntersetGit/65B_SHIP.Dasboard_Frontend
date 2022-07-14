@@ -93,14 +93,14 @@ const ScaffoldingPage = () => {
     //   width: 150
     // },
     {
-      title: 'วัน-เวลา นำเข้าพื้นที่',
+      title: 'วัน-เวลา ติดตั้ง',
       dataIndex: 'WorkingStartDate',
       key: 'WorkingStartDate',
       render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD HH:mm:ss") : "-",
       width: 200
     },
     {
-      title: 'วัน-เวลา หมดอายุนั่งร้าน',
+      title: 'วัน-เวลา หมดอายุ',
       dataIndex: 'WorkingEndDate',
       key: 'WorkingEndDate',
       render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD HH:mm:ss") : "-",
@@ -151,8 +151,8 @@ const ScaffoldingPage = () => {
                   "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubAreaName ?? "-",
                   // "ข้อมูลพิกัดนั่งร้าน": record.Features ?? "-",
                   // "ข้อมูลคุณสมบัตินั่งร้าน": record.FeaturesProperties ?? "-",
-                  "วัน เวลา เริ่มต้นการปฏิบัติงาน": record.WorkingStartDate ? moment(new Date(record.WorkingStartDate)).format("YYYY-MM-DD HH:mm:ss") : "-",
-                  "วัน เวลา สิ้นสุดการปฏิบัติงาน": record.WorkingEndDate ? moment(new Date(record.WorkingEndDate)).format("YYYY-MM-DD HH:mm:ss") : "-",
+                  "วัน เวลา ติดตั้ง": record.WorkingStartDate ? moment(new Date(record.WorkingStartDate)).format("YYYY-MM-DD HH:mm:ss") : "-",
+                  "วัน เวลา หมดอายุ": record.WorkingEndDate ? moment(new Date(record.WorkingEndDate)).format("YYYY-MM-DD HH:mm:ss") : "-",
                   "รหัสบริษัท": record.VendorCode ?? "-",
                   "ชื่อบริษัท": record.VendorName ?? "-",
                   "รหัสผู้ควบคุมงาน": record.PTTStaffCode ?? "-",
@@ -744,7 +744,7 @@ const ScaffoldingPage = () => {
 
               <Form.Item
                 name="StartDateTime"
-                label='วัน-เวลา เริ่มต้น'
+                label='วัน-เวลา ติดตั้ง'
               >
                 <DatePicker
                   showTime={{ format: 'HH:mm' }}
@@ -754,7 +754,7 @@ const ScaffoldingPage = () => {
 
               <Form.Item
                 name="EndDateTime"
-                label='วัน-เวลา สิ้นสุด'
+                label='วัน-เวลา หมดอายุ'
               >
                 <DatePicker
                   showTime={{ format: 'HH:mm' }}
