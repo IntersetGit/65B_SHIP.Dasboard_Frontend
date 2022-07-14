@@ -26,6 +26,7 @@ import API from '../../../util/Api'
 import { isArray, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 const { Panel } = Collapse;
+import { Helmet } from 'react-helmet';
 
 
 const ScaffoldingPage = () => {
@@ -550,7 +551,7 @@ const ScaffoldingPage = () => {
     const Status = {}
     if (data.all !== undefined) Status["นั่งร้านในพื้นที่"] = { value: data.all, color: '#112345' };
     if (data.normal !== undefined) Status["ปกติ"] = { value: data.normal, color: '#17d149' };
-    if  (data.near_expire !== undefined) Status["ใกล้ Exp"] = { value: data.near_expire ?? 0, color: '#F09234', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
+    if (data.near_expire !== undefined) Status["ใกล้ Exp"] = { value: data.near_expire ?? 0, color: '#F09234', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
     if (data.expire !== undefined) Status["หมด Exp"] = { value: data.expire, color: '#F54', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
 
     dispatch(
@@ -666,186 +667,191 @@ const ScaffoldingPage = () => {
   }
 
   return (
-    <div id="pagediv">
-      <Map
-        className='Mapacrgis'
-        onLoad={Onload}
-        mapProperties={{
-          basemap: `${'arcgis-navigation'}`,
-          autoResize: false,
-        }}
-        viewProperties={{
-          center: [100.3330867, 14.5548052],
-          ui: { components: ['attribution', 'compass'] },
-        }}
-      >
-        <div id='button-top' className='button-topleft'>
-          <div
-            className='esri-widget--button esri-icon-table'
-            onClick={() => {
-              if (
-                document.querySelector('.ant-table-wrapper').style.display ===
-                'none' ||
-                document.querySelector('.ant-table-wrapper').style.display ===
-                ''
-              ) {
-                // document
-                //   .querySelector('.ant-table-wrapper')
-                //   .style.setProperty('display', 'block', 'important');
-                openTable()
-              } else {
-                // document
-                //   .querySelector('.ant-table-wrapper')
-                //   .style.setProperty('display', 'none', 'important');
-                closeTable()
-              }
-            }}
-          />
-        </div>
-        <div
-          ref={refdrawn}
-          id='viewtest'
-          className='menuserchslide esri-widget'
+    <>
+      <Helmet>
+        <title>Scaffolding | DashBoard</title>
+      </Helmet>
+      <div id="pagediv">
+        <Map
+          className='Mapacrgis'
+          onLoad={Onload}
+          mapProperties={{
+            basemap: `${'arcgis-navigation'}`,
+            autoResize: false,
+          }}
+          viewProperties={{
+            center: [100.3330867, 14.5548052],
+            ui: { components: ['attribution', 'compass'] },
+          }}
         >
-          <Form
-            form={form}
-            labelCol={{ span: 10 }}
-            wrapperCol={{ span: 16 }}
-            name='nest-messages'
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
+          <div id='button-top' className='button-topleft'>
+            <div
+              className='esri-widget--button esri-icon-table'
+              onClick={() => {
+                if (
+                  document.querySelector('.ant-table-wrapper').style.display ===
+                  'none' ||
+                  document.querySelector('.ant-table-wrapper').style.display ===
+                  ''
+                ) {
+                  // document
+                  //   .querySelector('.ant-table-wrapper')
+                  //   .style.setProperty('display', 'block', 'important');
+                  openTable()
+                } else {
+                  // document
+                  //   .querySelector('.ant-table-wrapper')
+                  //   .style.setProperty('display', 'none', 'important');
+                  closeTable()
+                }
+              }}
+            />
+          </div>
+          <div
+            ref={refdrawn}
+            id='viewtest'
+            className='menuserchslide esri-widget'
           >
-            <Form.Item
-              name="PTTStaffCode"
-              label='รหัสพนักงานผู้ควบคุมงาน'
+            <Form
+              form={form}
+              labelCol={{ span: 10 }}
+              wrapperCol={{ span: 16 }}
+              name='nest-messages'
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
             >
-              <Select
-                showArrow
-                style={{ width: '100%' }}
-                options={PTTStaffCode}
-              />
-            </Form.Item>
+              <Form.Item
+                name="PTTStaffCode"
+                label='รหัสพนักงานผู้ควบคุมงาน'
+              >
+                <Select
+                  showArrow
+                  style={{ width: '100%' }}
+                  options={PTTStaffCode}
+                />
+              </Form.Item>
 
-            <Form.Item
-              name="AgencyName"
-              label='หน่วยงานผู้ควบคุมงาน'
-            >
-              <Select
-                showArrow
-                style={{ width: '100%' }}
-                options={AgencyName}
-              />
-            </Form.Item>
+              <Form.Item
+                name="AgencyName"
+                label='หน่วยงานผู้ควบคุมงาน'
+              >
+                <Select
+                  showArrow
+                  style={{ width: '100%' }}
+                  options={AgencyName}
+                />
+              </Form.Item>
 
-            <Form.Item
-              name="StartDateTime"
-              label='วัน-เวลา เริ่มต้น'
-            >
-              <DatePicker
-                showTime={{ format: 'HH:mm' }}
-                format="DD/MM/YYYY HH:mm"
-                style={{ width: '100%' }} />
-            </Form.Item>
+              <Form.Item
+                name="StartDateTime"
+                label='วัน-เวลา เริ่มต้น'
+              >
+                <DatePicker
+                  showTime={{ format: 'HH:mm' }}
+                  format="DD/MM/YYYY HH:mm"
+                  style={{ width: '100%' }} />
+              </Form.Item>
 
-            <Form.Item
-              name="EndDateTime"
-              label='วัน-เวลา สิ้นสุด'
-            >
-              <DatePicker
-                showTime={{ format: 'HH:mm' }}
-                format="DD/MM/YYYY HH:mm"
-                style={{ width: '100%' }} />
-            </Form.Item>
+              <Form.Item
+                name="EndDateTime"
+                label='วัน-เวลา สิ้นสุด'
+              >
+                <DatePicker
+                  showTime={{ format: 'HH:mm' }}
+                  format="DD/MM/YYYY HH:mm"
+                  style={{ width: '100%' }} />
+              </Form.Item>
 
-            <Form.Item
-              name="AreaName"
-              label='สถานที่ปฏิบัติงาน'
-            >
-              <Select
-                showArrow
-                style={{ width: '100%' }}
-                options={AreaName}
-              />
-            </Form.Item>
+              <Form.Item
+                name="AreaName"
+                label='สถานที่ปฏิบัติงาน'
+              >
+                <Select
+                  showArrow
+                  style={{ width: '100%' }}
+                  options={AreaName}
+                />
+              </Form.Item>
 
-            <Form.Item
-              name="ScaffoldingType"
-              label='ประเภทนั่งร้าน'
-            >
-              <Select
-                mode='multiple'
-                showArrow
-                style={{ width: '100%' }}
-                options={ScaffoldingType}
-              />
-            </Form.Item>
+              <Form.Item
+                name="ScaffoldingType"
+                label='ประเภทนั่งร้าน'
+              >
+                <Select
+                  mode='multiple'
+                  showArrow
+                  style={{ width: '100%' }}
+                  options={ScaffoldingType}
+                />
+              </Form.Item>
 
-            <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
+              <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
 
-              <Button type='primary' htmlType='submit' style={{ width: 100 }}>
-                ค้นหา
-              </Button>
-              <span style={{ paddingRight: 5 }} />
-              <Button style={{ width: 100 }} onClick={reset}>
-                ค่าเริ่มต้น
-              </Button>
-            </Form.Item>
-          </Form>
-        </div>
-
-
-        <div ref={refdetail} className='sysmbole esri-widget'>
-          <Collapse accordion >
-            <Panel header="ใช้สีแทนประเภทนั่งร้าน" key="1">
-              {stateSysmbole ? stateSysmbole[0] : <>กำลังรอข้อมูล...</>}
-            </Panel>
-            <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
-              {stateSysmbole ? stateSysmbole[1] : <>กำลังรอข้อมูล...</>}
-            </Panel>
-
-          </Collapse>
-        </div>
-
-      </Map>
+                <Button type='primary' htmlType='submit' style={{ width: 100 }}>
+                  ค้นหา
+                </Button>
+                <span style={{ paddingRight: 5 }} />
+                <Button style={{ width: 100 }} onClick={reset}>
+                  ค่าเริ่มต้น
+                </Button>
+              </Form.Item>
+            </Form>
+          </div>
 
 
-      <Modal
-        title='รายละเอียด'
-        okButtonProps={{ hidden: true }}
-        onCancel={() => setIsModalVisible(!isModalVisible)}
-        visible={isModalVisible}
-        bodyStyle={{
-          maxHeight: 600,
-          overflowX: "auto"
-        }}
-      >
-        {datamodal &&
-          Object.entries(datamodal).map(([key, value]) => (
-            <Row key={key}>
-              <Col span={12}>
-                <span style={{ color: "#0A8FDC" }}>{key}</span>
-              </Col>
-              <Col span={12}>{value}</Col>
-            </Row>
-          ))}
-      </Modal>
+          <div ref={refdetail} className='sysmbole esri-widget'>
+            <Collapse accordion >
+              <Panel header="ใช้สีแทนประเภทนั่งร้าน" key="1">
+                {stateSysmbole ? stateSysmbole[0] : <>กำลังรอข้อมูล...</>}
+              </Panel>
+              <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
+                {stateSysmbole ? stateSysmbole[1] : <>กำลังรอข้อมูล...</>}
+              </Panel>
 
-      <Table
-        id='divtable'
-        scroll={{ y: '25vh' }}
-        size='small'
-        style={{ position: 'absolute', bottom: 0, backgroundColor: 'white', display: 'none' }}
-        rowClassName={(record, index) =>
-          record?.status_warnning !== null &&
-            record?.status_warnning !== undefined
-            ? 'table-row-red'
-            : ''
-        }
-        rowKey={(d, index) => index.toString()}
-        columns={columns2}
-        dataSource={tabledata}
-      />
-    </div>
+            </Collapse>
+          </div>
+
+        </Map>
+
+
+        <Modal
+          title='รายละเอียด'
+          okButtonProps={{ hidden: true }}
+          onCancel={() => setIsModalVisible(!isModalVisible)}
+          visible={isModalVisible}
+          bodyStyle={{
+            maxHeight: 600,
+            overflowX: "auto"
+          }}
+        >
+          {datamodal &&
+            Object.entries(datamodal).map(([key, value]) => (
+              <Row key={key}>
+                <Col span={12}>
+                  <span style={{ color: "#0A8FDC" }}>{key}</span>
+                </Col>
+                <Col span={12}>{value}</Col>
+              </Row>
+            ))}
+        </Modal>
+
+        <Table
+          id='divtable'
+          scroll={{ y: '25vh' }}
+          size='small'
+          style={{ position: 'absolute', bottom: 0, backgroundColor: 'white', display: 'none' }}
+          rowClassName={(record, index) =>
+            record?.status_warnning !== null &&
+              record?.status_warnning !== undefined
+              ? 'table-row-red'
+              : ''
+          }
+          rowKey={(d, index) => index.toString()}
+          columns={columns2}
+          dataSource={tabledata}
+        />
+      </div>
+    </>
   );
 };
 

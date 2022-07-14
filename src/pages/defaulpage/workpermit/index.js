@@ -27,6 +27,7 @@ import API from '../../../util/Api'
 import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 import { circle } from '@turf/turf';
+import { Helmet } from 'react-helmet';
 
 const { Panel } = Collapse;
 
@@ -448,8 +449,8 @@ const WorkpermitPage = () => {
             reactiveUtils.watch(
               () => stateView?.scale,
               (scale) => {
-                layerpoint.featureReduction  =
-                scale > 80 ? clusterConfig : null;
+                layerpoint.featureReduction =
+                  scale > 80 ? clusterConfig : null;
                 // console.log('scale :>> ', scale);
               }
             );
@@ -778,69 +779,73 @@ const WorkpermitPage = () => {
     document.querySelector('.ant-table-wrapper').style.setProperty('display', 'none', 'important');
   }
   return (
-    <div id="pagediv">
-      <Map
-        className='Mapacrgis'
-        onLoad={Onload}
-        mapProperties={{
-          basemap: `${'arcgis-navigation'}`,
-          autoResize: false,
-        }}
-        viewProperties={{
-          center: [100.3330867, 14.5548052],
-          ui: { components: ['attribution', 'compass'] },
-        }}
-      >
-        <div id='button-top' className='button-topleft'>
-          <div
-            className='esri-widget--button esri-icon-table'
-            onClick={() => {
-              if (
-                document.querySelector('.ant-table-wrapper').style.display ===
-                'none' ||
-                document.querySelector('.ant-table-wrapper').style.display ===
-                ''
-              ) {
-                // document
-                //   .querySelector('.ant-table-wrapper')
-                //   .style.setProperty('display', 'block', 'important');
-                openTable()
-              } else {
-                // document
-                //   .querySelector('.ant-table-wrapper')
-                //   .style.setProperty('display', 'none', 'important');
-                closeTable()
-              }
-            }}
-          />
-        </div>
-
-        <div
-          ref={refdrawn}
-          id='viewtest'
-          className='menuserchslide esri-widget'
+    <>
+      <Helmet>
+        <title>Workpermit | DashBoard</title>
+      </Helmet>
+      <div id="pagediv">
+        <Map
+          className='Mapacrgis'
+          onLoad={Onload}
+          mapProperties={{
+            basemap: `${'arcgis-navigation'}`,
+            autoResize: false,
+          }}
+          viewProperties={{
+            center: [100.3330867, 14.5548052],
+            ui: { components: ['attribution', 'compass'] },
+          }}
         >
-          <Form
-            form={form}
-            labelCol={{ span: 10 }}
-            wrapperCol={{ span: 16 }}
-            name='nest-messages'
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-          >
-            <Form.Item
-              name="PTTStaffID"
-              label='รหัสพนักงานผู้ควบคุมงาน'
-            >
-              <Select
-                showArrow
-                loading={loading}
-                style={{ width: '100%' }}
-                options={PTTStaffIDOptions}
-              />
-            </Form.Item>
+          <div id='button-top' className='button-topleft'>
+            <div
+              className='esri-widget--button esri-icon-table'
+              onClick={() => {
+                if (
+                  document.querySelector('.ant-table-wrapper').style.display ===
+                  'none' ||
+                  document.querySelector('.ant-table-wrapper').style.display ===
+                  ''
+                ) {
+                  // document
+                  //   .querySelector('.ant-table-wrapper')
+                  //   .style.setProperty('display', 'block', 'important');
+                  openTable()
+                } else {
+                  // document
+                  //   .querySelector('.ant-table-wrapper')
+                  //   .style.setProperty('display', 'none', 'important');
+                  closeTable()
+                }
+              }}
+            />
+          </div>
 
-            {/* <Form.Item
+          <div
+            ref={refdrawn}
+            id='viewtest'
+            className='menuserchslide esri-widget'
+          >
+            <Form
+              form={form}
+              labelCol={{ span: 10 }}
+              wrapperCol={{ span: 16 }}
+              name='nest-messages'
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
+            >
+              <Form.Item
+                name="PTTStaffID"
+                label='รหัสพนักงานผู้ควบคุมงาน'
+              >
+                <Select
+                  showArrow
+                  loading={loading}
+                  style={{ width: '100%' }}
+                  options={PTTStaffIDOptions}
+                />
+              </Form.Item>
+
+              {/* <Form.Item
               name="AgencyID"
               label='รหัสหน่วยงานผู้ควบคุม'
             >
@@ -852,180 +857,182 @@ const WorkpermitPage = () => {
               />
             </Form.Item> */}
 
-            <Form.Item
-              name="AgencyName"
-              label='หน่วยงานผู้ควบคุม'
-            >
-              <Select
-                loading={loading}
-                showArrow
-                style={{ width: '100%' }}
-                options={AgencyNameOptions}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="StartDateTime"
-              label='วัน-เวลา เริ่มต้น'
-            >
-              <DatePicker
-                loading={loading}
-                showTime={{ format: 'HH:mm' }}
-                format="DD/MM/YYYY HH:mm"
-                style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item
-              name="EndDateTime"
-              label='วัน-เวลา สิ้นสุด'
-            >
-              <DatePicker
-                loading={loading}
-                showTime={{ format: 'HH:mm' }}
-                format="DD/MM/YYYY HH:mm"
-                style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item
-              name="AreaName"
-              label='สถานที่ปฎิบัติงาน'
-            >
-              <Select
-                loading={loading}
-                showArrow
-                style={{ width: '100%' }}
-                options={AreaNameOptions}
-              />
-            </Form.Item>
-
-
-            <Form.Item
-              name="WorkPermitStatusID"
-              label='สถานะ Work'
-            >
-              <Select
-                loading={loading}
-                mode='multiple'
-                showArrow
-                style={{ width: '100%' }}
-
+              <Form.Item
+                name="AgencyName"
+                label='หน่วยงานผู้ควบคุม'
               >
-                {WorkPermitStatusIDOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
+                <Select
+                  loading={loading}
+                  showArrow
+                  style={{ width: '100%' }}
+                  options={AgencyNameOptions}
+                />
+              </Form.Item>
 
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              name="WorkpermitTypeID"
-              label='ประเภทใบอนุญาต'
-            >
-              <Select
-                loading={loading}
-                mode='multiple'
-                showArrow
-                style={{ width: '100%' }}
+              <Form.Item
+                name="StartDateTime"
+                label='วัน-เวลา เริ่มต้น'
               >
-                {WorkpermitTypeIDOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
-              </Select>
+                <DatePicker
+                  loading={loading}
+                  showTime={{ format: 'HH:mm' }}
+                  format="DD/MM/YYYY HH:mm"
+                  style={{ width: '100%' }} />
+              </Form.Item>
 
-            </Form.Item>
+              <Form.Item
+                name="EndDateTime"
+                label='วัน-เวลา สิ้นสุด'
+              >
+                <DatePicker
+                  loading={loading}
+                  showTime={{ format: 'HH:mm' }}
+                  format="DD/MM/YYYY HH:mm"
+                  style={{ width: '100%' }} />
+              </Form.Item>
 
-            <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
+              <Form.Item
+                name="AreaName"
+                label='สถานที่ปฎิบัติงาน'
+              >
+                <Select
+                  loading={loading}
+                  showArrow
+                  style={{ width: '100%' }}
+                  options={AreaNameOptions}
+                />
+              </Form.Item>
 
-              <Button type='primary' htmlType='submit' style={{ width: 100 }} loading={loading}>
-                ค้นหา
-              </Button>
-              <span style={{ paddingRight: 5 }} />
-              <Button style={{ width: 100 }} onClick={reset} loading={loading}>
-                ค่าเริ่มต้น
-              </Button>
-            </Form.Item>
-          </Form>
-        </div>
-        <div ref={refdetail} className='sysmbole esri-widget'>
-          <Collapse accordion >
-            <Panel header="ใช้สีแทนประเภทใบงาน" key="1">
-              {stateSysmbole ? stateSysmbole[0] : <>กำลังรอข้อมูล...</>}
-            </Panel>
-            {stateSysmbole && stateSysmbole[2] && <Panel header="ใช้สัญลักษณ์แทนการเปิด-ปิด" key="3">
-              {stateSysmbole ? stateSysmbole[2] : <>กำลังรอข้อมูล...</>}
-            </Panel>}
-            <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
-              {stateSysmbole ? stateSysmbole[1] : <>กำลังรอข้อมูล...</>}
-            </Panel>
 
-          </Collapse>
-          {/* <div id="legendDiv"></div> */}
+              <Form.Item
+                name="WorkPermitStatusID"
+                label='สถานะ Work'
+              >
+                <Select
+                  loading={loading}
+                  mode='multiple'
+                  showArrow
+                  style={{ width: '100%' }}
 
-        </div>
+                >
+                  {WorkPermitStatusIDOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
 
-      </Map>
-      <Modal
-        title='รายละเอียด'
-        okButtonProps={{ hidden: true }}
-        onCancel={() => setIsModalVisible(!isModalVisible)}
-        visible={isModalVisible}
-        bodyStyle={{
-          maxHeight: 600,
-          overflowX: "auto"
-        }}
-      >
-        {datamodal &&
-          Object.entries(datamodal).map(([key, value]) => (
-            !(typeof value == 'object') &&
-            <Row key={key}>
-              <Col span={12}>
-                <span style={{ color: "#0A8FDC" }}>{key}</span>
-              </Col>
-              <Col span={12}>{value ?? "-"}</Col>
-            </Row>
-          ))}
-      </Modal>
-      <Table
-        id='divtable'
-        scroll={{ y: '25vh' }}
-        size='small'
-        style={{ position: 'absolute', bottom: 0, backgroundColor: 'white', display: 'none' }}
-        rowClassName={(record, index) =>
-          record?.status_warnning !== null &&
-            record?.status_warnning !== undefined
-            ? 'table-row-red'
-            : ''
-        }
-        onRow={(record, rowIndex) => {
-          return {
-            onClick: async () => {
-              const [GeoJSONLayer] = await loadModules([
-                'esri/layers/GeoJSONLayer',
-              ]);
-              let cicle = circle([record.longitude, record.latitude], 0.001);
-              const blob = new Blob([JSON.stringify(cicle)], {
-                type: 'application/json',
-              });
-              const url = URL.createObjectURL(blob);
-              const geojsonlayer = new GeoJSONLayer({
-                url: url,
-                copyright: "PTT POINTGENARATE"
-              });
-              let extent = await geojsonlayer.queryExtent();
+                </Select>
+              </Form.Item>
 
-              // const polygon = new Polygon({
-              //   hasZ: true,
-              //   hasM: true,
-              //   rings: [cicle.geometry.coordinates],
-              //   spatialReference: { wkid: 4326 }
-              // });
-              // console.log(polygon);
+              <Form.Item
+                name="WorkpermitTypeID"
+                label='ประเภทใบอนุญาต'
+              >
+                <Select
+                  loading={loading}
+                  mode='multiple'
+                  showArrow
+                  style={{ width: '100%' }}
+                >
+                  {WorkpermitTypeIDOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
+                </Select>
 
-              stateView?.goTo(extent.extent)
-            }, // click row
-          };
-        }}
-        rowKey={(i) => i.id}
-        columns={columns}
-        dataSource={tabledata}
-      />
-    </div>
+              </Form.Item>
+
+              <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
+
+                <Button type='primary' htmlType='submit' style={{ width: 100 }} loading={loading}>
+                  ค้นหา
+                </Button>
+                <span style={{ paddingRight: 5 }} />
+                <Button style={{ width: 100 }} onClick={reset} loading={loading}>
+                  ค่าเริ่มต้น
+                </Button>
+              </Form.Item>
+            </Form>
+          </div>
+          <div ref={refdetail} className='sysmbole esri-widget'>
+            <Collapse accordion >
+              <Panel header="ใช้สีแทนประเภทใบงาน" key="1">
+                {stateSysmbole ? stateSysmbole[0] : <>กำลังรอข้อมูล...</>}
+              </Panel>
+              {stateSysmbole && stateSysmbole[2] && <Panel header="ใช้สัญลักษณ์แทนการเปิด-ปิด" key="3">
+                {stateSysmbole ? stateSysmbole[2] : <>กำลังรอข้อมูล...</>}
+              </Panel>}
+              <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
+                {stateSysmbole ? stateSysmbole[1] : <>กำลังรอข้อมูล...</>}
+              </Panel>
+
+            </Collapse>
+            {/* <div id="legendDiv"></div> */}
+
+          </div>
+
+        </Map>
+        <Modal
+          title='รายละเอียด'
+          okButtonProps={{ hidden: true }}
+          onCancel={() => setIsModalVisible(!isModalVisible)}
+          visible={isModalVisible}
+          bodyStyle={{
+            maxHeight: 600,
+            overflowX: "auto"
+          }}
+        >
+          {datamodal &&
+            Object.entries(datamodal).map(([key, value]) => (
+              !(typeof value == 'object') &&
+              <Row key={key}>
+                <Col span={12}>
+                  <span style={{ color: "#0A8FDC" }}>{key}</span>
+                </Col>
+                <Col span={12}>{value ?? "-"}</Col>
+              </Row>
+            ))}
+        </Modal>
+        <Table
+          id='divtable'
+          scroll={{ y: '25vh' }}
+          size='small'
+          style={{ position: 'absolute', bottom: 0, backgroundColor: 'white', display: 'none' }}
+          rowClassName={(record, index) =>
+            record?.status_warnning !== null &&
+              record?.status_warnning !== undefined
+              ? 'table-row-red'
+              : ''
+          }
+          onRow={(record, rowIndex) => {
+            return {
+              onClick: async () => {
+                const [GeoJSONLayer] = await loadModules([
+                  'esri/layers/GeoJSONLayer',
+                ]);
+                let cicle = circle([record.longitude, record.latitude], 0.001);
+                const blob = new Blob([JSON.stringify(cicle)], {
+                  type: 'application/json',
+                });
+                const url = URL.createObjectURL(blob);
+                const geojsonlayer = new GeoJSONLayer({
+                  url: url,
+                  copyright: "PTT POINTGENARATE"
+                });
+                let extent = await geojsonlayer.queryExtent();
+
+                // const polygon = new Polygon({
+                //   hasZ: true,
+                //   hasM: true,
+                //   rings: [cicle.geometry.coordinates],
+                //   spatialReference: { wkid: 4326 }
+                // });
+                // console.log(polygon);
+
+                stateView?.goTo(extent.extent)
+              }, // click row
+            };
+          }}
+          rowKey={(i) => i.id}
+          columns={columns}
+          dataSource={tabledata}
+        />
+      </div>
+    </>
+
   )
 }
 export default WorkpermitPage;
