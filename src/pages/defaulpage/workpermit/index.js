@@ -74,14 +74,14 @@ const WorkpermitPage = () => {
     },
     {
       title: 'ประเภทงาน',
-      key: 'WorkpermitType',
-      dataIndex: 'WorkpermitType',
+      key: 'WorkType',
+      dataIndex: 'WorkType',
       width: 150
     },
     {
       title: 'สถานที่ปฏิบัติงาน',
-      key: 'AreaName',
-      dataIndex: 'AreaName',
+      key: 'Location',
+      dataIndex: 'Location',
       align: "center",
       width: 150
     },
@@ -103,7 +103,7 @@ const WorkpermitPage = () => {
       key: 'others',
       width: 150,
       align: "center",
-      render: (text, record) => text.WorkPermitStatusID
+      render: (text, record) => text.WorksheetStatusId
     },
     {
       title: 'สถานะแจ้งเตือน',
@@ -129,27 +129,27 @@ const WorkpermitPage = () => {
               onClick={() => {
                 setDatamodal({
                   "ชื่อ-สกุล": record.Name,
-                  "เลขบัตรประชาชน": record.PersonalID,
+                  "เลขบัตรประชาชน": record.IDCard,
                   "เลข Work Permit": record.WorkPermitNo,
-                  "รหัสประเภทของ work": record.WorkpermitTypeID,
-                  "ประเภทของ work": record.WorkpermitType,
+                  "รหัสประเภทของ work": record.WorkTypeID,
+                  "ประเภทของ work": record.WorkType,
                   "รายละเอียดของงาน": record.Description,
-                  "ชื่อสถานที่ปฏิบัติงานหลัก": record.AreaName,
-                  "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubAreaName,
-                  "วันที่เริ่มต้นของใบงาน": record.WorkingDateStart,
-                  "วันที่สิ้นสุดของใบงาน": record.WorkingDateEnd,
-                  "เวลาเริ่มต้นของใบงาน": record.WorkingTimeStart,
-                  "เวลาสิ้นสุดของใบงาน": record.WorkingTimeEnd,
-                  "รหัสบริษัท": record.VendorID,
-                  "ชื่อบริษัท": record.VendorName,
+                  "ชื่อสถานที่ปฏิบัติงานหลัก": record.Location,
+                  "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubLocation,
+                  "วันที่เริ่มต้นของใบงาน": record.WorkStartDate,
+                  "วันที่สิ้นสุดของใบงาน": record.WorkEndDate,
+                  "เวลาเริ่มต้นของใบงาน": record.WorkStartTime,
+                  "เวลาสิ้นสุดของใบงาน": record.WorkEndTime,
+                  "รหัสบริษัท": record.CompanyCode,
+                  "ชื่อบริษัท": record.CompanyName,
                   "รหัสผู้ควบคุมงาน": record.PTTStaffID,
                   "ชื่อผู้ควบคุมงาน": record.PTTStaffName,
                   "รหัสหน่วยงานผู้ควบคุม": record.AgencyID,
-                  "ชื่อหน่วยงานผู้ควบคุม": record.AgencyName,
+                  "ชื่อหน่วยงานผู้ควบคุม": record.SupervisorAgencyName,
                   "รหัสผู้อนุญาต/เจ้าของพื้นที่": record.OwnerID,
                   "ชื่อผู้อนุญาต/เจ้าของพื้นที่": record.OwnerName,
-                  "รหัสสถานะใบงาน": record.WorkPermitStatusID,
-                  "สถานะใบงาน": record.others.WorkPermitStatusID,
+                  "รหัสสถานะใบงาน": record.WorksheetStatusId,
+                  "สถานะใบงาน": record.others.WorksheetStatusId,
                   "เวลาการตรวจวัดก๊าซล่าสุด": record.GasMeasurement,
                   "อุปกรณ์ที่ Impairment": record.impairmentName,
                   "สถานะแจ้งเตือน": isArray(record.notification.list) ? record.notification.list.length > 1 ? record.notification.list.toString() : record.notification.list.toString() : "-"
@@ -209,16 +209,16 @@ const WorkpermitPage = () => {
     try {
       setloading(true);
       let url = `/workpermit/all?`;
-      if (item.PTTStaffID) url += `&PTTStaffID=${item.PTTStaffID}`;
-      if (item.AgencyID) url += `&AgencyID=${item.AgencyID}`;
-      if (item.AreaName) url += `&AreaName=${item.AreaName}`;
+      if (item.SupervisorId) url += `&SupervisorId=${item.SupervisorId}`;
+      if (item.SupervisorAgencyID) url += `&SupervisorAgencyID=${item.SupervisorAgencyID}`;
+      if (item.Location) url += `&Location=${item.Location}`;
       if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
       if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
-      if (isArray(item.WorkPermitStatusID)) {
-        url += `&WorkPermitStatusID=${item.WorkPermitStatusID.toString()}`;
+      if (isArray(item.WorksheetStatusId)) {
+        url += `&WorksheetStatusId=${item.WorksheetStatusId.toString()}`;
       }
-      if (isArray(item.WorkpermitTypeID)) {
-        url += `&WorkpermitTypeID=${item.WorkpermitTypeID.toString()}`;
+      if (isArray(item.WorkTypeID)) {
+        url += `&WorkTypeID=${item.WorkTypeID.toString()}`;
       }
       const { data } = await API.get(url);
       if (openTableBool) openTable()
@@ -267,7 +267,7 @@ const WorkpermitPage = () => {
   const [AreaNameOptions, setAreaNameOptions] = useState([]);
   const [PTTStaffIDOptions, setPTTStaffIDOptions] = useState([]);
   const [WorkPermitStatusIDOptions, setWorkPermitStatusIDOptions] = useState([]);
-  const [WorkpermitTypeIDOptions, setWorkpermitTypeIDOptions] = useState([]);
+  const [WorkTypeIDOptions, setWorkTypeIDOptions] = useState([]);
 
   const setLayerpoint = async (item) => {
     try {
@@ -276,19 +276,19 @@ const WorkpermitPage = () => {
         Status_cal(item.summary);
 
         if (isPlainObject(item.filter)) {
-          if (isArray(item.filter.AgencyID)) setAgencyIDOptions(item.filter.AgencyID.map(e => { return { value: e.AgencyID } }))
-          if (isArray(item.filter.AgencyName)) setAgencyNameOptions(item.filter.AgencyName.map(e => { return { value: e.AgencyName } }))
-          if (isArray(item.filter.AreaName)) setAreaNameOptions(item.filter.AreaName.map(e => { return { value: e.AreaName } }))
-          if (isArray(item.filter.PTTStaffID)) setPTTStaffIDOptions(item.filter.PTTStaffID.map(e => { return { value: e.PTTStaffID } }))
-          if (isArray(item.filter.WorkPermitStatusID)) setWorkPermitStatusIDOptions(item.filter.WorkPermitStatusID.map(e => {
+          if (isArray(item.filter.SupervisorAgencyID)) setAgencyIDOptions(item.filter.SupervisorAgencyID.map(e => { return { value: e.SupervisorAgencyID } }))
+          if (isArray(item.filter.SupervisorAgencyName)) setAgencyNameOptions(item.filter.SupervisorAgencyName.map(e => { return { value: e.SupervisorAgencyName } }))
+          if (isArray(item.filter.Location)) setAreaNameOptions(item.filter.Location.map(e => { return { value: e.Location } }))
+          if (isArray(item.filter.SupervisorId)) setPTTStaffIDOptions(item.filter.SupervisorId.map(e => { return { value: e.SupervisorId } }))
+          if (isArray(item.filter.WorksheetStatusId)) setWorkPermitStatusIDOptions(item.filter.WorksheetStatusId.map(e => {
             return {
-              id: e.WorkPermitStatusID,
+              id: e.WorksheetStatusId,
               value: e.Status_Desc
             }
           }))
-          if (isArray(item.filter.WorkpermitTypeID)) setWorkpermitTypeIDOptions(item.filter.WorkpermitTypeID.map(e => {
+          if (isArray(item.filter.WorkTypeID)) setWorkTypeIDOptions(item.filter.WorkTypeID.map(e => {
             return {
-              id: e.WorkpermitTypeID,
+              id: e.WorkTypeID,
               value: e.WP_Type_Name
             }
           }))
@@ -313,13 +313,13 @@ const WorkpermitPage = () => {
         // console.log('Arealatlng', Arealatlng)
         // let GetAllArea = null;
         let latlng = []
-
+        console.log('item.data', item.data)
 
         for (const opp in item.data) {
           const obj = item.data[opp];
           let findeArea = Arealatlng?.find((area) => {
-            if (area.name == (obj.AreaName).replace(/#/i, '')) {
-              let latlng_type = area.typelatlng[obj.WorkpermitTypeID];
+            if (area.name == (obj.Location).replace(/#/i, '')) {
+              let latlng_type = area.typelatlng[obj.WorkTypeID];
               // console.log('latlng_type', latlng_type)
               return area
             } else {
@@ -333,7 +333,7 @@ const WorkpermitPage = () => {
               }
             }
           });
-          let getlatlng_byarea = findeArea.typelatlng[obj.WorkpermitTypeID];
+          let getlatlng_byarea = findeArea.typelatlng[obj.WorkTypeID];
           // console.log('getlatlng_byarea :>> ', getlatlng_byarea);
 
           let checkstatus = Object.keys(obj.notification);
@@ -357,23 +357,25 @@ const WorkpermitPage = () => {
             obj.notification.list2 = arr2;
           }
 
+          obj.Name = `${obj.Titlename} ${obj.Firstname} ${obj.Lastname}`
+          obj.PTTStaffName = `${obj.SupervisorTitle} ${obj.SupervisorFName} ${obj.SupervisorLName}`
           latlng.push({
             ...obj,
             "id": obj._id,
             "work_number": obj.WorkPermitNo,
-            "name": obj.Name,
+            "name": `${obj.Name}`,
             "licensor": obj.PTTStaff,
             "supervisor": obj.OwnerName,
             "date_time_start": moment(new Date(obj.others.WorkingStart)).format("DD/MM/YYYY hh:mm:ss"),
             "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
-            // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
-            // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isstatus && isstatus.length > 2 ? '_warning_all' : '_' + isstatus[0]}`,
-            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isArray(obj.notification.list2) && obj.notification.list2.length > 1 ? '_warning_all' : '_' + isstatus[0]}`,
+            // "status_work": `${obj.WorkTypeID}_${obj.WorksheetStatusId}${obj.GasMeasurement ? '_Gas' : ''}`,
+            // "status_work": `${obj.WorkTypeID}_${obj.WorksheetStatusId}${isstatus && isstatus.length > 2 ? '_warning_all' : '_' + isstatus[0]}`,
+            "status_work": `${obj.WorkTypeID}_${obj.WorksheetStatusId}${isArray(obj.notification.list2) && obj.notification.list2.length > 1 ? '_warning_all' : '_' + isstatus[0]}`,
             // "latitude": randomlatlng?.latitude ?? null,
             // "longitude": randomlatlng?.longitude ?? null,
             ...demodata.getRandomLocation(getlatlng_byarea.latitude, getlatlng_byarea.longitude, 3),
-            "locatoin": obj.SubAreaName,
-            "work_type": obj.WorkpermitType,
+            "locatoin": obj.SubLocation,
+            "work_type": obj.WorkType,
             "warning": obj.notification.list.toString()
           })
 
@@ -415,7 +417,7 @@ const WorkpermitPage = () => {
                     label: "ประเภทใบงาน"
                   },
                   {
-                    fieldName: "WorkPermitStatus",
+                    fieldName: "WorksheetStatus",
                     label: "สถานะใบงาน"
                   },
                   {
@@ -439,7 +441,7 @@ const WorkpermitPage = () => {
                 width: 1,
               },
             },
-            uniqueValueInfos: await (await gen_uniqueValueInfos(item.filter.WorkpermitTypeID, item.filter.WorkPermitStatusID)).uniqueValueInfos
+            uniqueValueInfos: await (await gen_uniqueValueInfos(item.filter.WorkTypeID, item.filter.WorksheetStatusId)).uniqueValueInfos
 
 
           },
@@ -840,7 +842,7 @@ const WorkpermitPage = () => {
               onFinishFailed={onFinishFailed}
             >
               <Form.Item
-                name="PTTStaffID"
+                name="SupervisorId"
                 label='รหัสพนักงานผู้ควบคุมงาน'
               >
                 <Select
@@ -852,7 +854,7 @@ const WorkpermitPage = () => {
               </Form.Item>
 
               {/* <Form.Item
-              name="AgencyID"
+              name="SupervisorAgencyID"
               label='รหัสหน่วยงานผู้ควบคุม'
             >
               <Select
@@ -864,7 +866,7 @@ const WorkpermitPage = () => {
             </Form.Item> */}
 
               <Form.Item
-                name="AgencyName"
+                name="SupervisorAgencyName"
                 label='หน่วยงานผู้ควบคุม'
               >
                 <Select
@@ -898,7 +900,7 @@ const WorkpermitPage = () => {
               </Form.Item>
 
               <Form.Item
-                name="AreaName"
+                name="Location"
                 label='สถานที่ปฎิบัติงาน'
               >
                 <Select
@@ -911,7 +913,7 @@ const WorkpermitPage = () => {
 
 
               <Form.Item
-                name="WorkPermitStatusID"
+                name="WorksheetStatusId"
                 label='สถานะ Work'
               >
                 <Select
@@ -936,7 +938,7 @@ const WorkpermitPage = () => {
                   showArrow
                   style={{ width: '100%' }}
                 >
-                  {WorkpermitTypeIDOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
+                  {WorkTypeIDOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
                 </Select>
 
               </Form.Item>
