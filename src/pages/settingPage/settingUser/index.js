@@ -83,7 +83,7 @@ function SettingUser() {
     <div className="container" style={{ marginTop: 12 }}>
       <div className="head">
         <Title >จัดการผู้ใช้งาน</Title>
-        <Button type='primary' shape='round' onClick={() => navigate('/setting-permission')} >จัดการ Permission <ArrowRightOutlined /></Button>
+        {/* <Button type='primary' shape='round' onClick={() => navigate('/setting-permission')} >จัดการ Permission <ArrowRightOutlined /></Button> */}
       </div>
       <div className="table-serch">
         <div className='filterSerch' style={{ margin: '12px 0px' }}>

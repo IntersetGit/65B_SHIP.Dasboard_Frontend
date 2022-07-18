@@ -258,6 +258,38 @@ class PTTlayer {
         });
     }
 
+    GETMASTER_AREA_LAYERGIS = async (payload = [
+        {
+            "LAYER_NAME": "PLANT",
+            "SEARCH_COLUMN": []
+        },
+        {
+            "LAYER_NAME": "AREA",
+            "SEARCH_COLUMN": []
+        },
+        {
+            "LAYER_NAME": "BUILDING",
+            "SEARCH_COLUMN": []
+        },
+        {
+            "LAYER_NAME": "EQUIPMENT",
+            "SEARCH_COLUMN": []
+        }
+    ]) => {
+        const data = await Axios.post(`${process.env.REACT_APP_PTT_PROXY}${btoa("user=dashboard&system=api")}/api/track/attribute`,
+            payload,
+            {
+                headers: {
+                    'Content-Type': 'application/json; charset=utf-8',
+                },
+            }
+        );
+        if (data.status == 200) {
+            // console.log('data.data', data.data.data)
+            return data.data.data;
+        }
+    }
+
     RandomInArea = async (extent) => {
         const [Point] = await loadModules([
             "esri/geometry/Point",

@@ -564,8 +564,8 @@ const ScaffoldingPage = () => {
             setStatus({
                 "จำนวน": data.all,
                 "ปกติ": data.normal,
-                "⚠️ ใกล้ Exp": data.near_expire,
-                "‼️ หมด Exp": data.expire,
+                "ใกล้ Exp.": data.near_expire,
+                "Exp.": data.expire,
             }),
         );
     };

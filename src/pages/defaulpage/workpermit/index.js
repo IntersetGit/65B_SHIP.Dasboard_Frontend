@@ -11,8 +11,12 @@ import {
   Col,
   Modal,
   Collapse,
-  DatePicker
+  DatePicker,
+  Divider
 } from 'antd';
+import {
+  SearchOutlined
+} from '@ant-design/icons';
 import { Map, WebScene } from '@esri/react-arcgis';
 import { loadModules } from 'esri-loader';
 import './index.style.less';
@@ -27,8 +31,10 @@ import API from '../../../util/Api'
 import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 import { circle } from '@turf/turf';
+import { Helmet } from 'react-helmet';
 
 const { Panel } = Collapse;
+const { Option } = Select;
 
 
 const WorkpermitPage = () => {
@@ -36,6 +42,7 @@ const WorkpermitPage = () => {
   const [stateView, setStateView] = useState(null);
   const refdrawn = useRef();
   const refdetail = useRef();
+  const refgismap = useRef();
   const [tabledata, setTabledata] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [datamodal, setDatamodal] = useState(null);
@@ -44,66 +51,71 @@ const WorkpermitPage = () => {
   const Geojson = new WaGeojson();
   const PTTlayer = new PTTlayers();
   const [stateSysmbole, setstateSysmbole] = useState(null);
-
+  const [selectArea, setselectArea] = useState([]);
   const columns = [
     {
       title: 'เลข work',
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
+      align: "center",
+      width: 150
     },
     {
       title: 'ชื่อ - สกุล ผู้รับเหมา',
       dataIndex: 'Name',
       key: 'Name',
-
-
+      width: 150
     },
     {
       title: 'ผู้อนุญาต/เจ้าของพื้นที่',
       dataIndex: 'OwnerName',
       key: 'OwnerName',
-
+      width: 150
     },
     {
       title: 'ผู้ควบคุมงาน',
       dataIndex: 'PTTStaffName',
       key: 'PTTStaffName',
-
+      width: 150
     },
     {
       title: 'ประเภทงาน',
-      key: 'WorkpermitType',
-      dataIndex: 'WorkpermitType',
-
+      key: 'WorkType',
+      dataIndex: 'WorkType',
+      width: 150
     },
     {
       title: 'สถานที่ปฏิบัติงาน',
-      key: 'AreaName',
-      dataIndex: 'AreaName',
-
+      key: 'Location',
+      dataIndex: 'Location',
+      align: "center",
+      width: 150
     },
     {
       title: 'วัน-เวลา เริ่มต้นของใบงาน',
       dataIndex: 'date_time_start',
       key: 'date_time_start',
-
+      width: 200
     },
     {
       title: 'วัน-เวลา สิ้นสุดของใบงาน',
       dataIndex: 'date_time_end',
       key: 'date_time_end',
-
+      width: 200
     },
     {
       title: 'สถานะ work',
       dataIndex: 'others',
       key: 'others',
-      render: (text, record) => text.WorkPermitStatusID
+      width: 150,
+      align: "center",
+      render: (text, record) => text.WorksheetStatusId
     },
     {
       title: 'สถานะแจ้งเตือน',
       dataIndex: 'notification',
       key: 'notification',
+      width: 150,
       render: (text, record) => isArray(text.list) ? text.list.length > 1 ? (
         <>
           <img src='/assets/iconmap/status/warning-all.png' width={15} /> {text.list.toString()}
@@ -113,7 +125,8 @@ const WorkpermitPage = () => {
     {
       title: '...',
       key: '',
-
+      width: 150,
+      align: "center",
       render: (text, record) => {
         return (
           <Space size='middle'>
@@ -122,29 +135,30 @@ const WorkpermitPage = () => {
               onClick={() => {
                 setDatamodal({
                   "ชื่อ-สกุล": record.Name,
-                  "เลขบัตรประชาชน": record.PersonalID,
+                  "เลขบัตรประชาชน": record.IDCard,
                   "เลข Work Permit": record.WorkPermitNo,
-                  "รหัสประเภทของ work": record.WorkpermitTypeID,
-                  "ประเภทของ work": record.WorkpermitType,
+                  "รหัสประเภทของ work": record.WorkTypeID,
+                  "ประเภทของ work": record.WorkType,
                   "รายละเอียดของงาน": record.Description,
-                  "ชื่อสถานที่ปฏิบัติงานหลัก": record.AreaName,
-                  "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubAreaName,
-                  "วันที่เริ่มต้นของใบงาน": record.WorkingDateStart,
-                  "วันที่สิ้นสุดของใบงาน": record.WorkingDateEnd,
-                  "เวลาเริ่มต้นของใบงาน": record.WorkingTimeStart,
-                  "เวลาสิ้นสุดของใบงาน": record.WorkingTimeEnd,
-                  "รหัสบริษัท": record.VendorID,
-                  "ชื่อบริษัท": record.VendorName,
+                  "ชื่อสถานที่ปฏิบัติงานหลัก": record.Location,
+                  "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubLocation,
+                  "วันที่เริ่มต้นของใบงาน": record.WorkStartDate,
+                  "วันที่สิ้นสุดของใบงาน": record.WorkEndDate,
+                  "เวลาเริ่มต้นของใบงาน": record.WorkStartTime,
+                  "เวลาสิ้นสุดของใบงาน": record.WorkEndTime,
+                  "รหัสบริษัท": record.CompanyCode,
+                  "ชื่อบริษัท": record.CompanyName,
                   "รหัสผู้ควบคุมงาน": record.PTTStaffID,
                   "ชื่อผู้ควบคุมงาน": record.PTTStaffName,
                   "รหัสหน่วยงานผู้ควบคุม": record.AgencyID,
-                  "ชื่อหน่วยงานผู้ควบคุม": record.AgencyName,
+                  "ชื่อหน่วยงานผู้ควบคุม": record.SupervisorAgencyName,
                   "รหัสผู้อนุญาต/เจ้าของพื้นที่": record.OwnerID,
                   "ชื่อผู้อนุญาต/เจ้าของพื้นที่": record.OwnerName,
-                  "รหัสสถานะใบงาน": record.WorkPermitStatusID,
-                  "สถานะใบงาน": record.others.WorkPermitStatusID,
+                  "รหัสสถานะใบงาน": record.WorksheetStatusId,
+                  "สถานะใบงาน": record.others.WorksheetStatusId,
                   "เวลาการตรวจวัดก๊าซล่าสุด": record.GasMeasurement,
                   "อุปกรณ์ที่ Impairment": record.impairmentName,
+                  "สถานะแจ้งเตือน": isArray(record.notification.list) ? record.notification.list.length > 1 ? record.notification.list.toString() : record.notification.list.toString() : "-"
                 }),
                   setIsModalVisible(!isModalVisible);
               }}
@@ -201,16 +215,16 @@ const WorkpermitPage = () => {
     try {
       setloading(true);
       let url = `/workpermit/all?`;
-      if (item.PTTStaffID) url += `&PTTStaffID=${item.PTTStaffID}`;
-      if (item.AgencyID) url += `&AgencyID=${item.AgencyID}`;
-      if (item.AreaName) url += `&AreaName=${item.AreaName}`;
+      if (item.SupervisorId) url += `&SupervisorId=${item.SupervisorId}`;
+      if (item.SupervisorAgencyID) url += `&SupervisorAgencyID=${item.SupervisorAgencyID}`;
+      if (item.Location) url += `&Location=${item.Location}`;
       if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
       if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
-      if (isArray(item.WorkPermitStatusID)) {
-        url += `&WorkPermitStatusID=${item.WorkPermitStatusID.toString()}`;
+      if (isArray(item.WorksheetStatusId)) {
+        url += `&WorksheetStatusId=${item.WorksheetStatusId.toString()}`;
       }
-      if (isArray(item.WorkpermitTypeID)) {
-        url += `&WorkpermitTypeID=${item.WorkpermitTypeID.toString()}`;
+      if (isArray(item.WorkTypeID)) {
+        url += `&WorkTypeID=${item.WorkTypeID.toString()}`;
       }
       const { data } = await API.get(url);
       if (openTableBool) openTable()
@@ -228,6 +242,13 @@ const WorkpermitPage = () => {
     }
   }
 
+  useEffect(() => {
+    (async () => {
+      let area = await PTTlayer.GETMASTER_AREA_LAYERGIS();
+      console.log('showarea :>> ', area);
+      setselectArea(area);
+    })();
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -259,28 +280,28 @@ const WorkpermitPage = () => {
   const [AreaNameOptions, setAreaNameOptions] = useState([]);
   const [PTTStaffIDOptions, setPTTStaffIDOptions] = useState([]);
   const [WorkPermitStatusIDOptions, setWorkPermitStatusIDOptions] = useState([]);
-  const [WorkpermitTypeIDOptions, setWorkpermitTypeIDOptions] = useState([]);
+  const [WorkTypeIDOptions, setWorkTypeIDOptions] = useState([]);
 
   const setLayerpoint = async (item) => {
     try {
       if (stateView) {
 
-        Status_cal(item.summary);
+        Status_cal(item?.summary);
 
-        if (isPlainObject(item.filter)) {
-          if (isArray(item.filter.AgencyID)) setAgencyIDOptions(item.filter.AgencyID.map(e => { return { value: e.AgencyID } }))
-          if (isArray(item.filter.AgencyName)) setAgencyNameOptions(item.filter.AgencyName.map(e => { return { value: e.AgencyName } }))
-          if (isArray(item.filter.AreaName)) setAreaNameOptions(item.filter.AreaName.map(e => { return { value: e.AreaName } }))
-          if (isArray(item.filter.PTTStaffID)) setPTTStaffIDOptions(item.filter.PTTStaffID.map(e => { return { value: e.PTTStaffID } }))
-          if (isArray(item.filter.WorkPermitStatusID)) setWorkPermitStatusIDOptions(item.filter.WorkPermitStatusID.map(e => {
+        if (isPlainObject(item?.filter)) {
+          if (isArray(item.filter.SupervisorAgencyID)) setAgencyIDOptions(item.filter.SupervisorAgencyID.map(e => { return { value: e.SupervisorAgencyID } }))
+          if (isArray(item.filter.SupervisorAgencyName)) setAgencyNameOptions(item.filter.SupervisorAgencyName.map(e => { return { value: e.SupervisorAgencyName } }))
+          if (isArray(item.filter.Location)) setAreaNameOptions(item.filter.Location.map(e => { return { value: e.Location } }))
+          if (isArray(item.filter.SupervisorId)) setPTTStaffIDOptions(item.filter.SupervisorId.map(e => { return { value: e.SupervisorId } }))
+          if (isArray(item.filter.WorksheetStatusId)) setWorkPermitStatusIDOptions(item.filter.WorksheetStatusId.map(e => {
             return {
-              id: e.WorkPermitStatusID,
+              id: e.WorksheetStatusId,
               value: e.Status_Desc
             }
           }))
-          if (isArray(item.filter.WorkpermitTypeID)) setWorkpermitTypeIDOptions(item.filter.WorkpermitTypeID.map(e => {
+          if (isArray(item.filter.WorkTypeID)) setWorkTypeIDOptions(item.filter.WorkTypeID.map(e => {
             return {
-              id: e.WorkpermitTypeID,
+              id: e.WorkTypeID,
               value: e.WP_Type_Name
             }
           }))
@@ -288,8 +309,8 @@ const WorkpermitPage = () => {
         let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
         var Arealatlng = await Promise.all(GetAllArea.map(async (area, index) => {
           let extent = await area?.queryExtent();
-          let test = await PTTlayer.RandomInArea(extent.extent);
-          console.log('test', test)
+          // let test = await PTTlayer.RandomInArea(extent.extent);
+          // console.log('test', test)
 
           let feature = await area.queryFeatures();
           let namearea = feature?.features[0]?.attributes?.UNITNAME;
@@ -305,27 +326,29 @@ const WorkpermitPage = () => {
         // console.log('Arealatlng', Arealatlng)
         // let GetAllArea = null;
         let latlng = []
-
+        console.log('item.data', item.data)
 
         for (const opp in item.data) {
           const obj = item.data[opp];
-          let findeArea = Arealatlng?.find((area) => {
-            if (area.name == (obj.AreaName).replace(/#/i, '')) {
-              let latlng_type = area.typelatlng[obj.WorkpermitTypeID];
-              // console.log('latlng_type', latlng_type)
-              return area
-            } else {
-              return {
-                name: "defaul",
-                center: {
-                  latitude: 12.719,
-                  longitude: 101.147
-                },
-                typelatlng: area.typelatlng
-              }
-            }
-          });
-          let getlatlng_byarea = findeArea.typelatlng[obj.WorkpermitTypeID];
+          // let findeArea = Arealatlng?.find((area) => {
+          //   if (area.name == (obj.AreaName).replace(/#/i, '')) {
+          //     let latlng_type = area.typelatlng[obj.WorkpermitTypeID];
+          //     // console.log('latlng_type', latlng_type)
+          //     return area
+          //   } else {
+          //     return {
+          //       name: "defaul",
+          //       center: {
+          //         latitude: 12.719,
+          //         longitude: 101.147
+          //       },
+          //       typelatlng: area.typelatlng
+          //     }
+          //   }
+          // });
+          let findeArea = Arealatlng?.find((area) => (area.name).replace(/#/i, '') == (obj.Location).replace(/#/i, ''))
+          if (!findeArea) findeArea = Arealatlng[0]
+          let getlatlng_byarea = findeArea.typelatlng[obj.WorkTypeID];
           // console.log('getlatlng_byarea :>> ', getlatlng_byarea);
 
           let checkstatus = Object.keys(obj.notification);
@@ -341,40 +364,41 @@ const WorkpermitPage = () => {
             if (obj.notification.gas) arr2.push("gas");
             if (obj.notification.impairment) arr2.push("impairment");
 
-            if (isNumber(obj.notification.near_expire)) arr.push("⚠️ ใกล้ Exp");
-            if (isNumber(obj.notification.expire)) arr.push("‼️ หมด Exp");
-            if (isNumber(obj.notification.gas)) arr.push("ก๊าซที่ต้องตรวจวัด");
-            if (isNumber(obj.notification.impairment)) arr.push("Impairment");
+            if ((obj.notification.near_expire === true)) arr.push(" ใกล้ Exp.");
+            if ((obj.notification.expire === true)) arr.push(" Exp.");
+            if ((obj.notification.gas === true)) arr.push(" ก๊าซที่ต้องตรวจวัด");
+            if ((obj.notification.impairment === true)) arr.push(" Impairment");
             obj.notification.list = arr;
             obj.notification.list2 = arr2;
           }
-          // console.log('obj', obj)
 
+          obj.Name = `${obj.Titlename} ${obj.Firstname} ${obj.Lastname}`
+          obj.PTTStaffName = `${obj.SupervisorTitle} ${obj.SupervisorFName} ${obj.SupervisorLName}`
           latlng.push({
             ...obj,
             "id": obj._id,
             "work_number": obj.WorkPermitNo,
-            "name": obj.Name,
+            "name": `${obj.Name}`,
             "licensor": obj.PTTStaff,
             "supervisor": obj.OwnerName,
             "date_time_start": moment(new Date(obj.others.WorkingStart)).format("DD/MM/YYYY hh:mm:ss"),
             "date_time_end": moment(new Date(obj.others.WorkingEnd)).format("DD/MM/YYYY hh:mm:ss"),
-            // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${obj.GasMeasurement ? '_Gas' : ''}`,
-            // "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isstatus && isstatus.length > 2 ? '_warning_all' : '_' + isstatus[0]}`,
-            "status_work": `${obj.WorkpermitTypeID}_${obj.WorkPermitStatusID}${isArray(obj.notification.list2) && obj.notification.list2.length > 1 ? '_warning_all' : '_' + isstatus[0]}`,
+            // "status_work": `${obj.WorkTypeID}_${obj.WorksheetStatusId}${obj.GasMeasurement ? '_Gas' : ''}`,
+            // "status_work": `${obj.WorkTypeID}_${obj.WorksheetStatusId}${isstatus && isstatus.length > 2 ? '_warning_all' : '_' + isstatus[0]}`,
+            "status_work": `${obj.WorkTypeID}_${obj.WorksheetStatusId}${isArray(obj.notification.list2) && obj.notification.list2.length > 1 ? '_warning_all' : '_' + isstatus[0]}`,
             // "latitude": randomlatlng?.latitude ?? null,
             // "longitude": randomlatlng?.longitude ?? null,
             ...demodata.getRandomLocation(getlatlng_byarea.latitude, getlatlng_byarea.longitude, 3),
-            "locatoin": obj.SubAreaName,
-            "work_type": obj.WorkpermitType,
-            "warning": obj.others.WorkPermitStatusID
+            "locatoin": obj.SubLocation,
+            "work_type": obj.WorkType,
+            "warning": obj.notification.list.toString()
           })
 
           //})
         }
 
 
-        console.log('latlng =>>>>>>>>>>>>>', latlng)
+        // console.log('latlng =>>>>>>>>>>>>>', latlng)
         setTabledata(latlng);
 
         let datageojson = await Geojson.CleateGeojson(latlng, 'Point');
@@ -408,7 +432,7 @@ const WorkpermitPage = () => {
                     label: "ประเภทใบงาน"
                   },
                   {
-                    fieldName: "WorkPermitStatus",
+                    fieldName: "WorksheetStatus",
                     label: "สถานะใบงาน"
                   },
                   {
@@ -432,31 +456,31 @@ const WorkpermitPage = () => {
                 width: 1,
               },
             },
-            uniqueValueInfos: await (await gen_uniqueValueInfos(item.filter.WorkpermitTypeID, item.filter.WorkPermitStatusID)).uniqueValueInfos
+            uniqueValueInfos: await (await gen_uniqueValueInfos(item.filter.WorkTypeID, item.filter.WorksheetStatusId)).uniqueValueInfos
 
 
           },
         });
-        layerpoint
-          .when()
-          .then(clusterConfig)
-          .then(async (featureReduction) => {
-            //console.log('featureReduction :>> ', featureReduction);
-            // layerpoint.featureReduction = featureReduction;
-            // layerView = await stateView?.whenLayerView(layerpoint);
+        // layerpoint
+        //   .when()
+        //   .then(clusterConfig)
+        //   .then(async (featureReduction) => {
+        //     //console.log('featureReduction :>> ', featureReduction);
+        //     // layerpoint.featureReduction = featureReduction;
+        //     // layerView = await stateView?.whenLayerView(layerpoint);
 
-            reactiveUtils.watch(
-              () => stateView?.scale,
-              (scale) => {
-                layerpoint.featureReduction  =
-                scale > 80 ? clusterConfig : null;
-                // console.log('scale :>> ', scale);
-              }
-            );
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+        //     reactiveUtils.watch(
+        //       () => stateView?.scale,
+        //       (scale) => {
+        //         layerpoint.featureReduction  =
+        //         scale > 80 ? clusterConfig : null;
+        //         // console.log('scale :>> ', scale);
+        //       }
+        //     );
+        //   })
+        //   .catch((error) => {
+        //     console.error(error);
+        //   });
         await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
         stateMap?.add(layerpoint);
         // let maplayerSerch = stateMap?.findLayerById('pointlayer');
@@ -487,8 +511,8 @@ const WorkpermitPage = () => {
       },
       {
         name: "CD",
-        color: "rgba(251, 154, 153)",
-        img: await CreateIcon("rgba(251, 154, 153)", false),
+        color: "#228B22",
+        img: await CreateIcon("#228B22", false),
         detail: 'ใบอนุญาติทำงานธรรมดา'
       },
       {
@@ -499,8 +523,8 @@ const WorkpermitPage = () => {
       },
       {
         name: "EV",
-        color: "rgba(123, 154, 153)",
-        img: await CreateIcon("rgba(123, 154, 153)", false),
+        color: "#93FFE8",
+        img: await CreateIcon("#93FFE8", false),
         detail: 'ใบอนุญาติทำงานที่อับอากาศ'
       },
       {
@@ -511,26 +535,26 @@ const WorkpermitPage = () => {
       },
       {
         name: "HT1",
-        color: "rgba(255, 127, 0)",
-        img: await CreateIcon("rgba(255, 127, 0)", false),
+        color: "#EE9A4D",
+        img: await CreateIcon("#EE9A4D", false),
         detail: 'ใบอนุญาติที่มีความร้อนประกายไฟ-I'
       },
       {
         name: "HT2",
-        color: "rgba(255, 12, 0)",
-        img: await CreateIcon("rgba(255, 12, 0)", false),
+        color: "#A70D2A",
+        img: await CreateIcon("#A70D2A", false),
         detail: 'ใบอนุญาติที่มีความร้อนประกายไฟ-II'
       },
       {
         name: "MC",
-        color: "rgba(51, 160, 44)",
-        img: await CreateIcon("rgba(51, 160, 44)", false),
+        color: "#9D00FF",
+        img: await CreateIcon("#9D00FF", false),
         detail: 'ใบอนุญาติใช้งานรถเครนชนิดเคลื่อนที่/รถเฮียบ'
       },
       {
         name: "RD",
-        color: "rgba(122, 160, 44)",
-        img: await CreateIcon("rgba(122, 160, 44)", false),
+        color: "#F778A1",
+        img: await CreateIcon("#F778A1", false),
         detail: 'ใบอนุญาติทำงานรังสี'
       },
     ]
@@ -572,12 +596,12 @@ const WorkpermitPage = () => {
       {
         name: "near_expire",
         detail: "แจ้งเตือนใกล้หมดอายุ",
-        img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png"
+        img: "/assets/iconmap/status/warning-yellow-2.png"
       },
       {
         name: "expire",
         detail: "แจ้งเตือนหมดอายุ",
-        img: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
+        img: "/assets/iconmap/status/warning-red-2.png"
       },
       {
         name: "warning_all",
@@ -655,8 +679,8 @@ const WorkpermitPage = () => {
     if (data.total !== undefined) Status["ใบงานทั้งหมด"] = { value: data.total, color: '#112345' };
     if (data.open !== undefined) Status["Open"] = { value: data.open, color: '#17d149' };
     if (data.close !== undefined) Status["Close"] = { value: data.close, color: '#F09234', };
-    if (data.near_expire !== undefined) Status["ใกล้ Exp"] = { value: data.near_expire, color: '#F54', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
-    if (data.expire !== undefined) Status["หมด Exp"] = { value: data.expire, color: '#F89', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
+    if (data.near_expire !== undefined) Status["ใกล้ Exp."] = { value: data.near_expire, color: '#F54', img: "/assets/iconmap/status/warning-yellow-2.png" };
+    if (data.expire !== undefined) Status["Exp."] = { value: data.expire, color: '#F89', img: "/assets/iconmap/status/warning-red-2.png" };
     if (data.gas !== undefined) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F024', img: '/assets/iconmap/status/warning-yellow.png' };
     if (data.impairment !== undefined) Status["Impairment"] = { value: data.impairment, color: '#548', img: '/assets/iconmap/status/warning-red.png' };
     dispatch(
@@ -708,7 +732,15 @@ const WorkpermitPage = () => {
     view.ui.add(fullscreenui, 'top-right');
     view.ui.add(zoomui, 'top-right');
     view.ui.add(detaillayer, 'top-right');
-
+    view.ui.add(
+      new Expand({
+        view,
+        content: refgismap.current,
+        expandIconClass: "esri-icon-layer-list",
+        expanded: false,
+      }),
+      "top-left"
+    );
     // view.watch('zoom', zoomChanged);
     // function zoomChanged(newValue, oldValue, property, object) {
     //   let maplayerCLuster = map.findLayerById('pointlayer');
@@ -766,7 +798,6 @@ const WorkpermitPage = () => {
     console.log('error', error)
   }
 
-  const [visible, setVisible] = useState(false);
 
   const [form] = Form.useForm()
 
@@ -777,7 +808,29 @@ const WorkpermitPage = () => {
   const closeTable = () => {
     document.querySelector('.ant-table-wrapper').style.setProperty('display', 'none', 'important');
   }
+
+  const OptionSelectArea = (namearea) => {
+    // console.log('selectArea', selectArea)
+    if (selectArea.length > 0) {
+      let area = selectArea?.find((i) => i.LAYERNAME == namearea);
+      if (area) {
+        let id = namearea == "PLANT" ? ["OBJECTID"] : namearea == "AREA" ? ["SUBUNITID"] : namearea == "BUILDING" ? ["BLDGID"] : namearea == "EQUIPMENT" ? ["EQUIPMENTID"] : ["OBJECTID"];
+        let label = namearea == "PLANT" ? ["UNITNAME"] : namearea == "AREA" ? ["SUBUNITNAME"] : namearea == "BUILDING" ? ["BLDGNAME"] : namearea == "EQUIPMENT" ? ["EQUIPMENTID"] : ["OBJECTID"];
+        return (
+          <>
+            {area?.RESULT?.map((item, index) =>
+              <Option key={index} value={item[id]}>{item[label]}</Option>
+            )}
+          </>
+        )
+      }
+    }
+  }
   return (
+    <>
+    <Helmet>
+    <title>Workpermit | DashBoard</title>
+  </Helmet>
     <div id="pagediv">
       <Map
         className='Mapacrgis'
@@ -791,6 +844,78 @@ const WorkpermitPage = () => {
           ui: { components: ['attribution', 'compass'] },
         }}
       >
+        <div ref={refgismap} id="infoDiv" style={{ width: '200px', height: '100%', padding: "10px" }} className="esri-widget">
+          สถานที่ใช้งาน
+          <Divider orientation="left">Plant</Divider>
+          <Space style={{ margin: "5px 0px" }}>
+            <Select
+              loading={selectArea.length > 0 ? false : true}
+              showSearch
+              allowClear
+              placeholder="ค้นหา"
+              optionFilterProp="children"
+              size="small"
+              style={{ width: '150px' }}
+            >
+              {/* {selectArea.length > 0 && selectArea.find((i)=>{
+                if(i.LAYERNAME == "PLANT"){
+                  i?.RESULT?.map((item,index)=>(
+                    <Option key={index} value="jack">Jack</Option>
+                  ))
+                }
+              })} */}
+              {OptionSelectArea("PLANT")}
+            </Select>
+            <Button size="small" icon={<SearchOutlined />}></Button>
+          </Space>
+          <Divider orientation="left">Area</Divider>
+          <Space style={{ margin: "5px 0px" }}>
+            <Select
+              loading={selectArea.length > 0 ? false : true}
+              showSearch
+              allowClear
+              placeholder="ค้นหา"
+              optionFilterProp="children"
+              size="small"
+              style={{ width: '150px' }}
+            >
+              {OptionSelectArea("AREA")}
+            </Select>
+            <Button size="small" icon={<SearchOutlined />}></Button>
+          </Space>
+          <Divider orientation="left">Building</Divider>
+          <Space style={{ margin: "5px 0px" }}>
+            <Select
+              loading={selectArea.length > 0 ? false : true}
+              showSearch
+              allowClear
+              placeholder="ค้นหา"
+              optionFilterProp="children"
+              size="small"
+              style={{ width: '150px' }}
+            >
+              {OptionSelectArea("BUILDING")}
+            </Select>
+            <Button size="small" icon={<SearchOutlined />}></Button>
+          </Space>
+          <Divider orientation="left">Equipment</Divider>
+          <Space style={{ margin: "5px 0px" }}>
+            <Select
+              loading={selectArea.length > 0 ? false : true}
+              showSearch
+              allowClear
+              placeholder="ค้นหา"
+              optionFilterProp="children"
+              size="small"
+              style={{ width: '150px' }}
+            >
+              {OptionSelectArea("EQUIPMENT")}
+            </Select>
+            <Button size="small" icon={<SearchOutlined />}></Button>
+          </Space>
+
+
+        </div>
         <div id='button-top' className='button-topleft'>
           <div
             className='esri-widget--button esri-icon-table'
@@ -820,28 +945,29 @@ const WorkpermitPage = () => {
           id='viewtest'
           className='menuserchslide esri-widget'
         >
-          <Form
-            form={form}
-            labelCol={{ span: 10 }}
-            wrapperCol={{ span: 16 }}
-            name='nest-messages'
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-          >
-            <Form.Item
-              name="PTTStaffID"
-              label='รหัสพนักงานผู้ควบคุมงาน'
-            >
-              <Select
-                showArrow
-                loading={loading}
-                style={{ width: '100%' }}
-                options={PTTStaffIDOptions}
-              />
-            </Form.Item>
 
-            {/* <Form.Item
-              name="AgencyID"
+            <Form
+              form={form}
+              labelCol={{ span: 10 }}
+              wrapperCol={{ span: 16 }}
+              name='nest-messages'
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
+            >
+              <Form.Item
+                name="SupervisorId"
+                label='รหัสพนักงานผู้ควบคุมงาน'
+              >
+                <Select
+                  showArrow
+                  loading={loading}
+                  style={{ width: '100%' }}
+                  options={PTTStaffIDOptions}
+                />
+              </Form.Item>
+
+              {/* <Form.Item
+              name="SupervisorAgencyID"
               label='รหัสหน่วยงานผู้ควบคุม'
             >
               <Select
@@ -852,180 +978,182 @@ const WorkpermitPage = () => {
               />
             </Form.Item> */}
 
-            <Form.Item
-              name="AgencyName"
-              label='หน่วยงานผู้ควบคุม'
-            >
-              <Select
-                loading={loading}
-                showArrow
-                style={{ width: '100%' }}
-                options={AgencyNameOptions}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="StartDateTime"
-              label='วัน-เวลา เริ่มต้น'
-            >
-              <DatePicker
-                loading={loading}
-                showTime={{ format: 'HH:mm' }}
-                format="DD/MM/YYYY HH:mm"
-                style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item
-              name="EndDateTime"
-              label='วัน-เวลา สิ้นสุด'
-            >
-              <DatePicker
-                loading={loading}
-                showTime={{ format: 'HH:mm' }}
-                format="DD/MM/YYYY HH:mm"
-                style={{ width: '100%' }} />
-            </Form.Item>
-
-            <Form.Item
-              name="AreaName"
-              label='สถานที่ปฎิบัติงาน'
-            >
-              <Select
-                loading={loading}
-                showArrow
-                style={{ width: '100%' }}
-                options={AreaNameOptions}
-              />
-            </Form.Item>
-
-
-            <Form.Item
-              name="WorkPermitStatusID"
-              label='สถานะ Work'
-            >
-              <Select
-                loading={loading}
-                mode='multiple'
-                showArrow
-                style={{ width: '100%' }}
-
+              <Form.Item
+                name="SupervisorAgencyName"
+                label='หน่วยงานผู้ควบคุม'
               >
-                {WorkPermitStatusIDOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
+                <Select
+                  loading={loading}
+                  showArrow
+                  style={{ width: '100%' }}
+                  options={AgencyNameOptions}
+                />
+              </Form.Item>
 
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              name="WorkpermitTypeID"
-              label='ประเภทใบอนุญาต'
-            >
-              <Select
-                loading={loading}
-                mode='multiple'
-                showArrow
-                style={{ width: '100%' }}
+              <Form.Item
+                name="StartDateTime"
+                label='วัน-เวลา เริ่มต้น'
               >
-                {WorkpermitTypeIDOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
-              </Select>
+                <DatePicker
+                  loading={loading}
+                  showTime={{ format: 'HH:mm' }}
+                  format="DD/MM/YYYY HH:mm"
+                  style={{ width: '100%' }} />
+              </Form.Item>
 
-            </Form.Item>
+              <Form.Item
+                name="EndDateTime"
+                label='วัน-เวลา สิ้นสุด'
+              >
+                <DatePicker
+                  loading={loading}
+                  showTime={{ format: 'HH:mm' }}
+                  format="DD/MM/YYYY HH:mm"
+                  style={{ width: '100%' }} />
+              </Form.Item>
 
-            <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
+              <Form.Item
+                name="Location"
+                label='สถานที่ปฎิบัติงาน'
+              >
+                <Select
+                  loading={loading}
+                  showArrow
+                  style={{ width: '100%' }}
+                  options={AreaNameOptions}
+                />
+              </Form.Item>
 
-              <Button type='primary' htmlType='submit' style={{ width: 100 }} loading={loading}>
-                ค้นหา
-              </Button>
-              <span style={{ paddingRight: 5 }} />
-              <Button style={{ width: 100 }} onClick={reset} loading={loading}>
-                ค่าเริ่มต้น
-              </Button>
-            </Form.Item>
-          </Form>
-        </div>
-        <div ref={refdetail} className='sysmbole esri-widget'>
-          <Collapse accordion >
-            <Panel header="ใช้สีแทนประเภทใบงาน" key="1">
-              {stateSysmbole ? stateSysmbole[0] : <>กำลังรอข้อมูล...</>}
-            </Panel>
-            {stateSysmbole && stateSysmbole[2] && <Panel header="ใช้สัญลักษณ์แทนการเปิด-ปิด" key="3">
-              {stateSysmbole ? stateSysmbole[2] : <>กำลังรอข้อมูล...</>}
-            </Panel>}
-            <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
-              {stateSysmbole ? stateSysmbole[1] : <>กำลังรอข้อมูล...</>}
-            </Panel>
 
-          </Collapse>
-          {/* <div id="legendDiv"></div> */}
+              <Form.Item
+                name="WorksheetStatusId"
+                label='สถานะ Work'
+              >
+                <Select
+                  loading={loading}
+                  mode='multiple'
+                  showArrow
+                  style={{ width: '100%' }}
 
-        </div>
+                >
+                  {WorkPermitStatusIDOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
 
-      </Map>
-      <Modal
-        title='รายละเอียด'
-        okButtonProps={{ hidden: true }}
-        onCancel={() => setIsModalVisible(!isModalVisible)}
-        visible={isModalVisible}
-        bodyStyle={{
-          maxHeight: 600,
-          overflowX: "auto"
-        }}
-      >
-        {datamodal &&
-          Object.entries(datamodal).map(([key, value]) => (
-            !(typeof value == 'object') &&
-            <Row key={key}>
-              <Col span={12}>
-                <span style={{ color: "#0A8FDC" }}>{key}</span>
-              </Col>
-              <Col span={12}>{value ?? "-"}</Col>
-            </Row>
-          ))}
-      </Modal>
-      <Table
-        id='divtable'
-        scroll={{ y: '25vh' }}
-        size='small'
-        style={{ position: 'absolute', bottom: 0, backgroundColor: 'white', display: 'none' }}
-        rowClassName={(record, index) =>
-          record?.status_warnning !== null &&
-            record?.status_warnning !== undefined
-            ? 'table-row-red'
-            : ''
-        }
-        onRow={(record, rowIndex) => {
-          return {
-            onClick: async () => {
-              const [GeoJSONLayer] = await loadModules([
-                'esri/layers/GeoJSONLayer',
-              ]);
-              let cicle = circle([record.longitude, record.latitude], 0.001);
-              const blob = new Blob([JSON.stringify(cicle)], {
-                type: 'application/json',
-              });
-              const url = URL.createObjectURL(blob);
-              const geojsonlayer = new GeoJSONLayer({
-                url: url,
-                copyright: "PTT POINTGENARATE"
-              });
-              let extent = await geojsonlayer.queryExtent();
+                </Select>
+              </Form.Item>
 
-              // const polygon = new Polygon({
-              //   hasZ: true,
-              //   hasM: true,
-              //   rings: [cicle.geometry.coordinates],
-              //   spatialReference: { wkid: 4326 }
-              // });
-              // console.log(polygon);
+              <Form.Item
+                name="WorkpermitTypeID"
+                label='ประเภทใบอนุญาต'
+              >
+                <Select
+                  loading={loading}
+                  mode='multiple'
+                  showArrow
+                  style={{ width: '100%' }}
+                >
+                  {WorkTypeIDOptions.map((e) => <Select.Option key={e.id}>{`${e.id}-${e.value}`}</Select.Option>)}
+                </Select>
 
-              stateView?.goTo(extent.extent)
-            }, // click row
-          };
-        }}
-        rowKey={(i) => i.id}
-        columns={columns}
-        dataSource={tabledata}
-      />
-    </div>
+              </Form.Item>
+
+              <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
+
+                <Button type='primary' htmlType='submit' style={{ width: 100 }} loading={loading}>
+                  ค้นหา
+                </Button>
+                <span style={{ paddingRight: 5 }} />
+                <Button style={{ width: 100 }} onClick={reset} loading={loading}>
+                  ค่าเริ่มต้น
+                </Button>
+              </Form.Item>
+            </Form>
+          </div>
+          <div ref={refdetail} className='sysmbole esri-widget'>
+            <Collapse accordion >
+              <Panel header="ใช้สีแทนประเภทใบงาน" key="1">
+                {stateSysmbole ? stateSysmbole[0] : <>กำลังรอข้อมูล...</>}
+              </Panel>
+              {stateSysmbole && stateSysmbole[2] && <Panel header="ใช้สัญลักษณ์แทนการเปิด-ปิด" key="3">
+                {stateSysmbole ? stateSysmbole[2] : <>กำลังรอข้อมูล...</>}
+              </Panel>}
+              <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
+                {stateSysmbole ? stateSysmbole[1] : <>กำลังรอข้อมูล...</>}
+              </Panel>
+
+            </Collapse>
+            {/* <div id="legendDiv"></div> */}
+
+          </div>
+
+        </Map>
+        <Modal
+          title='รายละเอียด'
+          okButtonProps={{ hidden: true }}
+          onCancel={() => setIsModalVisible(!isModalVisible)}
+          visible={isModalVisible}
+          bodyStyle={{
+            maxHeight: 600,
+            overflowX: "auto"
+          }}
+        >
+          {datamodal &&
+            Object.entries(datamodal).map(([key, value]) => (
+              !(typeof value == 'object') &&
+              <Row key={key}>
+                <Col span={12}>
+                  <span style={{ color: "#0A8FDC" }}>{key}</span>
+                </Col>
+                <Col span={12}>{value ?? "-"}</Col>
+              </Row>
+            ))}
+        </Modal>
+        <Table
+          id='divtable'
+          scroll={{ y: '25vh' }}
+          size='small'
+          style={{ position: 'absolute', bottom: 0, backgroundColor: 'white', display: 'none' }}
+          rowClassName={(record, index) =>
+            record?.status_warnning !== null &&
+              record?.status_warnning !== undefined
+              ? 'table-row-red'
+              : ''
+          }
+          onRow={(record, rowIndex) => {
+            return {
+              onClick: async () => {
+                const [GeoJSONLayer] = await loadModules([
+                  'esri/layers/GeoJSONLayer',
+                ]);
+                let cicle = circle([record.longitude, record.latitude], 0.001);
+                const blob = new Blob([JSON.stringify(cicle)], {
+                  type: 'application/json',
+                });
+                const url = URL.createObjectURL(blob);
+                const geojsonlayer = new GeoJSONLayer({
+                  url: url,
+                  copyright: "PTT POINTGENARATE"
+                });
+                let extent = await geojsonlayer.queryExtent();
+
+                // const polygon = new Polygon({
+                //   hasZ: true,
+                //   hasM: true,
+                //   rings: [cicle.geometry.coordinates],
+                //   spatialReference: { wkid: 4326 }
+                // });
+                // console.log(polygon);
+
+                stateView?.goTo(extent.extent)
+              }, // click row
+            };
+          }}
+          rowKey={(i) => i.id}
+          columns={columns}
+          dataSource={tabledata}
+        />
+      </div>
+    </>
+
   )
 }
 export default WorkpermitPage;

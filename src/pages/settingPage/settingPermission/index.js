@@ -1,10 +1,11 @@
-import React from 'react'
-import { Table, Button, Form, Input, Typography, Tooltip, Checkbox } from 'antd';
-import { SearchOutlined, DeleteOutlined, EditOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react'
+import { Table, Button, Form, Input, Typography, Tooltip, Checkbox, Tabs, Select, Tag, Divider, Drawer, Space } from 'antd';
+import { SearchOutlined, DeleteOutlined, EditOutlined, ArrowRightOutlined, SaveFilled } from '@ant-design/icons';
 import './index.style.less';
 import { useNavigate } from 'react-router-dom';
-
+import API from '../../../util/Api'
 const { Title } = Typography;
+const { TabPane } = Tabs;
 
 
 const columns = [
@@ -28,42 +29,42 @@ const columns = [
   },
   {
     title: 'workpermit',
-    className:"column-1",
+    className: "column-1",
     children: [
       {
         title: <Tooltip title={`แสดงภาพรวมการขออนุญาตทำงาน โดยมี Icon สีแสดงแยกประเภทใบอนุญาตทำงาน`}>แสดงภาพรวมการขออนุญาตทำงาน...</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-        align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`แสดงภาพรวมสถานะเปิด – ปิดใบอนุญาตทำงานโดยมี Icon สี แสดงสถานะใบอนุญาตทำงาน`}>แสดงภาพรวมสถานะเปิด – ปิด</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`แสดงสถานะอุปกรณ์ที่ Impairment โดยมี Icon สี แสดงสถานะอุปกรณ์`}>แสดงสถานะอุปกรณ์ที่ Impairment</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`แสดงการแจ้งเตือนรอบการวัดก๊าซ โดยมี Icon สี เพื่อแจ้งเตือน`}>แสดงการแจ้งเตือนรอบการวัดก๊าซ</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`แสดงการแจ้งเตือนเมื่อใบอนุญาตทำงานใกล้หมดอายุการขออนุญาตในแต่ละวัน ชั่วโมง โดยมี Icon สี เพื่อแจ้งเตือน`}>แสดงการแจ้งเตือนเมื่อใบอนุญาตทำงานใกล้หมดอายุ</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`ใช้ฟังก์ชันการค้นหาข้อมูล
@@ -79,20 +80,20 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
     ],
   },
   {
     title: 'Vehicle',
-    className:"column-2",
+    className: "column-2",
     children: [
       {
         title: <Tooltip title={`แสดงภาพรวมยานพาหนะ โดยมี Icon แสดงแยกตามชนิดยานพาหนะ`}>แสดงภาพรวมยานพาหนะ...</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`การแจ้งเตือนกรณียานพาหนะขับนอกเส้นทาง,
@@ -103,7 +104,7 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`แสดงภาพรวมยานพาหนะเข้า - ออก พื้นที่ โดยมี
@@ -112,7 +113,7 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`การแจ้งเตือนกรณียานพาหนะไม่ได้รับอนุญาต
@@ -121,7 +122,7 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`ใช้ฟังก์ชันการค้นหาข้อมูล
@@ -137,27 +138,27 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
     ],
   },
   {
     title: 'Equipment',
-    className:"column-3",
+    className: "column-3",
     children: [
       {
         title: <Tooltip title={`แสดงภาพรวมอุปกรณ์ที่มีความเสี่ยงซึ่งติดตั้งอยู่ในพื้นที่ โดยมี Icon สี แสดงจุดที่มีการติดตั้งอุปกรณ์`}>แสดงภาพรวมอุปกรณ์ที่มีความเสี่ยงซึ่งติดตั้งอยู่ในพื้นที่...</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`การแจ้งเตือนกรณีอุปกรณ์ที่มีความเสี่ยงซึ่งติดตั้งอยู่ในพื้นที่หมดอายุการตรวจสภาพโดยมี Icon สี เพื่อแจ้งเตือน`}>การแจ้งเตือนกรณีอุปกรณ์ที่มีความเสี่ยงซึ่งติดตั้งอยู่ในพื้นที่หมดอายุการตรวจสภาพโดยมี – ปิด</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`การแจ้งเตือนกรณีอุปกรณ์ที่มีความเสี่ยงซึ่งติดตั้ง
@@ -165,7 +166,7 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`ภาพรวมการนำอุปกรณ์เข้า - ออก พื้นที่ โดยแสดง
@@ -173,14 +174,14 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`แสดงการแจ้งเตือนอุปกรณ์ที่ยังไม่ได้นำออกจากพื้นที่ โดยแจ้งเตือนตามรายการอุปกรณ์ที่มีการขออนุญาตนำเข้าพื้นที่ในแต่ละวัน`}>แสดงการแจ้งเตือนอุปกรณ์ที่ยังไม่ได้นำออกจากพื้นที่...</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`ใช้ฟังก์ชันการค้นหาข้อมูล
@@ -194,34 +195,34 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
     ],
   },
   {
     title: 'Scaffolding',
-    className:"column-4",
+    className: "column-4",
     children: [
       {
         title: <Tooltip title={`แสดงภาพรวมการติดตั้งนั่งร้าน โดยมี Icon สี แสดงจุดที่มีการติดตั้งนั่งร้าน`}>แสดงภาพรวมการติดตั้งนั่งร้าน...</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`แสดงการแจ้งเตือนกรณีนั่งร้านที่ติดตั้งในพื้นที่หมดอายุการตรวจสภาพ โดยมี Icon สี เพื่อแจ้งเตือน`}>แสดงการแจ้งเตือนกรณีนั่งร้านที่ติดตั้งในพื้นที่หมดอายุการตรวจสภาพ...</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
-        title: <Tooltip title={`การแจ้งเตือนกรณีนั่งร้านที่ติดตั้งในพื้นที่ใกล้หมดอายุการตรวจสภาพ, หมดอายุการตรวจสภาพ โดยมี Icon สี เพื่อแจ้งเตือนสถานะ`}>กการแจ้งเตือนกรณีนั่งร้านที่ติดตั้งในพื้นที่ใกล้หมดอายุการตรวจสภาพ...</Tooltip>,
+        title: <Tooltip title={`การแจ้งเตือนกรณีนั่งร้านที่ติดตั้งในพื้นที่ใกล้หมดอายุการตรวจสภาพ, หมดอายุการตรวจสภาพ โดยมี Icon สี เพื่อแจ้งเตือนสถานะ`}>การแจ้งเตือนกรณีนั่งร้านที่ติดตั้งในพื้นที่ใกล้หมดอายุการตรวจสภาพ...</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`ใช้ฟังก์ชันการค้นหาข้อมูล
@@ -235,27 +236,27 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
     ],
   },
   {
     title: 'People Tracking',
-    className:"column-5",
+    className: "column-5",
     children: [
       {
         title: <Tooltip title={`แสดงภาพรวมบุคคลที่ปฏิบัติงาน โดยมี Icon แสดงแยกตามประเภทกลุ่มบุคคล ได้แก่ ผู้รับเหมา, เจ้าหน้าที่ความปลอดภัย, ผู้เฝ้าระวังไฟ เป็นต้น`}>แสดงภาพรวมบุคคลที่ปฏิบัติงาน...</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`แสดงการแจ้งเตือนกรณีบุคคลอยู่นิ่ง หรืออยู่นอกพื้นที่การขออนุญาตทำงานมากกว่า 30 นาทีขึ้นไป โดยมี Icon สี เพื่อแจ้งเตือน`}>แสดงการแจ้งเตือนกรณีบุคคลอยู่นิ่ง</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`แสดงการแจ้งเตือนกรณีบุคคลเกิดเหตุฉุกเฉิน ได้แก่
@@ -264,7 +265,7 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`การแจ้งเตือนกรณีบุคคลอยู่ในพื้นที่กระบวนการผลิต
@@ -274,7 +275,7 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`ใช้ฟังก์ชันการค้นหาข้อมูล
@@ -288,27 +289,27 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
     ],
   },
   {
     title: 'Access Control',
-    className:"column-6",
+    className: "column-6",
     children: [
       {
         title: <Tooltip title={`แสดงภาพรวมบุคคลที่เข้า - ออก พื้นที่ โดย มี Icon แสดงแยกตามประเภทกลุ่มบุคคล และแสดงจำนวนบุคคลเข้า-ออก (ใช้ข้อมูลจากพื้นที่ที่สแกนอุปกรณ์ล่าสุด)`}>แสดงภาพรวมบุคคลที่เข้า-ออก...</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`แสดงภาพรวมการแลกบัตรเข้า - ออก พื้นที่ แสดงจำนวนบุคคลที่มีการแลกบัตรเข้า - ออก`}>แสดงภาพรวมการแลกบัตรเข้า - ออก</Tooltip>,
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`แสดงการแจ้งเตือนกรณี อุปกรณ์ Access Control
@@ -316,7 +317,7 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
       {
         title: <Tooltip title={`ใช้ฟังก์ชันการค้นหาข้อมูล
@@ -331,7 +332,7 @@ const columns = [
         dataIndex: 'companyName',
         key: 'companyName',
         width: 200,
-         align:'center'
+        align: 'center'
       },
     ],
   },
@@ -360,45 +361,172 @@ for (let i = 0; i < 20; i++) {
 }
 
 
+const ColumnRole = [
+  {
+    title: 'สิทธิ์ผู้ใช้งาน',
+    dataIndex: 'group_name',
+    key: 'group_name',
+    width: 40,
+  },
+  {
+    title: 'สถานะ',
+    dataIndex: 'status',
+    key: 'status',
+    align: 'center',
+    width: 40,
+    render: (row, recoard) => (row ? <span style={{ color: 'green' }}>เปิดใช้งาน</span> : <span style={{ color: 'red' }}>ปิดใช้งาน</span>)
+  },
+  {
+    title: 'จัดการ',
+    dataIndex: 'gender',
+    key: 'gender',
+    width: 10,
+    align: 'center',
+    fixed: 'right',
+    render: () => <Space>
+      <Tooltip title="แก้ไขRole">
+        <Button type="primary" shape="circle" icon={<EditOutlined />} />
+      </Tooltip>
+      <Tooltip title="ลบRole">
+        <Button danger type="primary" shape="circle" icon={<DeleteOutlined />} />
+      </Tooltip>
+    </Space>
+  },
+]
+
+
 function SettingUser() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const [state_table, setstate_table] = useState([]);
+  const [state_role, setstate_role] = useState([]);
+  const [visible, setVisible] = useState(false);
 
+
+  useEffect(() => {
+    _API_GETPERMISSION();
+    _API_GETROLE();
+  }, []);
   const onFinish = (values) => {
     console.log('Finish:', values);
+  };
+
+  const _API_GETPERMISSION = async () => {
+    let permission = await API.get('/admin/application/all');
+    if (permission.status == 200) {
+      let { Message: { data } } = permission.data;
+      let datamap = data.map((item, index) => {
+        item.key = index;
+        item.children = item.child;
+        return {
+          ...item
+        }
+      })
+      console.log('datamap :>> ', datamap);
+      setstate_table(datamap);
+    }
+  }
+
+  var alreadyDone = [];
+  const randomValueFromArray = (myArray) => {
+    if (alreadyDone.length === 0) {
+      for (var i = 0; i < myArray.length; i++) alreadyDone.push(i);
+    }
+    var randomValueIndex = Math.floor(Math.random() * alreadyDone.length);
+    var indexOfItemInMyArray = alreadyDone[randomValueIndex];
+    alreadyDone.splice(randomValueIndex, 1);
+    return myArray[indexOfItemInMyArray];
+  };
+  let colorRandom = ["#111827", "#b831d4", "#202cd3", "#f37d2f", "#f00116", "#21b6a1", "#927edd", "#9b2693", "#4a5289", "#d91373", "#551f15", "#2c208b", "#5c715c", "#3d1ef6", `#${(Math.floor(Math.random() * 16777215).toString(16))}`]
+  const _API_GETROLE = async () => {
+    console.log('randomValueFromArray :>> ', randomValueFromArray(colorRandom));
+    let role = await API.get('/admin/group/all');
+    if (role.status == 200) {
+      let { Message: { data } } = role.data;
+      let datamap = data.map((item, index) => {
+        item.value = item._id;
+        item.label = item.group_name;
+        item.color = randomValueFromArray(colorRandom);
+        return {
+          ...item
+        }
+      })
+      // console.log('datamap :>> ', datamap);
+      setstate_role(datamap);
+    }
+  }
+  const tagRender = (props) => {
+    const { label, value, closable, onClose } = props;
+    const onPreventMouseDown = (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    };
+    let color = state_role.find((i) => i._id == value);
+    // console.log('color :>> ', state_role);
+    return (
+      <Tag
+        color={color?.color}
+        onMouseDown={onPreventMouseDown}
+        closable={closable}
+        onClose={onClose}
+        style={{
+          marginRight: 3,
+        }}
+      >
+        {label}
+      </Tag>
+    );
+  };
+
+  const columns2 = [
+    {
+      title: <b>ชื่อระบบ</b>,
+      // dataIndex: 'application_name',
+      key: 'application_name',
+      render: (row, recoard) => (<b>{row.config ? row.config.description : row.application_name}</b>),
+      sorter: (a, b) => a.config ? a.config.description : a.application_name - b.config ? b.config.description : b.application_name,
+    },
+    {
+      title: <b>สิทธิ์การเข้าถึงระบบ</b>,
+      dataIndex: 'permission',
+      key: 'permission',
+      width: '50%',
+      render: (row, recoard) => (
+        <Select
+          mode="multiple"
+          showArrow
+          tagRender={tagRender}
+          defaultValue={recoard?.role?.map((i) => i.group_id)}
+          style={{
+            width: '100%',
+          }}
+          options={state_role}
+        />
+      )
+    },
+
+  ];
+
+  const onCloseOpen = () => {
+    setVisible(!visible);
   };
   return (
     <div className="container" style={{ marginTop: 12 }}>
       <div className="head">
         <Title >จัดการPermission</Title>
-        <Button type='primary' shape='round' onClick={() => navigate('/setting-user')} >จัดการผู้ใช้งาน<ArrowRightOutlined /></Button>
+        <Button type='primary' shape='round' onClick={onCloseOpen} >จัดการกลุ่มผู้ใช้งาน<ArrowRightOutlined /></Button>
       </div>
       <div className="table-serch">
         <div className='filterSerch' style={{ margin: '12px 0px' }}>
-          <Form form={form} name="horizontal_login" layout="inline" onFinish={onFinish}>
-            <Form.Item
-              name="name"
-              rules={[{ required: true, message: 'Please input your name!' }]}
-            >
-              <Input prefix={<SearchOutlined className="site-form-item-icon" />} placeholder="ค้นหาสิทธิผู้ใช้งาน" />
-            </Form.Item>
-            <Form.Item shouldUpdate>
-              {() => (
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={
-                    !form.isFieldsTouched(true) ||
-                    !!form.getFieldsError().filter(({ errors }) => errors.length).length
-                  }
-                >
-                  ค้นหา
-                </Button>
-              )}
-            </Form.Item>
-          </Form>
+          <Divider orientation="left">กลุ่มผู้ใช้งาน</Divider>
+          <div>
+            {state_role.map((i, index) => (
+              <Tag key={index.toString()} color={i.color}>{i.group_name}</Tag>
+            ))}
+          </div>
         </div>
-        <Table
+        <Button icon={<SaveFilled />} style={{ float: 'right' }} type='primary' size='small' >บันทึกการเปลียนแปลง</Button>
+        {/* <Table
           bordered
           className='tablepermission'
           columns={columns}
@@ -408,7 +536,25 @@ function SettingUser() {
             x: 1500,
             y: 300,
           }}
+        /> */}
+        <Table
+          className='tablepermission'
+          bordered
+          columns={columns2}
+          // rowSelection={{ ...rowSelection, checkStrictly }}
+          dataSource={state_table}
         />
+        <Drawer title="จัดการกลุ่มผู้ใช้งาน" size={"large"} placement="right" onClose={onCloseOpen} visible={visible}>
+          <Table
+            bordered
+            className='tablepermission'
+            columns={ColumnRole}
+            dataSource={state_role}
+            rowKey={(i, index) => index}
+
+          />
+
+        </Drawer>
       </div>
     </div>
 
