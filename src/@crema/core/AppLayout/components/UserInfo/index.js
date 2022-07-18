@@ -31,7 +31,8 @@ const UserInfo = ({ hasColor, onToggleSidebar, children }) => {
   const menu = (
     <List className='dropdown-list'>
       <List.Item key={1} onClick={() => navigate('/my-profile')}>จัดการข้อมูลส่วนตัว</List.Item>
-      <List.Item key={2} onClick={() => navigate('/setting-user')}>ตั้งค่าขั้นสูง</List.Item>
+      <List.Item key={2} onClick={() => navigate('/setting-user')}>ตั้งค่าผู้ใช้</List.Item>
+      <List.Item key={2} onClick={() => navigate('/setting-permission')}>ตั้งค่าสิทธิ์การใช้งาน</List.Item>
       <List.Item key={3} onClick={() => logout()}>ออกจากระบบ</List.Item>
     </List>
   );

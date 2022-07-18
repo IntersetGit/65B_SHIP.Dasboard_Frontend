@@ -11,8 +11,12 @@ import {
   Col,
   Modal,
   Collapse,
-  DatePicker
+  DatePicker,
+  Divider
 } from 'antd';
+import {
+  SearchOutlined
+} from '@ant-design/icons';
 import { Map, WebScene } from '@esri/react-arcgis';
 import { loadModules } from 'esri-loader';
 import './index.style.less';
@@ -29,6 +33,7 @@ import PTTlayers from '../../../util/PTTlayer'
 import { circle } from '@turf/turf';
 
 const { Panel } = Collapse;
+const { Option } = Select;
 
 
 const WorkpermitPage = () => {
@@ -36,6 +41,7 @@ const WorkpermitPage = () => {
   const [stateView, setStateView] = useState(null);
   const refdrawn = useRef();
   const refdetail = useRef();
+  const refgismap = useRef();
   const [tabledata, setTabledata] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [datamodal, setDatamodal] = useState(null);
@@ -44,7 +50,7 @@ const WorkpermitPage = () => {
   const Geojson = new WaGeojson();
   const PTTlayer = new PTTlayers();
   const [stateSysmbole, setstateSysmbole] = useState(null);
-
+  const [selectArea, setselectArea] = useState([]);
   const columns = [
     {
       title: 'เลข work',
@@ -228,6 +234,13 @@ const WorkpermitPage = () => {
     }
   }
 
+  useEffect(() => {
+    (async () => {
+      let area = await PTTlayer.GETMASTER_AREA_LAYERGIS();
+      console.log('showarea :>> ', area);
+      setselectArea(area);
+    })();
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -309,22 +322,25 @@ const WorkpermitPage = () => {
 
         for (const opp in item.data) {
           const obj = item.data[opp];
-          let findeArea = Arealatlng?.find((area) => {
-            if (area.name == (obj.AreaName).replace(/#/i, '')) {
-              let latlng_type = area.typelatlng[obj.WorkpermitTypeID];
-              // console.log('latlng_type', latlng_type)
-              return area
-            } else {
-              return {
-                name: "defaul",
-                center: {
-                  latitude: 12.719,
-                  longitude: 101.147
-                },
-                typelatlng: area.typelatlng
-              }
-            }
-          });
+          // let findeArea = Arealatlng?.find((area) => {
+          //   if (area.name == (obj.AreaName).replace(/#/i, '')) {
+          //     let latlng_type = area.typelatlng[obj.WorkpermitTypeID];
+          //     // console.log('latlng_type', latlng_type)
+          //     return area
+          //   } else {
+          //     return {
+          //       name: "defaul",
+          //       center: {
+          //         latitude: 12.719,
+          //         longitude: 101.147
+          //       },
+          //       typelatlng: area.typelatlng
+          //     }
+          //   }
+          // });
+          let findeArea = Arealatlng?.find((area) => (area.name).replace(/#/i, '') == (obj.AreaName).replace(/#/i, ''))
+          if (!findeArea) findeArea = Arealatlng[0]
+
           let getlatlng_byarea = findeArea.typelatlng[obj.WorkpermitTypeID];
           // console.log('getlatlng_byarea :>> ', getlatlng_byarea);
 
@@ -437,26 +453,26 @@ const WorkpermitPage = () => {
 
           },
         });
-        layerpoint
-          .when()
-          .then(clusterConfig)
-          .then(async (featureReduction) => {
-            //console.log('featureReduction :>> ', featureReduction);
-            // layerpoint.featureReduction = featureReduction;
-            // layerView = await stateView?.whenLayerView(layerpoint);
+        // layerpoint
+        //   .when()
+        //   .then(clusterConfig)
+        //   .then(async (featureReduction) => {
+        //     //console.log('featureReduction :>> ', featureReduction);
+        //     // layerpoint.featureReduction = featureReduction;
+        //     // layerView = await stateView?.whenLayerView(layerpoint);
 
-            reactiveUtils.watch(
-              () => stateView?.scale,
-              (scale) => {
-                layerpoint.featureReduction  =
-                scale > 80 ? clusterConfig : null;
-                // console.log('scale :>> ', scale);
-              }
-            );
-          })
-          .catch((error) => {
-            console.error(error);
-          });
+        //     reactiveUtils.watch(
+        //       () => stateView?.scale,
+        //       (scale) => {
+        //         layerpoint.featureReduction  =
+        //         scale > 80 ? clusterConfig : null;
+        //         // console.log('scale :>> ', scale);
+        //       }
+        //     );
+        //   })
+        //   .catch((error) => {
+        //     console.error(error);
+        //   });
         await stateMap?.remove(stateMap?.findLayerById('pointlayer'));
         stateMap?.add(layerpoint);
         // let maplayerSerch = stateMap?.findLayerById('pointlayer');
@@ -708,7 +724,15 @@ const WorkpermitPage = () => {
     view.ui.add(fullscreenui, 'top-right');
     view.ui.add(zoomui, 'top-right');
     view.ui.add(detaillayer, 'top-right');
-
+    view.ui.add(
+      new Expand({
+        view,
+        content: refgismap.current,
+        expandIconClass: "esri-icon-layer-list",
+        expanded: false,
+      }),
+      "top-left"
+    );
     // view.watch('zoom', zoomChanged);
     // function zoomChanged(newValue, oldValue, property, object) {
     //   let maplayerCLuster = map.findLayerById('pointlayer');
@@ -766,7 +790,6 @@ const WorkpermitPage = () => {
     console.log('error', error)
   }
 
-  const [visible, setVisible] = useState(false);
 
   const [form] = Form.useForm()
 
@@ -776,6 +799,24 @@ const WorkpermitPage = () => {
 
   const closeTable = () => {
     document.querySelector('.ant-table-wrapper').style.setProperty('display', 'none', 'important');
+  }
+
+  const OptionSelectArea = (namearea) => {
+    // console.log('selectArea', selectArea)
+    if (selectArea.length > 0) {
+      let area = selectArea?.find((i) => i.LAYERNAME == namearea);
+      if (area) {
+        let id = namearea == "PLANT" ? ["OBJECTID"] : namearea == "AREA" ? ["SUBUNITID"] : namearea == "BUILDING" ? ["BLDGID"] : namearea == "EQUIPMENT" ? ["EQUIPMENTID"] : ["OBJECTID"];
+        let label = namearea == "PLANT" ? ["UNITNAME"] : namearea == "AREA" ? ["SUBUNITNAME"] : namearea == "BUILDING" ? ["BLDGNAME"] : namearea == "EQUIPMENT" ? ["EQUIPMENTID"] : ["OBJECTID"];
+        return (
+          <>
+            {area?.RESULT?.map((item, index) =>
+              <Option key={index} value={item[id]}>{item[label]}</Option>
+            )}
+          </>
+        )
+      }
+    }
   }
   return (
     <div id="pagediv">
@@ -791,6 +832,78 @@ const WorkpermitPage = () => {
           ui: { components: ['attribution', 'compass'] },
         }}
       >
+        <div ref={refgismap} id="infoDiv" style={{ width: '200px', height: '100%', padding: "10px" }} className="esri-widget">
+          สถานที่ใช้งาน
+          <Divider orientation="left">Plant</Divider>
+          <Space style={{ margin: "5px 0px" }}>
+            <Select
+              loading={selectArea.length > 0 ? false : true}
+              showSearch
+              allowClear
+              placeholder="ค้นหา"
+              optionFilterProp="children"
+              size="small"
+              style={{ width: '150px' }}
+            >
+              {/* {selectArea.length > 0 && selectArea.find((i)=>{
+                if(i.LAYERNAME == "PLANT"){
+                  i?.RESULT?.map((item,index)=>(
+                    <Option key={index} value="jack">Jack</Option>
+                  ))
+                }
+              })} */}
+              {OptionSelectArea("PLANT")}
+            </Select>
+            <Button size="small" icon={<SearchOutlined />}></Button>
+          </Space>
+          <Divider orientation="left">Area</Divider>
+          <Space style={{ margin: "5px 0px" }}>
+            <Select
+              loading={selectArea.length > 0 ? false : true}
+              showSearch
+              allowClear
+              placeholder="ค้นหา"
+              optionFilterProp="children"
+              size="small"
+              style={{ width: '150px' }}
+            >
+              {OptionSelectArea("AREA")}
+            </Select>
+            <Button size="small" icon={<SearchOutlined />}></Button>
+          </Space>
+          <Divider orientation="left">Building</Divider>
+          <Space style={{ margin: "5px 0px" }}>
+            <Select
+              loading={selectArea.length > 0 ? false : true}
+              showSearch
+              allowClear
+              placeholder="ค้นหา"
+              optionFilterProp="children"
+              size="small"
+              style={{ width: '150px' }}
+            >
+              {OptionSelectArea("BUILDING")}
+            </Select>
+            <Button size="small" icon={<SearchOutlined />}></Button>
+          </Space>
+          <Divider orientation="left">Equipment</Divider>
+          <Space style={{ margin: "5px 0px" }}>
+            <Select
+              loading={selectArea.length > 0 ? false : true}
+              showSearch
+              allowClear
+              placeholder="ค้นหา"
+              optionFilterProp="children"
+              size="small"
+              style={{ width: '150px' }}
+            >
+              {OptionSelectArea("EQUIPMENT")}
+            </Select>
+            <Button size="small" icon={<SearchOutlined />}></Button>
+          </Space>
+
+
+        </div>
         <div id='button-top' className='button-topleft'>
           <div
             className='esri-widget--button esri-icon-table'
