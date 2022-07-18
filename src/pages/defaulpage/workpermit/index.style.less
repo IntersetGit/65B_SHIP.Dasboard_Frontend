@@ -142,3 +142,26 @@
 // //   z-index: 1;
 // //   overflow: auto;
 // // }
+#zoom-select{
+  font-size: 65px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99;
+  transform-origin: center center;
+  display: none;
+}
+/* Copy this @keyframes block to your CSS*/
+@keyframes zoomanimation {
+  0.0%{
+  }
+  11.5%{
+      font-size: 40px;
+  }
+}
+
+/* Add the animation: property to whichever element you want to animate */
+#zoom-select{
+  animation: zoomanimation 3s ease 0s infinite normal none;
+}

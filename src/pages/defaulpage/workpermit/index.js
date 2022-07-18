@@ -15,7 +15,8 @@ import {
   Divider
 } from 'antd';
 import {
-  SearchOutlined
+  SearchOutlined,
+  ExpandOutlined
 } from '@ant-design/icons';
 import { Map, WebScene } from '@esri/react-arcgis';
 import { loadModules } from 'esri-loader';
@@ -245,8 +246,8 @@ const WorkpermitPage = () => {
   useEffect(() => {
     (async () => {
       let area = await PTTlayer.GETMASTER_AREA_LAYERGIS();
-      console.log('showarea :>> ', area);
       setselectArea(area);
+
     })();
   }, []);
 
@@ -828,123 +829,128 @@ const WorkpermitPage = () => {
   }
   return (
     <>
-    <Helmet>
-    <title>Workpermit | DashBoard</title>
-  </Helmet>
-    <div id="pagediv">
-      <Map
-        className='Mapacrgis'
-        onLoad={Onload}
-        mapProperties={{
-          basemap: `${'arcgis-navigation'}`,
-          autoResize: false,
-        }}
-        viewProperties={{
-          center: [100.3330867, 14.5548052],
-          ui: { components: ['attribution', 'compass'] },
-        }}
-      >
-        <div ref={refgismap} id="infoDiv" style={{ width: '200px', height: '100%', padding: "10px" }} className="esri-widget">
-          สถานที่ใช้งาน
-          <Divider orientation="left">Plant</Divider>
-          <Space style={{ margin: "5px 0px" }}>
-            <Select
-              loading={selectArea.length > 0 ? false : true}
-              showSearch
-              allowClear
-              placeholder="ค้นหา"
-              optionFilterProp="children"
-              size="small"
-              style={{ width: '150px' }}
-            >
-              {/* {selectArea.length > 0 && selectArea.find((i)=>{
+      <Helmet>
+        <title>Workpermit | DashBoard</title>
+      </Helmet>
+      <div id="pagediv">
+        <div id='zoom-select'>
+          <ExpandOutlined />
+        </div>
+
+        <Map
+          className='Mapacrgis'
+          onLoad={Onload}
+          mapProperties={{
+            basemap: `${'arcgis-navigation'}`,
+            autoResize: false,
+          }}
+          viewProperties={{
+            center: [100.3330867, 14.5548052],
+            ui: { components: ['attribution', 'compass'] },
+          }}
+        >
+
+          <div ref={refgismap} id="infoDiv" style={{ width: '200px', height: '100%', padding: "10px" }} className="esri-widget">
+            สถานที่ใช้งาน
+            <Divider orientation="left">Plant</Divider>
+            <Space style={{ margin: "5px 0px" }}>
+              <Select
+                loading={selectArea.length > 0 ? false : true}
+                showSearch
+                allowClear
+                placeholder="ค้นหา"
+                optionFilterProp="children"
+                size="small"
+                style={{ width: '150px' }}
+              >
+                {/* {selectArea.length > 0 && selectArea.find((i)=>{
                 if(i.LAYERNAME == "PLANT"){
                   i?.RESULT?.map((item,index)=>(
                     <Option key={index} value="jack">Jack</Option>
                   ))
                 }
               })} */}
-              {OptionSelectArea("PLANT")}
-            </Select>
-            <Button size="small" icon={<SearchOutlined />}></Button>
-          </Space>
-          <Divider orientation="left">Area</Divider>
-          <Space style={{ margin: "5px 0px" }}>
-            <Select
-              loading={selectArea.length > 0 ? false : true}
-              showSearch
-              allowClear
-              placeholder="ค้นหา"
-              optionFilterProp="children"
-              size="small"
-              style={{ width: '150px' }}
-            >
-              {OptionSelectArea("AREA")}
-            </Select>
-            <Button size="small" icon={<SearchOutlined />}></Button>
-          </Space>
-          <Divider orientation="left">Building</Divider>
-          <Space style={{ margin: "5px 0px" }}>
-            <Select
-              loading={selectArea.length > 0 ? false : true}
-              showSearch
-              allowClear
-              placeholder="ค้นหา"
-              optionFilterProp="children"
-              size="small"
-              style={{ width: '150px' }}
-            >
-              {OptionSelectArea("BUILDING")}
-            </Select>
-            <Button size="small" icon={<SearchOutlined />}></Button>
-          </Space>
-          <Divider orientation="left">Equipment</Divider>
-          <Space style={{ margin: "5px 0px" }}>
-            <Select
-              loading={selectArea.length > 0 ? false : true}
-              showSearch
-              allowClear
-              placeholder="ค้นหา"
-              optionFilterProp="children"
-              size="small"
-              style={{ width: '150px' }}
-            >
-              {OptionSelectArea("EQUIPMENT")}
-            </Select>
-            <Button size="small" icon={<SearchOutlined />}></Button>
-          </Space>
+                {OptionSelectArea("PLANT")}
+              </Select>
+              <Button size="small" icon={<SearchOutlined />}></Button>
+            </Space>
+            <Divider orientation="left">Area</Divider>
+            <Space style={{ margin: "5px 0px" }}>
+              <Select
+                loading={selectArea.length > 0 ? false : true}
+                showSearch
+                allowClear
+                placeholder="ค้นหา"
+                optionFilterProp="children"
+                size="small"
+                style={{ width: '150px' }}
+              >
+                {OptionSelectArea("AREA")}
+              </Select>
+              <Button size="small" icon={<SearchOutlined />}></Button>
+            </Space>
+            <Divider orientation="left">Building</Divider>
+            <Space style={{ margin: "5px 0px" }}>
+              <Select
+                loading={selectArea.length > 0 ? false : true}
+                showSearch
+                allowClear
+                placeholder="ค้นหา"
+                optionFilterProp="children"
+                size="small"
+                style={{ width: '150px' }}
+              >
+                {OptionSelectArea("BUILDING")}
+              </Select>
+              <Button size="small" icon={<SearchOutlined />}></Button>
+            </Space>
+            <Divider orientation="left">Equipment</Divider>
+            <Space style={{ margin: "5px 0px" }}>
+              <Select
+                loading={selectArea.length > 0 ? false : true}
+                showSearch
+                allowClear
+                placeholder="ค้นหา"
+                optionFilterProp="children"
+                size="small"
+                style={{ width: '150px' }}
+              >
+                {OptionSelectArea("EQUIPMENT")}
+              </Select>
+              <Button size="small" icon={<SearchOutlined />}></Button>
+            </Space>
 
 
-        </div>
-        <div id='button-top' className='button-topleft'>
+          </div>
+          <div id='button-top' className='button-topleft'>
+            <div
+              className='esri-widget--button esri-icon-table'
+              onClick={() => {
+                if (
+                  document.querySelector('.ant-table-wrapper').style.display ===
+                  'none' ||
+                  document.querySelector('.ant-table-wrapper').style.display ===
+                  ''
+                ) {
+                  // document
+                  //   .querySelector('.ant-table-wrapper')
+                  //   .style.setProperty('display', 'block', 'important');
+                  openTable()
+                } else {
+                  // document
+                  //   .querySelector('.ant-table-wrapper')
+                  //   .style.setProperty('display', 'none', 'important');
+                  closeTable()
+                }
+              }}
+            />
+          </div>
+
           <div
-            className='esri-widget--button esri-icon-table'
-            onClick={() => {
-              if (
-                document.querySelector('.ant-table-wrapper').style.display ===
-                'none' ||
-                document.querySelector('.ant-table-wrapper').style.display ===
-                ''
-              ) {
-                // document
-                //   .querySelector('.ant-table-wrapper')
-                //   .style.setProperty('display', 'block', 'important');
-                openTable()
-              } else {
-                // document
-                //   .querySelector('.ant-table-wrapper')
-                //   .style.setProperty('display', 'none', 'important');
-                closeTable()
-              }
-            }}
-          />
-        </div>
-
-        <div
-          ref={refdrawn}
-          id='viewtest'
-          className='menuserchslide esri-widget'
-        >
+            ref={refdrawn}
+            id='viewtest'
+            className='menuserchslide esri-widget'
+          >
 
             <Form
               form={form}
@@ -1134,16 +1140,13 @@ const WorkpermitPage = () => {
                   copyright: "PTT POINTGENARATE"
                 });
                 let extent = await geojsonlayer.queryExtent();
-
-                // const polygon = new Polygon({
-                //   hasZ: true,
-                //   hasM: true,
-                //   rings: [cicle.geometry.coordinates],
-                //   spatialReference: { wkid: 4326 }
-                // });
-                // console.log(polygon);
-
                 stateView?.goTo(extent.extent)
+                let animation = document.querySelector('#zoom-select');
+                animation.style.setProperty('display', 'block', 'important');
+                setTimeout(()=>{
+                  animation.style.setProperty('display', 'none', 'important');
+                },3000)
+
               }, // click row
             };
           }}
