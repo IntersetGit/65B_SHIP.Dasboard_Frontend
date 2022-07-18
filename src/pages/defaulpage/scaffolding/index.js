@@ -58,7 +58,8 @@ const ScaffoldingPage = () => {
 
     },
     {
-      title: 'ผู้อนุญาต/เจ้าของพื้นที่',
+      // title: 'ผู้อนุญาต/เจ้าของพื้นที่',
+      title: 'เจ้าของพื้นที่',
       dataIndex: 'OwnerName',
       key: 'OwnerName',
       render: (text) => text ?? "-",
@@ -93,14 +94,14 @@ const ScaffoldingPage = () => {
     //   width: 150
     // },
     {
-      title: 'วัน-เวลา ติดตั้ง',
+      title: 'วัน-เวลา ติดตั้งนั่งร้าน',
       dataIndex: 'WorkingStartDate',
       key: 'WorkingStartDate',
       render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD HH:mm:ss") : "-",
       width: 200
     },
     {
-      title: 'วัน-เวลา หมดอายุ',
+      title: 'วัน-เวลา หมดอายุนั่งร้าน',
       dataIndex: 'WorkingEndDate',
       key: 'WorkingEndDate',
       render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD HH:mm:ss") : "-",
@@ -135,22 +136,17 @@ const ScaffoldingPage = () => {
                   "เลขที่นั่งร้าน": record.ScaffoldingCode ?? "-",
                   "ประเภทผู้ขอรายการ": record.OwnerType == 1 ? "พนักงาน ปตท." : record.OwnerType == 2 ? "ผู้รับเหมา" : "-",
                   "รหัสผู้ขอรายการ": record.WorkOwnerID ?? "-",
-                  "ชื่อ นามสกุล": record.WorkName ?? "-",
-                  "รหัสผู้อนุญาต/เจ้าของพื้นที่": record.Owner ?? "-",
-                  "ชื่อผู้อนุญาต/เจ้าของพื้นที่": record.OwnerName ?? "-",
+                  "ชื่อ-นามสกุล": record.WorkName ?? "-",
                   "เลขบัตรประชาชน": record.PersonalID ?? "-",
                   "เลข Work Permit": record.WorkPermitNo ?? "-",
                   "รหัสประเภทนั่งร้าน": record.ScaffoldingTypeID ?? "-",
                   "ชื่องาน": record.Title ?? "-",
                   "รายละเอียดของงาน": record.Description ?? "-",
                   "วัตถุประสงค์": record.Objective ?? "-",
-                  "วันหมดอายุสภาพนั่งร้าน": record.ExpiredDate ? moment(new Date(record.ExpiredDate)).format("YYYY-MM-DD") : "-",
                   "รหัสสถานที่ปฏิบัติงานหลัก": record.Area ?? "-",
                   "ชื่อสถานที่ปฏิบัติงานหลัก": record.AreaName ?? "-",
                   "รหัสสถานที่ปฏิบัติงานย่อย": record.SubArea ?? "-",
                   "ชื่อสถานที่ปฏิบัติงานย่อย": record.SubAreaName ?? "-",
-                  // "ข้อมูลพิกัดนั่งร้าน": record.Features ?? "-",
-                  // "ข้อมูลคุณสมบัตินั่งร้าน": record.FeaturesProperties ?? "-",
                   "วัน เวลา ติดตั้ง": record.WorkingStartDate ? moment(new Date(record.WorkingStartDate)).format("YYYY-MM-DD HH:mm:ss") : "-",
                   "วัน เวลา หมดอายุ": record.WorkingEndDate ? moment(new Date(record.WorkingEndDate)).format("YYYY-MM-DD HH:mm:ss") : "-",
                   "รหัสบริษัท": record.VendorCode ?? "-",
@@ -159,6 +155,8 @@ const ScaffoldingPage = () => {
                   "ชื่อผู้ควบคุมงาน": record.PTTStaff ?? "-",
                   "รหัสหน่วยงานผู้ควบคุม": record.AgencyID ?? "-",
                   "ชื่อหน่วยงานผู้ควบคุม": record.AgencyName ?? "-",
+                  "รหัสผู้อนุญาต/เจ้าของพื้นที่": record.Owner ?? "-",
+                  "ชื่อผู้อนุญาต/เจ้าของพื้นที่": record.OwnerName ?? "-",
                   "ประเภทของ Work": record.WorkpermitType ?? "-",
                   "สถานะใบงาน": record.StatusName ?? "-",
                   "สถานะแจ้งเตือน": record.others.StatusName ?? "-",
@@ -220,7 +218,7 @@ const ScaffoldingPage = () => {
 
       // let latlng = item.data;
       Status_cal(item.summary);
-      // console.log('item', item)
+      console.log('item', item)
       // console.log("data =>>>>>>>>>>>>>>>>>", item.data);
       // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
       if (isPlainObject(item.filter)) {
@@ -233,6 +231,7 @@ const ScaffoldingPage = () => {
 
       let latlng = item.data.map(obj => {
         // console.log('status_work', `A${obj.ScaffoldingTypeID}_${obj.Status.toLowerCase()}`)
+        console.log('`A${obj.ScaffoldingTypeID}_${obj.others?.StatusName}`', `A${obj.ScaffoldingTypeID}_${obj.others?.StatusName}`)
         return {
           ...obj,
           "id": obj._id,
@@ -551,8 +550,8 @@ const ScaffoldingPage = () => {
     const Status = {}
     if (data.all !== undefined) Status["นั่งร้านในพื้นที่"] = { value: data.all, color: '#112345' };
     if (data.normal !== undefined) Status["ปกติ"] = { value: data.normal, color: '#17d149' };
-    if (data.near_expire !== undefined) Status["ใกล้ Exp."] = { value: data.near_expire ?? 0, color: '#F09234', img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png" };
-    if (data.expire !== undefined) Status["Exp."] = { value: data.expire, color: '#F54', img: "https://cdn-icons-png.flaticon.com/512/564/564619.png" };
+    if (data.near_expire !== undefined) Status["ใกล้ Exp."] = { value: data.near_expire ?? 0, color: '#F54', img: "/assets/iconmap/status/warning-yellow-2.png"  };
+    if (data.expire !== undefined) Status["Exp."] = { value: data.expire, color: '#F89', img: "/assets/iconmap/status/warning-red-2.png"};
 
     dispatch(
       setStatus(Status),
