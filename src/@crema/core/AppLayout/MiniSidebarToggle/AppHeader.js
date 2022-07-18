@@ -41,7 +41,7 @@ const AppHeader = ({ isCollapsed, onToggleSidebar }) => {
 
   const IconLink = ({ number, text ,color ,img }) => (
     <a className="example-link">
-      <Badge style={{ backgroundColor: `${color ? color :'#'+Math.floor(Math.random()*16777215).toString(16)}` }} count={number ? number : 0} showZero />
+      <Badge style={{ backgroundColor: `${color ? color :'#'+Math.floor(Math.random()*16777215).toString(16)}` }} count={number ? number : 0} showZero overflowCount={9999999999} />
       {" "+text}
       {img && <img style={{position:'relative',left:'5px'}} width={15} height={15} src={img} alt="Avatar"  />}
     </a>

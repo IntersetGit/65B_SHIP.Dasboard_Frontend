@@ -217,13 +217,18 @@ const WorkpermitPage = () => {
       setloading(true);
       let url = `/workpermit/all?`;
       if (item.SupervisorId) url += `&SupervisorId=${item.SupervisorId}`;
-      if (item.SupervisorAgencyID) url += `&SupervisorAgencyID=${item.SupervisorAgencyID}`;
-      if (item.Location) url += `&Location=${item.Location}`;
+      if (item.SupervisorAgencyName) url += `&SupervisorAgencyName=${item.SupervisorAgencyName}`;
+      if (item.Location) {
+        const Location = (item.Location).replace(/#/i, '%23')
+        url += `&Location=${Location}`;
+      };
       if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
       if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
       if (isArray(item.WorksheetStatusId)) {
         url += `&WorksheetStatusId=${item.WorksheetStatusId.toString()}`;
       }
+      // GSP%231%20Utility
+      // GSP%231%20Utility
       if (isArray(item.WorkTypeID)) {
         url += `&WorkTypeID=${item.WorkTypeID.toString()}`;
       }
@@ -788,7 +793,8 @@ const WorkpermitPage = () => {
         EndDateTime: isMoment(value.EndDateTime) ? value.EndDateTime.format(`YYYY-MM-DD HH:mm`) : ""
       }
       // console.log('model', model)
-      setLayerpoint(await getWorkpermit(model, true))
+      const resSf = await getWorkpermit(model);
+      setLayerpoint(resSf)
 
     } catch (error) {
       console.log('error', error)
@@ -1048,7 +1054,7 @@ const WorkpermitPage = () => {
               </Form.Item>
 
               <Form.Item
-                name="WorkpermitTypeID"
+                name="WorkTypeID"
                 label='ประเภทใบอนุญาต'
               >
                 <Select
@@ -1143,9 +1149,9 @@ const WorkpermitPage = () => {
                 stateView?.goTo(extent.extent)
                 let animation = document.querySelector('#zoom-select');
                 animation.style.setProperty('display', 'block', 'important');
-                setTimeout(()=>{
+                setTimeout(() => {
                   animation.style.setProperty('display', 'none', 'important');
-                },3000)
+                }, 3000)
 
               }, // click row
             };
