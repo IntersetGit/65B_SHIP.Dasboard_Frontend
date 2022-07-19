@@ -119,7 +119,8 @@ const WorkpermitPage = () => {
       width: 150,
       render: (text, record) => isArray(text.list) ? text.list.length > 1 ? (
         <>
-          <img src='/assets/iconmap/status/warning-all.png' width={15} /> {text.list.toString()}
+          {/* <img src='/assets/iconmap/status/warning-all.png' width={15} />  */}
+          {text.list.toString()}
         </>
       ) : text.list.toString() : "-"
     },
@@ -149,9 +150,9 @@ const WorkpermitPage = () => {
                   "เวลาสิ้นสุดของใบงาน": record.WorkEndTime,
                   "รหัสบริษัท": record.CompanyCode,
                   "ชื่อบริษัท": record.CompanyName,
-                  "รหัสผู้ควบคุมงาน": record.PTTStaffID,
+                  "รหัสผู้ควบคุมงาน": record.SupervisorId,
                   "ชื่อผู้ควบคุมงาน": record.PTTStaffName,
-                  "รหัสหน่วยงานผู้ควบคุม": record.AgencyID,
+                  "รหัสหน่วยงานผู้ควบคุม": record.SupervisorAgencyID,
                   "ชื่อหน่วยงานผู้ควบคุม": record.SupervisorAgencyName,
                   "รหัสผู้อนุญาต/เจ้าของพื้นที่": record.OwnerID,
                   "ชื่อผู้อนุญาต/เจ้าของพื้นที่": record.OwnerName,
@@ -793,7 +794,7 @@ const WorkpermitPage = () => {
         EndDateTime: isMoment(value.EndDateTime) ? value.EndDateTime.format(`YYYY-MM-DD HH:mm`) : ""
       }
       // console.log('model', model)
-      const resSf = await getWorkpermit(model);
+      const resSf = await getWorkpermit(model, true);
       setLayerpoint(resSf)
 
     } catch (error) {
