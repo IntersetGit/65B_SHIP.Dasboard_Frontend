@@ -511,56 +511,56 @@ const WorkpermitPage = () => {
     const scaffoldingIcon = [
       {
         name: "SF",
-        color: "rgba(106, 61, 154)",
-        img: await CreateIcon("rgba(106, 61, 154)", false),
+        color: "#8A2BE2",
+        img: await CreateIcon("#8A2BE2", false),
         detail: 'ใบอนุญาติติดตั้ง/รื้อถอนนั่งร้าน'
       },
       {
         name: "CD",
-        color: "#228B22",
-        img: await CreateIcon("#228B22", false),
+        color: "#228B22 ",
+        img: await CreateIcon("#228B22 ", false),
         detail: 'ใบอนุญาติทำงานธรรมดา'
       },
       {
         name: "EL",
-        color: "rgba(11, 154, 153)",
-        img: await CreateIcon("rgba(11, 154, 153)", false),
+        color: "#000080",
+        img: await CreateIcon("#000080", false),
         detail: 'ใบอนุญาติทำงานไฟฟ้่า/ระบบควบคุม'
       },
       {
         name: "EV",
-        color: "#93FFE8",
-        img: await CreateIcon("#93FFE8", false),
+        color: "#00CED1",
+        img: await CreateIcon("#00CED1", false),
         detail: 'ใบอนุญาติทำงานที่อับอากาศ'
       },
       {
         name: "EX",
-        color: "rgba(12, 32, 153)",
-        img: await CreateIcon("rgba(12, 32, 153)", false),
+        color: "#CD853F",
+        img: await CreateIcon("#CD853F", false),
         detail: 'ใบอนุญาติทำงานขุดเจาะ'
       },
       {
         name: "HT1",
-        color: "#EE9A4D",
-        img: await CreateIcon("#EE9A4D", false),
+        color: "#CD5C5C",
+        img: await CreateIcon("#CD5C5C", false),
         detail: 'ใบอนุญาติที่มีความร้อนประกายไฟ-I'
       },
       {
         name: "HT2",
-        color: "#A70D2A",
-        img: await CreateIcon("#A70D2A", false),
+        color: "#FF6699",
+        img: await CreateIcon("#FF6699", false),
         detail: 'ใบอนุญาติที่มีความร้อนประกายไฟ-II'
       },
       {
         name: "MC",
-        color: "#9D00FF",
-        img: await CreateIcon("#9D00FF", false),
+        color: "#3CB371",
+        img: await CreateIcon("#3CB371", false),
         detail: 'ใบอนุญาติใช้งานรถเครนชนิดเคลื่อนที่/รถเฮียบ'
       },
       {
         name: "RD",
-        color: "#F778A1",
-        img: await CreateIcon("#F778A1", false),
+        color: "#DDA0DD",
+        img: await CreateIcon("#DDA0DD", false),
         detail: 'ใบอนุญาติทำงานรังสี'
       },
     ]
