@@ -93,7 +93,7 @@ const AcessControlPage = () => {
       title: 'วัน-เวลาสแกน',
       dataIndex: 'others',
       key: 'others',
-      render: (text) => text ? moment(text.scan_date_time).format("DD/MM/YYYY") : "-",
+      render: (text) => text.scan_date_time ? moment(text.scan_date_time).format("DD/MM/YYYY") : "-",
       width: 150
     },
     {
@@ -309,7 +309,7 @@ const AcessControlPage = () => {
           let findeArea = Arealatlng?.find((area) => (area.name).replace(/#/i, '') == (obj.AreaName).replace(/#/i, ''))
           if(!findeArea) findeArea = Arealatlng[0]
 
-        console.log('findeArea :>> ', findeArea);
+        // console.log('findeArea :>> ', findeArea);
         let getlatlng = findeArea?.typelatlng[obj.PersonalTypeID];
         if (obj.PersonalTypeID) {
 
