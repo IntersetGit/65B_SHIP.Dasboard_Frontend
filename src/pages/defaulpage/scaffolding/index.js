@@ -27,6 +27,7 @@ import { isArray, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 const { Panel } = Collapse;
 import { Helmet } from 'react-helmet';
+import Searchlayer from '../../../components/Searchlayer/index'
 
 
 const ScaffoldingPage = () => {
@@ -34,6 +35,8 @@ const ScaffoldingPage = () => {
   const [stateView, setStateView] = useState(null);
   const refdrawn = useRef();
   const refdetail = useRef();
+  const refgismap = useRef();
+
   const [tabledata, setTabledata] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [datamodal, setDatamodal] = useState(null);
@@ -605,6 +608,16 @@ const ScaffoldingPage = () => {
     view.ui.add(fullscreenui, 'top-right');
     view.ui.add(zoomui, 'top-right');
     view.ui.add(detaillayer, 'top-right');
+    view.ui.add(
+      new Expand({
+        view,
+        content: refgismap.current,
+        expandIconClass: "esri-icon-layer-list",
+        expanded: false,
+      }),
+      "top-left"
+    );
+
     setStateMap(map);
     setStateView(view);
 
@@ -693,6 +706,8 @@ const ScaffoldingPage = () => {
             ui: { components: ['attribution', 'compass'] },
           }}
         >
+          <Searchlayer ref={refgismap} map={stateMap} view={stateView} />
+
           <div id='button-top' className='button-topleft'>
             <div
               className='esri-widget--button esri-icon-table'
