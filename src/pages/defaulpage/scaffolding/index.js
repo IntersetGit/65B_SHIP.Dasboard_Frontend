@@ -478,15 +478,25 @@ const ScaffoldingPage = () => {
       ]
 
       const scaffoldingStatusWork = [
+        // {
+        //   name: "near_expire",
+        //   detail: "ใกล้หมดอายุ",
+        //   img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png"
+        // },
+        // {
+        //   name: "expire",
+        //   detail: "หมดอายุ",
+        //   img: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
+        // },
         {
           name: "near_expire",
-          detail: "ใกล้หมดอายุ",
-          img: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Antu_dialog-warning.svg/2048px-Antu_dialog-warning.svg.png"
+          detail: "แจ้งเตือนใกล้หมดอายุ",
+          img: "/assets/iconmap/status/warning-yellow-2.png"
         },
         {
           name: "expire",
-          detail: "หมดอายุ",
-          img: "https://cdn-icons-png.flaticon.com/512/564/564619.png"
+          detail: "แจ้งเตือนหมดอายุ",
+          img: "/assets/iconmap/status/warning-red-2.png"
         },
         {
           name: "normal",
@@ -550,8 +560,8 @@ const ScaffoldingPage = () => {
     const Status = {}
     if (data.all !== undefined) Status["นั่งร้านในพื้นที่"] = { value: data.all, color: '#112345' };
     if (data.normal !== undefined) Status["ปกติ"] = { value: data.normal, color: '#17d149' };
-    if (data.near_expire !== undefined) Status["ใกล้ Exp."] = { value: data.near_expire ?? 0, color: '#F54', img: "/assets/iconmap/status/warning-yellow-2.png"  };
-    if (data.expire !== undefined) Status["Exp."] = { value: data.expire, color: '#F89', img: "/assets/iconmap/status/warning-red-2.png"};
+    if (data.near_expire !== undefined) Status["ใกล้ Exp."] = { value: data.near_expire ?? 0, color: '#F54', img: "/assets/iconmap/status/warning-yellow-2.png" };
+    if (data.expire !== undefined) Status["Exp."] = { value: data.expire, color: '#F89', img: "/assets/iconmap/status/warning-red-2.png" };
 
     dispatch(
       setStatus(Status),
