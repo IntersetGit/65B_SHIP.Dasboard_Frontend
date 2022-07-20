@@ -97,7 +97,7 @@ const AcessControlPage = () => {
       title: 'วัน-เวลาสแกน',
       dataIndex: 'others',
       key: 'others',
-      render: (text) => text ? moment(text.scan_date_time).format("DD/MM/YYYY") : "-",
+      render: (text) => text.scan_date_time ? moment(text.scan_date_time).format("DD/MM/YYYY") : "-",
       width: 150
     },
     {
