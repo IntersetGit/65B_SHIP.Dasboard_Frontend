@@ -33,6 +33,7 @@ import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 import { circle } from '@turf/turf';
 import { Helmet } from 'react-helmet';
+import Searchlayer from '../../../components/Searchlayer/index'
 
 const { Panel } = Collapse;
 const { Option } = Select;
@@ -857,78 +858,8 @@ const WorkpermitPage = () => {
           }}
         >
 
-          <div ref={refgismap} id="infoDiv" style={{ width: '200px', height: '100%', padding: "10px" }} className="esri-widget">
-            สถานที่ใช้งาน
-            <Divider orientation="left">Plant</Divider>
-            <Space style={{ margin: "5px 0px" }}>
-              <Select
-                loading={selectArea.length > 0 ? false : true}
-                showSearch
-                allowClear
-                placeholder="ค้นหา"
-                optionFilterProp="children"
-                size="small"
-                style={{ width: '150px' }}
-              >
-                {/* {selectArea.length > 0 && selectArea.find((i)=>{
-                if(i.LAYERNAME == "PLANT"){
-                  i?.RESULT?.map((item,index)=>(
-                    <Option key={index} value="jack">Jack</Option>
-                  ))
-                }
-              })} */}
-                {OptionSelectArea("PLANT")}
-              </Select>
-              <Button size="small" icon={<SearchOutlined />}></Button>
-            </Space>
-            <Divider orientation="left">Area</Divider>
-            <Space style={{ margin: "5px 0px" }}>
-              <Select
-                loading={selectArea.length > 0 ? false : true}
-                showSearch
-                allowClear
-                placeholder="ค้นหา"
-                optionFilterProp="children"
-                size="small"
-                style={{ width: '150px' }}
-              >
-                {OptionSelectArea("AREA")}
-              </Select>
-              <Button size="small" icon={<SearchOutlined />}></Button>
-            </Space>
-            <Divider orientation="left">Building</Divider>
-            <Space style={{ margin: "5px 0px" }}>
-              <Select
-                loading={selectArea.length > 0 ? false : true}
-                showSearch
-                allowClear
-                placeholder="ค้นหา"
-                optionFilterProp="children"
-                size="small"
-                style={{ width: '150px' }}
-              >
-                {OptionSelectArea("BUILDING")}
-              </Select>
-              <Button size="small" icon={<SearchOutlined />}></Button>
-            </Space>
-            <Divider orientation="left">Equipment</Divider>
-            <Space style={{ margin: "5px 0px" }}>
-              <Select
-                loading={selectArea.length > 0 ? false : true}
-                showSearch
-                allowClear
-                placeholder="ค้นหา"
-                optionFilterProp="children"
-                size="small"
-                style={{ width: '150px' }}
-              >
-                {OptionSelectArea("EQUIPMENT")}
-              </Select>
-              <Button size="small" icon={<SearchOutlined />}></Button>
-            </Space>
+          <Searchlayer ref={refgismap} map={stateMap} view={stateView} />
 
-
-          </div>
           <div id='button-top' className='button-topleft'>
             <div
               className='esri-widget--button esri-icon-table'

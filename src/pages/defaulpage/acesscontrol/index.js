@@ -29,6 +29,7 @@ import API from '../../../util/Api'
 import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 import Searchlayer from '../../../components/Searchlayer/index'
+import { polygon } from '@turf/turf';
 
 const { Panel } = Collapse;
 
@@ -56,63 +57,72 @@ const AcessControlPage = () => {
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
       render: (text, obj) => (obj.TitleName ?? "-") + " " + (obj.FirstName ?? "-") + " " + (obj.LastName ?? ""),
-      width: 150
+      width: 150,
+      align: 'center'
     },
     {
       title: 'ประเภทบุคคล',
       dataIndex: 'PersonalTypeName',
       key: 'PersonalTypeName',
       render: (text) => text ? text.PersonalTypeName : "-",
-      width: 150
+      width: 150,
+      align: 'center'
     },
     {
       title: 'ผู้ควบคุมงาน',
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
       render: (text, obj) => (obj.PTTStaff_FName ?? "-") + " " + (obj.PTTStaff_LName ?? ""),
-      width: 200
+      width: 200,
+      align: 'center'
     },
     {
       title: 'พื้นที่สแกนล่าสุด',
       dataIndex: 'AccDevice',
       key: 'AccDevice',
       render: (text) => text ? text.AreaName : "-",
-      width: 150
+      width: 150,
+      align: 'center'
     },
     {
       title: 'ประเภทบัตรที่แลก',
       dataIndex: 'others',
       key: 'others',
       render: (text) => text ? text.CardTypeName : "-",
-      width: 150
+      width: 150,
+      align: 'center'
     },
     {
       title: 'สถานะการสแกนล่าสุด',
       dataIndex: 'others',
       key: 'others',
       render: (text) => text ? text.Scan_Status_Name : "-",
-      width: 150
+      width: 150,
+      align: 'center'
     },
     {
       title: 'วัน-เวลาสแกน',
       dataIndex: 'others',
       key: 'others',
       render: (text) => text.scan_date_time ? moment(text.scan_date_time).format("DD/MM/YYYY") : "-",
-      width: 150
+      width: 150,
+      align: 'center'
     },
     {
-      title: 'สถานะการแลคบัตร',
+      title: 'สถานะการแลกบัตร',
       dataIndex: 'others',
       key: 'others',
       render: (text) => text ? text.ExchangeCard_Status_Name : "-",
-      width: 150
+      width: 150,
+      align: 'center'
     },
     {
-      title: 'วัน-เวลาแลคบัตร',
+      title: 'วัน-เวลาแลกบัตร',
       dataIndex: 'ExchangeCard_Date',
       key: 'ExchangeCard_Date',
       render: (text, obj) => text ? moment(text).format("DD/MM/YYYY") + " " + obj.ExchangeCard_Time : "-",
-      width: 200
+      width: 200,
+      align: 'center'
     },
     {
       title: '...',
@@ -313,7 +323,7 @@ const AcessControlPage = () => {
           let findeArea = Arealatlng?.find((area) => (area.name).replace(/#/i, '') == (obj.AreaName).replace(/#/i, ''))
           if (!findeArea) findeArea = Arealatlng[0]
 
-          console.log('findeArea :>> ', findeArea);
+          // console.log('findeArea :>> ', findeArea);
           let getlatlng = findeArea?.typelatlng[obj.PersonalTypeID];
           if (obj.PersonalTypeID) {
 
@@ -666,6 +676,8 @@ const AcessControlPage = () => {
     document.querySelector('.ant-table-wrapper').style.setProperty('display', 'none', 'important');
   }
 
+
+
   return (
     <div id="pagediv">
       <Map
@@ -680,12 +692,7 @@ const AcessControlPage = () => {
           ui: { components: ['attribution', 'compass'] },
         }}
       >
-        <Searchlayer ref={refgismap}
-          on_serch_plant={(e) => console.log('serchvalue', e)}
-          on_serch_area={(e) => console.log('sercharea', e)}
-          on_serch_building={(e) => console.log('sercharea', e)}
-          on_serch_equipment={(e) => console.log('sercharea', e)}
-        />
+        <Searchlayer ref={refgismap} map={stateMap} view={stateView} />
         <div id='button-top' className='button-topleft'>
           <div
             className='esri-widget--button esri-icon-table'
