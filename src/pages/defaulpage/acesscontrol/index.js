@@ -785,7 +785,7 @@ const AcessControlPage = () => {
                 showArrow
                 style={{ width: '100%' }}
               >
-                {PersonalTypeNameOptions.map((e) => <Select.Option key={e.value}>{`${e.id}-${e.value}`}</Select.Option>)}
+                {PersonalTypeNameOptions.map((e) => <Select.Option key={e.value}>{`${e.value}`}</Select.Option>)}
               </Select>
             </Form.Item>
 
