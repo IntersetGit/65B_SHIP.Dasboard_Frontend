@@ -19,7 +19,8 @@ const routesConfig = [
     type: 'group',
     children: [
       {
-        id: "62a4d45011b91829618a4413",
+        _id: "62a4d45011b91829618a4413",
+        id: 'workpermit',
         title: 'workpermit',
         messageId: 'sidebar.sample.page1',
         message: "Work Permit",
@@ -35,7 +36,8 @@ const routesConfig = [
 
       },
       {
-        id: '62a4d4a822bdf92ba30d162b',
+        _id: '62a4d4a822bdf92ba30d162b',
+        id: 'vehicle',
         title: 'vehicle',
         messageId: 'sidebar.sample.page2',
         type: 'item',
@@ -49,7 +51,8 @@ const routesConfig = [
         path: '/vehicle',
       },
       {
-        id: '62a4d4b922bdf92ba30d162f',
+        _id: '62a4d4b922bdf92ba30d162f',
+        id: 'equipment',
         title: 'equipment',
         messageId: 'sidebar.sample.page3',
         type: 'collapse',
@@ -62,7 +65,8 @@ const routesConfig = [
         ),
         children: [
           {
-            id: "62d3fe8e03036b7b55c5af2c",
+            _id: "62d3fe8e03036b7b55c5af2c",
+            id: 'อุปกรณ์เสี่ยง',
             title: 'อุปกรณ์เสี่ยง',
             messageId: 'sidebar.sample.page3.sub1',
             message: "อุปกรณ์เสี่ยง",
@@ -77,7 +81,8 @@ const routesConfig = [
             path: '/equipment/risk',
           },
           {
-            id: "62d3ff0303036b7b55c5af87",
+            _id: "62d3ff0303036b7b55c5af87",
+            id: 'ภาพรวมอุปกรณ์ทั้งหมด',
             title: 'ภาพรวมอุปกรณ์ทั้งหมด',
             messageId: 'sidebar.sample.page3.sub2',
             message: "ภาพรวมอุปกรณ์ทั้งหมด",
@@ -94,7 +99,8 @@ const routesConfig = [
         ]
       },
       {
-        id: "62a4d4c622bdf92ba30d1633",
+        _id: "62a4d4c622bdf92ba30d1633",
+        id: 'scaffolding',
         title: 'scaffolding',
         messageId: 'sidebar.sample.page4',
         type: 'item',
@@ -108,7 +114,8 @@ const routesConfig = [
         path: '/scaffolding',
       },
       {
-        id: "62a4d4de22bdf92ba30d1637",
+        _id: "62a4d4de22bdf92ba30d1637",
+        id: 'peopleTracking',
         title: 'peopleTracking',
         messageId: 'sidebar.sample.page5',
         type: 'item',
@@ -126,7 +133,8 @@ const routesConfig = [
         path: '/peopletracking',
       },
       {
-        id: "62a4d4fa22bdf92ba30d163b",
+        _id: "62a4d4fa22bdf92ba30d163b",
+        id: 'acesscontrol',
         title: 'acesscontrol',
         messageId: 'sidebar.sample.page6',
         type: 'item',

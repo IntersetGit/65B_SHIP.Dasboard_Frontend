@@ -3,7 +3,9 @@ import {RoutePermittedRole} from '../../shared/constants/AppEnums';
 import './index.style.less';
 
 const Vehicle = React.lazy(() => import('./vehicle'));
-const Equipment = React.lazy(() => import('./equipment'));
+// const Equipment = React.lazy(() => import('./equipment'));
+const EquipmentRisk = React.lazy(() => import('./equipment/risk'));
+const EquipmentAll = React.lazy(() => import('./equipment/all'));
 const Workpermit = React.lazy(() => import('./workpermit'));
 const Scaffolding = React.lazy(() => import('./scaffolding'));
 const People = React.lazy(() => import('./people'));
@@ -20,10 +22,20 @@ export const PagesConfigs = [
     path: '/vehicle',
     element: <Vehicle />,
   },
+  // {
+  //   permittedRole: RoutePermittedRole.user,
+  //   path: '/equipment',
+  //   element: <Equipment />,
+  // },
   {
     permittedRole: RoutePermittedRole.user,
-    path: '/equipment',
-    element: <Equipment />,
+    path: '/equipment/risk',
+    element: <EquipmentRisk />,
+  },
+  {
+    permittedRole: RoutePermittedRole.user,
+    path: '/equipment/all',
+    element: <EquipmentAll />,
   },
   {
     permittedRole: RoutePermittedRole.user,

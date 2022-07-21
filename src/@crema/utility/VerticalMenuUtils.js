@@ -144,7 +144,7 @@ export const getRouteMenus = () => {
   console.log('user.menu', user.menu)
   const routesConfigAuth = routesConfig.map((route) => {
     let groupmenu = route.children.filter((listmenu) => {
-      if (user.menu.some((i) => i._id == listmenu.id)) {
+      if (user.menu.some((i) => i._id == listmenu._id)) {
         // console.log(user.menu.some((i)=>i.url == listmenu.path))
         return listmenu
       } 
