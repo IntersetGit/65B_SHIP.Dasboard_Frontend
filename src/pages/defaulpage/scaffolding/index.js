@@ -664,10 +664,12 @@ const ScaffoldingPage = () => {
     if (item.AgencyName) url += `&AgencyName=${item.AgencyName}`;
     if (item.StartDateTime) url += `&StartDateTime=${item.StartDateTime}`;
     if (item.EndDateTime) url += `&EndDateTime=${item.EndDateTime}`;
-    if (item.AreaName) url += `&AreaName=${item.AreaName}`;
+    if (item.AreaName) url += `&AreaName=${encodeURIComponent(item.AreaName)}`;
     if (isArray(item.ScaffoldingType)) {
       url += `&ScaffoldingType=${item.ScaffoldingType.toString()}`;
     }
+    // console.log('url', url)
+
     const { data } = await API.get(url);
     if (openTableBool) openTable()
     return data.Status === 'success' ? data.Message : {
