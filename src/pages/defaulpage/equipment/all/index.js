@@ -1,15 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import {
-  Table,
-  Space,
-  Form,
-  Button,
-  Select,
-  Row,
-  Col,
-  Modal,
-  Collapse,
-} from 'antd';
+import { Form, Collapse } from 'antd';
 import { Map } from '@esri/react-arcgis';
 import { loadModules } from 'esri-loader';
 import './index.style.less';
@@ -25,10 +15,13 @@ import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../../util/PTTlayer'
 import Searchlayer from '../../../../components/Searchlayer/index'
 import { Helmet } from 'react-helmet';
+import TableData from '../TableData';
+import FromDataSearch from '../FromDataSearch';
 
 const { Panel } = Collapse;
 
 const EquipmentAllPage = () => {
+  const [filter, setFilter] = useState({})
   const [stateMap, setStateMap] = useState(null);
   const [stateView, setStateView] = useState(null);
   const refdrawn = useRef();
@@ -36,8 +29,7 @@ const EquipmentAllPage = () => {
   const refgismap = useRef();
 
   const [tabledata, setTabledata] = useState(null);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [datamodal, setDatamodal] = useState(null);
+
   const dispatch = useDispatch();
   const Geojson = new WaGeojson();
   const demodata = new Demodata('access_control');
@@ -46,122 +38,7 @@ const EquipmentAllPage = () => {
 
   const [form] = Form.useForm()
 
-  const columns = [
-    {
-      title: 'ชื่อ-สกุล ผู้รับเหมา',
-      dataIndex: 'WorkPermitNo',
-      key: 'WorkPermitNo',
-      render: (text, obj) => (obj.TitleName ?? "-") + " " + (obj.FirstName ?? "-") + " " + (obj.LastName ?? ""),
-      width: 150,
-      align: 'center'
-    },
-    {
-      title: 'ประเภทบุคคล',
-      dataIndex: 'PersonalTypeName',
-      key: 'PersonalTypeName',
-      render: (text) => text ? text.PersonalTypeName : "-",
-      width: 150,
-      align: 'center'
-    },
-    {
-      title: 'ผู้ควบคุมงาน',
-      dataIndex: 'WorkPermitNo',
-      key: 'WorkPermitNo',
-      render: (text, obj) => (obj.PTTStaff_FName ?? "-") + " " + (obj.PTTStaff_LName ?? ""),
-      width: 200,
-      align: 'center'
-    },
-    {
-      title: 'พื้นที่สแกนล่าสุด',
-      dataIndex: 'AccDevice',
-      key: 'AccDevice',
-      render: (text) => text ? text.AreaName : "-",
-      width: 150,
-      align: 'center'
-    },
-    {
-      title: 'ประเภทบัตรที่แลก',
-      dataIndex: 'others',
-      key: 'others',
-      render: (text) => text ? text.CardTypeName : "-",
-      width: 150,
-      align: 'center'
-    },
-    {
-      title: 'สถานะการสแกนล่าสุด',
-      dataIndex: 'others',
-      key: 'others',
-      render: (text) => text ? text.Scan_Status_Name : "-",
-      width: 150,
-      align: 'center'
-    },
-    {
-      title: 'วัน-เวลาสแกน',
-      dataIndex: 'others',
-      key: 'others',
-      render: (text) => text.scan_date_time ? moment(text.scan_date_time).format("DD/MM/YYYY") : "-",
-      width: 150,
-      align: 'center'
-    },
-    {
-      title: 'สถานะการแลกบัตร',
-      dataIndex: 'others',
-      key: 'others',
-      render: (text) => text ? text.ExchangeCard_Status_Name : "-",
-      width: 150,
-      align: 'center'
-    },
-    {
-      title: 'วัน-เวลาแลกบัตร',
-      dataIndex: 'ExchangeCard_Date',
-      key: 'ExchangeCard_Date',
-      render: (text, obj) => text ? moment(text).format("DD/MM/YYYY") + " " + obj.ExchangeCard_Time : "-",
-      width: 200,
-      align: 'center'
-    },
-    {
-      title: '...',
-      key: '',
-      width: 100,
-      render: (text, record) => {
-        return (
-          <Space size='middle'>
-            <Button
-              type='primary'
-              onClick={() => {
-                setDatamodal({
-                  "ชื่อ-สกุล": `${record.FirstName ?? "-"} ${record.LastName ?? ""}`,
-                  "เลขบัตรประชาชน": `${record.PersonalID ?? "-"}`,
-                  "ตำแหน่ง": `${record.Position ?? "-"}`,
-                  "เลข Work Permit": `${record.WorkPermitID ?? "-"}`,
-                  "เลขที่บัตรแสดงตัว/เลขที่บัตรที่แลก": `${record.SecureCard_ID ?? "-"}`,
-                  "ประเภทบัตรที่แลก": `${record.others?.CardTypeName ?? "-"}`,
-                  "ประเภทบุคคล": `${record.others?.PersonalTypeName ?? "-"}`,
-                  "รหัสอุปกรณ์ที่แกน": `${record.ACC_ID ?? "-"}`,
-                  "ชื่ออุปกรณ์ที่สแกน": `${record.AccDevice?.AccDeviceName ?? "-"}`,
-                  "พื้นที่ที่ทำการสแกน": `${record.AreaName ?? "-"}`,
-                  "สถานะการสแกน": `${record.others?.Scan_Status_Name ?? "-"}`,
-                  "วันที่ที่ทำการสแกน": record.others.scan_date_time ? moment(record.others.scan_date_time).format("DD/MM/YYYY") : "-",
-                  "เวลาที่ที่ทำการสแกน": record.others.scan_date_time ? moment(record.others.scan_date_time).format("HH:mm:ss") : "-",
-                  "เลขที่อุปกรณ์ดิดตามตัว": `${record.PersonGPS_ID ?? "-"}`,
-                  "เลขที่อุปกรณ์ติดตามยานพาหนะ": `${record.VehicleGPS_ID ?? "-"}`,
-                  "วันที่ทำการแลกบัตร": record.ExchangeCard_Date ? moment(record.ExchangeCard_Date).format("DD/MM/YYYY") : "-",
-                  "เวลาทำการแลกบัตร": record.ExchangeCard_Time ?? "-",
-                  "สถานะการแลกบัตร": record.others?.ExchangeCard_Status_Name ?? "-",
-                  "รหัสผู้ควบคุมงาน": record.PTTStaffCode ?? "-",
-                  "ชื่อผู้ควบคุมงาน": `${record.PTTStaff_FName ?? "-"} ${record.PTTStaff_LName ?? ""}`,
-                  "รหัสหน่วยงานผู้ควบคุม": `${record.AgencyCode ?? "-"}`,
-                  "ชื่อหน่วยงานผู้ควบคุม": `${record.AgencyName ?? "-"}`,
-                }), setIsModalVisible(!isModalVisible);
-              }}
-            >
-              Detail
-            </Button>
-          </Space>
-        );
-      },
-    },
-  ];
+
   const clusterConfig = {
     type: "cluster",
     clusterRadius: "30px",
@@ -203,15 +80,16 @@ const EquipmentAllPage = () => {
 
   };
 
-  const getAcessControls = async (item, openTableBool) => {
-    let url = `/accesscontrol/all?`;
+  const getEquipment = async (item, openTableBool) => {
+    let url = `/equipment/all?`;
     if (item.PTTStaffCode) url += `&PTTStaffCode=${item.PTTStaffCode}`;
     if (item.AgencyName) url += `&AgencyName=${item.AgencyName}`;
-    if (item.Scan_Date_Time_Start) url += `&Scan_Date_Time_Start=${item.Scan_Date_Time_Start}`;
-    if (item.Scan_Date_Time_End) url += `&Scan_Date_Time_End=${item.Scan_Date_Time_End}`;
-    if (item.AccDeviceName) url += `&AccDeviceName=${item.AccDeviceName}`;
-    if (isArray(item.PersonalTypeName)) {
-      url += `&PersonalTypeName=${item.PersonalTypeName.toString()}`;
+    if (item.AreaName) {
+      const AreaName = (item.AreaName).replace(/#/i, '%23')
+      url += `&AreaName=${AreaName}`;
+    };
+    if (isArray(item.EquipmentType)) {
+      url += `&EquipmentType=${item.EquipmentType.toString()}`;
     }
     const { data } = await API.get(url);
     if (openTableBool) openTable();
@@ -236,30 +114,14 @@ const EquipmentAllPage = () => {
   }, [stateMap, stateView]);
 
   const initMap = async (socket) => {
-
-    const resSf = await getAcessControls({});
+    const resSf = await getEquipment({});
     setLayerpoint(resSf)
-    socket.on("accesscontrol", (res) => {
-      // console.log('socket', res)
-      if (res.Status == "success") {
-        setLayerpoint(res.Message)
-      }
+    socket.on("equipment", async (res) => {
+      const resSf = await getEquipment(form.getFieldValue());
+      setLayerpoint(resSf)
     });
-    socket.on("accesscontroldevice", (res) => {
-      // console.log('socket', res)
-      if (res.Status == "success") {
-        setLayerpoint(res.Message)
-      }
-    });
-
-
   }
 
-
-  const [AccDeviceNameOptions, setAccDeviceNameOptions] = useState([]);
-  const [AgencyNameOptions, setAgencyNameOptions] = useState([]);
-  const [PersonalTypeNameOptions, setPersonalTypeNameOptions] = useState([]);
-  const [PTTStaffCodeOptions, setPTTStaffCodeOptions] = useState([]);
 
   const setLayerpoint = async (item) => {
     try {
@@ -269,20 +131,7 @@ const EquipmentAllPage = () => {
         Status_cal(item.summary);
 
         if (isPlainObject(item.filter)) {
-          if (isArray(item.filter.AccDeviceName)) setAccDeviceNameOptions(item.filter.AccDeviceName.map(e => {
-            return {
-              id: e.AccDeviceID,
-              value: e.AccDeviceName
-            }
-          }))
-          if (isArray(item.filter.AgencyName)) setAgencyNameOptions(item.filter.AgencyName.map(e => { return { value: e.AgencyName } }))
-          if (isArray(item.filter.PTTStaffCode)) setPTTStaffCodeOptions(item.filter.PTTStaffCode.map(e => { return { value: e.PTTStaffCode } }))
-          if (isArray(item.filter.PersonalTypeName)) setPersonalTypeNameOptions(item.filter.PersonalTypeName.map(e => {
-            return {
-              id: e.PersonalTypeID,
-              value: e.PersonalTypeName
-            }
-          }))
+          setFilter(item.filter);
         }
 
         let GetAllArea = await PTTlayer.SHOW_AREALAYERNAME();
@@ -299,7 +148,7 @@ const EquipmentAllPage = () => {
           }
         }));
         0
-        console.log('Arealatlng', Arealatlng)
+        // console.log('Arealatlng', Arealatlng)
         let latlng = []
         // console.log('item', item)
         // let acesscontrol_type = await (await gen_uniqueValueInfos()).acessControlIcon;
@@ -560,9 +409,18 @@ const EquipmentAllPage = () => {
   const Status_cal = async (data) => {
 
     // console.log('data', data)
+
+    // all: 40
+    // expire: 5
+    //   in: 0
+    // near_expire: 5
+    // not_remove: 5
+    // obstruct: 8
+    // out: 5
+    // risk: 35
     dispatch(
       setStatus({
-        "สแกนเข้า": { value: data.in, color: '#F88' },
+        "อุปกรณ์เสี่ยง": { value: data.in, color: '#F88' },
         "สแกนออก": { value: data.out, color: '#F48' },
         "แลกบัตรเข้า": { value: data.exchange_card_in, color: '#F82' },
         "บุคคลที่อยู่ในพื้นที่": { value: data.on_plant, color: '#F445' },
@@ -651,8 +509,8 @@ const EquipmentAllPage = () => {
       }
       // console.log('model', model)
 
-      // console.log('first', getAcessControls(model))
-      setLayerpoint(await getAcessControls(model, true))
+      // console.log('first', getEquipment(model))
+      setLayerpoint(await getEquipment(model, true))
 
     } catch (error) {
       console.log('error', error)
@@ -677,7 +535,7 @@ const EquipmentAllPage = () => {
     <div id="pagediv">
 
       <Helmet>
-        <title>Equipment | DashBoard</title>
+        <title>อุปกรณ์เสี่ยง | Equipment | DashBoard</title>
       </Helmet>
       <Map
         className='Mapacrgis'
@@ -715,98 +573,11 @@ const EquipmentAllPage = () => {
             }}
           />
         </div>
-        <div
-          ref={refdrawn}
-          id='viewtest'
-          className='menuserchslide esri-widget'
-        >
-          <Form
-            form={form}
-            labelCol={{ span: 10 }}
-            wrapperCol={{ span: 16 }}
-            name='nest-messages'
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-          >
-            <Form.Item
-              name="PTTStaffCode"
-              label='รหัสพนักงานผู้ควบคุมงาน'
-            >
-              <Select
-                showArrow
-                style={{ width: '100%' }}
-                options={PTTStaffCodeOptions}
-              />
-            </Form.Item>
 
-            <Form.Item
-              name="AgencyName"
-              label='หน่วยงานผู้ควบคุมงาน'
-            >
-              <Select
-                showArrow
-                style={{ width: '100%' }}
-                options={AgencyNameOptions}
-              />
-            </Form.Item>
-
-            {/* <Form.Item
-              name="StartDateTime"
-              label='วัน-เวลา เริ่มต้น'
-            >
-              <DatePicker
-                showTime={{ format: 'HH:mm' }}
-                format="DD/MM/YYYY HH:mm"
-                style={{ width: '100%' }} />
-            </Form.Item> */}
-
-            {/* <Form.Item
-              name="EndDateTime"
-              label='วัน-เวลา สิ้นสุด'
-            >
-              <DatePicker
-                showTime={{ format: 'HH:mm' }}
-                format="DD/MM/YYYY HH:mm"
-                style={{ width: '100%' }} />
-            </Form.Item> */}
-
-            <Form.Item
-              name="AccDeviceName"
-              label='อุปกรณ์ Access Control'
-            >
-              <Select
-                showArrow
-                style={{ width: '100%' }}
-              >
-                {AccDeviceNameOptions.map((e) => <Select.Option key={e.value}>{`${e.id}-${e.value}`}</Select.Option>)}
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              name="PersonalTypeName"
-              label='ประเภทกลุ่มบุคคล'
-            >
-              <Select
-                mode='multiple'
-                showArrow
-                style={{ width: '100%' }}
-              >
-                {PersonalTypeNameOptions.map((e) => <Select.Option key={e.value}>{`${e.value}`}</Select.Option>)}
-              </Select>
-            </Form.Item>
-
-            <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
-
-              <Button type='primary' htmlType='submit' style={{ width: 100 }}>
-                ค้นหา
-              </Button>
-              <span style={{ paddingRight: 5 }} />
-              <Button style={{ width: 100 }} onClick={reset}>
-                ค่าเริ่มต้น
-              </Button>
-            </Form.Item>
-          </Form>
+        <div ref={refdrawn} id='viewtest' className='menuserchslide esri-widget'>
+          <FromDataSearch form={form} onFinish={onFinish} onFinishFailed={onFinishFailed} reset={reset} filter={filter} />
         </div>
+
         <div ref={refdetail} className='sysmbole esri-widget'>
           <Collapse accordion >
             <Panel header="ใช้สีแทนประเภทใบงาน" key="1">
@@ -818,49 +589,14 @@ const EquipmentAllPage = () => {
             <Panel header="ใช้สัญลักษณ์แทนการแจ้งเตือน" key="2">
               {stateSysmbole ? stateSysmbole[1] : <>กำลังรอข้อมูล...</>}
             </Panel>
-
           </Collapse>
           {/* <div id="legendDiv"></div> */}
 
         </div>
 
       </Map>
-      <Modal
-        title='รายละเอียด'
-        okButtonProps={{ hidden: true }}
-        onCancel={() => setIsModalVisible(!isModalVisible)}
-        visible={isModalVisible}
-        bodyStyle={{
-          maxHeight: 600,
-          overflowX: "auto"
-        }}
-      >
-        {datamodal &&
-          Object.entries(datamodal).map(([key, value]) => (
-            !(typeof value == 'object') &&
-            <Row key={key}>
-              <Col span={12}>
-                <span style={{ color: "#0A8FDC" }}>{key}</span>
-              </Col>
-              <Col span={12}>{value ?? "-"}</Col>
-            </Row>
-          ))}
-      </Modal>
-      <Table
-        id='divtable'
-        scroll={{ y: '25vh' }}
-        size='small'
-        style={{ position: 'absolute', bottom: 0, backgroundColor: 'white', display: 'none' }}
-        rowClassName={(record, index) =>
-          record?.status_warnning !== null &&
-            record?.status_warnning !== undefined
-            ? 'table-row-red'
-            : ''
-        }
-        rowKey={(i) => i.id}
-        columns={columns}
-        dataSource={tabledata}
-      />
+
+      <TableData dataSource={tabledata} />
     </div>
   )
 }
