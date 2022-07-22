@@ -19,6 +19,7 @@ const routesConfig = [
     type: 'group',
     children: [
       {
+        _id: "62a4d45011b91829618a4413",
         id: 'workpermit',
         title: 'workpermit',
         messageId: 'sidebar.sample.page1',
@@ -35,6 +36,7 @@ const routesConfig = [
 
       },
       {
+        _id: '62a4d4a822bdf92ba30d162b',
         id: 'vehicle',
         title: 'vehicle',
         messageId: 'sidebar.sample.page2',
@@ -49,10 +51,11 @@ const routesConfig = [
         path: '/vehicle',
       },
       {
+        _id: '62a4d4b922bdf92ba30d162f',
         id: 'equipment',
         title: 'equipment',
         messageId: 'sidebar.sample.page3',
-        type: 'item',
+        type: 'collapse',
         icon: (
           <Icon
             component={() => (
@@ -60,9 +63,43 @@ const routesConfig = [
             )}
           />
         ),
-        path: '/equipment',
+        children: [
+          {
+            _id: "62d3fe8e03036b7b55c5af2c",
+            id: 'อุปกรณ์เสี่ยง',
+            title: 'อุปกรณ์เสี่ยง',
+            messageId: 'sidebar.sample.page3.sub1',
+            message: "อุปกรณ์เสี่ยง",
+            type: 'item',
+            icon: (
+              <Icon
+                component={() => (
+                  <img src={EquipmentIcon} width='20' style={{ marginTop: -10 }} />
+                )}
+              />
+            ),
+            path: '/equipment/risk',
+          },
+          {
+            _id: "62d3ff0303036b7b55c5af87",
+            id: 'ภาพรวมอุปกรณ์ทั้งหมด',
+            title: 'ภาพรวมอุปกรณ์ทั้งหมด',
+            messageId: 'sidebar.sample.page3.sub2',
+            message: "ภาพรวมอุปกรณ์ทั้งหมด",
+            type: 'item',
+            icon: (
+              <Icon
+                component={() => (
+                  <img src={EquipmentIcon} width='20' style={{ marginTop: -10 }} />
+                )}
+              />
+            ),
+            path: '/equipment/all',
+          },
+        ]
       },
       {
+        _id: "62a4d4c622bdf92ba30d1633",
         id: 'scaffolding',
         title: 'scaffolding',
         messageId: 'sidebar.sample.page4',
@@ -77,7 +114,8 @@ const routesConfig = [
         path: '/scaffolding',
       },
       {
-        id: 'peopletracking',
+        _id: "62a4d4de22bdf92ba30d1637",
+        id: 'peopleTracking',
         title: 'peopleTracking',
         messageId: 'sidebar.sample.page5',
         type: 'item',
@@ -95,7 +133,8 @@ const routesConfig = [
         path: '/peopletracking',
       },
       {
-        id: 'accesscontrol',
+        _id: "62a4d4fa22bdf92ba30d163b",
+        id: 'acesscontrol',
         title: 'acesscontrol',
         messageId: 'sidebar.sample.page6',
         type: 'item',
@@ -108,6 +147,20 @@ const routesConfig = [
         ),
         path: '/accesscontrol',
       },
+      // {
+      //   id: 'equipment',
+      //   title: 'equipment',
+      //   messageId: 'sidebar.sample.page3',
+      //   type: 'item',
+      //   icon: (
+      //     <Icon
+      //       component={() => (
+      //         <img src={EquipmentIcon} width='20' style={{ marginTop: -10 }} />
+      //       )}
+      //     />
+      //   ),
+      //   path: '/equipment',
+      // },
       // {
       //   id: 'page-7',
       //   title: 'Page 7',

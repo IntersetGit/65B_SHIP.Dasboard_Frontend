@@ -141,48 +141,52 @@ export const getRouteMenus = () => {
     "62a4d4fa22bdf92ba30d163b": "/assets/icon/Access Control.png",
   }
 
-  const routesConfigAuth = routesConfig.map((route)=>{
-    let groupmenu = route.children.filter((listmenu)=>{
-      if(user.menu.some((i)=>i.url == listmenu.path)){
+  console.log('user.menu', user.menu)
+  const routesConfigAuth = routesConfig.map((route) => {
+    let groupmenu = route.children.filter((listmenu) => {
+      if (user.menu.some((i) => i._id == listmenu._id)) {
         // console.log(user.menu.some((i)=>i.url == listmenu.path))
         return listmenu
-      }else{
-        // console.log(user.menu.some((i)=>i.url == listmenu.path))
-      }
+      } 
+      // else if (listmenu.type == 'group') {
+      //   // console.log(user.menu.some((i)=>i.url == listmenu.path))
+      // }
 
     })
-    let setroute =  {...route,children:groupmenu}
+    // console.log('groupmenu', groupmenu)
+    let setroute = { ...route, children: groupmenu }
     return setroute
   })
   // console.log('routesConfigAuth', routesConfigAuth)
-  const children = user.menu.map((item) => {
-    return {
-      id: item.application_name,
-      title: item.application_name,
-      messageId: 'sidebar.sample.page1',
-      message: item.application_name,
-      type: 'item',
-      icon: (
-        <Icon
-          component={() => (
-            <img src={imgSrc[item._id]} width='20' style={{ marginTop: -10 }} />
-          )}
-        />
-      ),
-      path: item.url,
-    }
+  
+  // const children = user.menu.map((item) => {
+  //   return {
+  //     id: item.application_name,
+  //     title: item.application_name,
+  //     messageId: 'sidebar.sample.page1',
+  //     message: item.application_name,
+  //     type: 'item',
+  //     icon: (
+  //       <Icon
+  //         component={() => (
+  //           <img src={imgSrc[item._id]} width='20' style={{ marginTop: -10 }} />
+  //         )}
+  //       />
+  //     ),
+  //     path: item.url,
+  //   }
 
-  })
+  // })
 
-  const route = [
-    {
-      id: 'app',
-      title: 'Mornitor',
-      messageId: 'sidebar.sample',
-      type: 'group',
-      children,
-    }
-  ]
+  // const route = [
+  //   {
+  //     id: 'app',
+  //     title: 'Mornitor',
+  //     messageId: 'sidebar.sample',
+  //     type: 'group',
+  //     children,
+  //   }
+  // ]
 
   //  return routesConfig.map((route) =>
   //   renderMenu(route, sidebarColorSet, isSidebarBgImage, 0),
