@@ -1,0 +1,93 @@
+body {
+  font-family: "Asap", sans-serif;
+}
+
+.login {
+  overflow: hidden;
+  /* background-color: #ECECEC; */
+  padding: 40px 30px 30px 30px;
+  border-radius: 10px;
+  position: relative;
+  top: 8%;
+  left:1%;
+  width: 400px;
+  transform: translate(0);
+  /* margin: auto; */
+  transition: transform 300ms, box-shadow 300ms;
+  /* box-shadow: 5px 10px 10px #000000; */
+}
+.login::before, .login::after {
+  content: "";
+  position: relative;
+  width: 600px;
+  height: 600px;
+  border-top-left-radius: 40%;
+  border-top-right-radius: 45%;
+  border-bottom-left-radius: 35%;
+  border-bottom-right-radius: 40%;
+  z-index: -1;
+}
+/*
+.login::before {
+  right: 30%;
+  bottom: -130%;
+  background-color: #00adee;
+  animation: wawes 6s infinite linear;
+}
+.login::after {
+  right: 65%;
+  bottom: -125%;
+  background-color: #1b1464;
+  animation: wawes 7s infinite;
+}
+*/
+
+.login > input {
+  font-family: "Asap", sans-serif;
+  display: block;
+  border-radius: 5px;
+  font-size: 16px;
+  background: white;
+  width: 100%;
+  border: 0;
+  padding: 10px 10px;
+  margin: 15px -10px;
+}
+.login > button {
+  font-family: "Asap", sans-serif;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 16px;
+  text-transform: uppercase;
+  width: 100%;
+  border: 0;
+  padding: 10px 10px;
+  margin: 15px -10px;
+  margin-top: 10px;
+  margin-left: -9px;
+  border-radius: 5px;
+  background-color: #00adee;
+  transition: background-color 300ms;
+}
+.login > button:hover {
+  background-color: #0050ef;
+}
+
+@keyframes wawes {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.detail-box > a {
+  text-decoration: none;
+  color: LightGray;
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  font-size: 12px;
+}
+
+/*# sourceMappingURL=login-compile.css.map */

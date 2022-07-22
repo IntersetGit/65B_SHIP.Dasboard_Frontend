@@ -4,6 +4,7 @@ import AuthWrapper from '../AuthWrapper';
 import AppPageMetadata from '../../../@crema/core/AppPageMetadata';
 import SignInFirebase from './SigninFirebase';
 import SigninJwtAuth from './SigninJwtAuth';
+import Login from './Login'
 
 const Signin = () => {
   return (

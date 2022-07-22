@@ -260,7 +260,7 @@ const ScaffoldingPage = () => {
       setTabledata(latlng);
 
       const datageojson = await Geojson.CleateGeojson(latlng, 'Point');
-      // console.log('datageojson:>> ', datageojson);
+      console.log('datageojson:>> ', datageojson);
 
       const [FeatureLayer, GeoJSONLayer] = await loadModules([
         'esri/layers/FeatureLayer',
@@ -355,6 +355,14 @@ const ScaffoldingPage = () => {
           uniqueValueInfos
 
         },
+      });
+      layerpoint.load().then(() => {
+        setTimeout(() => {
+          let urlnew = "blob:http://localhost:3000/ac4fce7b-e539-4202-9e24-1d9fa9711fee";
+          layerpoint.customParameters.url = urlnew;
+          layerpoint.refresh();
+          console.log("yesrefresh")
+        }, 8000);
       });
       // console.log('layerpoint', layerpoint)
       await stateMap?.remove(stateMap?.findLayerById('pointlayer'));

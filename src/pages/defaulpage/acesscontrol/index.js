@@ -29,7 +29,7 @@ import API from '../../../util/Api'
 import { isArray, isNumber, isPlainObject } from 'lodash';
 import PTTlayers from '../../../util/PTTlayer'
 import Searchlayer from '../../../components/Searchlayer/index'
-import { polygon } from '@turf/turf';
+import { circle } from '@turf/turf';
 
 const { Panel } = Collapse;
 
@@ -858,6 +858,33 @@ const AcessControlPage = () => {
             ? 'table-row-red'
             : ''
         }
+        onRow={(record, rowIndex) => {
+          return {
+            onClick: async () => {
+              const [GeoJSONLayer] = await loadModules([
+                'esri/layers/GeoJSONLayer',
+              ]);
+              console.log(record)
+              // let cicle = circle([record?.AccDevice?.Lat, record?.AccDevice?.Long], 0.001);
+              // const blob = new Blob([JSON.stringify(cicle)], {
+              //   type: 'application/json',
+              // });
+              // const url = URL.createObjectURL(blob);
+              // const geojsonlayer = new GeoJSONLayer({
+              //   url: url,
+              //   copyright: "PTT POINTGENARATE"
+              // });
+              // let extent = await geojsonlayer.queryExtent();
+              // stateView?.goTo(extent.extent)
+              // let animation = document.querySelector('#zoom-select');
+              // animation.style.setProperty('display', 'block', 'important');
+              // setTimeout(() => {
+              //   animation.style.setProperty('display', 'none', 'important');
+              // }, 3000)
+
+            }, // click row
+          };
+        }}
         rowKey={(i) => i.id}
         columns={columns}
         dataSource={tabledata}
