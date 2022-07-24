@@ -12,7 +12,8 @@ import {
   Modal,
   Drawer,
   Collapse,
-  DatePicker
+  DatePicker,
+  Divider
 } from 'antd';
 import { Map, WebScene } from '@esri/react-arcgis';
 import { loadModules } from 'esri-loader';
@@ -57,24 +58,21 @@ const AcessControlPage = () => {
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
       render: (text, obj) => (obj.TitleName ?? "-") + " " + (obj.FirstName ?? "-") + " " + (obj.LastName ?? ""),
-      width: 150,
-      align: 'center'
+      width: 170,
     },
     {
       title: 'ประเภทบุคคล',
       dataIndex: 'PersonalTypeName',
       key: 'PersonalTypeName',
       render: (text) => text ? text.PersonalTypeName : "-",
-      width: 150,
-      align: 'center'
+      width: 170,
     },
     {
       title: 'ผู้ควบคุมงาน',
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
       render: (text, obj) => (obj.PTTStaff_FName ?? "-") + " " + (obj.PTTStaff_LName ?? ""),
-      width: 200,
-      align: 'center'
+      width: 170,
     },
     {
       title: 'พื้นที่สแกนล่าสุด',
@@ -567,13 +565,13 @@ const AcessControlPage = () => {
     // console.log('data', data)
     dispatch(
       setStatus({
-        "สแกนเข้า": { value: data.in, color: '#F88' },
-        "สแกนออก": { value: data.out, color: '#F48' },
-        "แลกบัตรเข้า": { value: data.exchange_card_in, color: '#F82' },
-        "บุคคลที่อยู่ในพื้นที่": { value: data.on_plant, color: '#F445' },
-        "แลกบัตรออก": { value: data.exchange_card_out, color: '#F89' },
-        "อุปกรณ์ Online": { value: data.online, color: '#112341' },
-        "อุปกรณ์ Offline": { value: data.offline, color: '#112345' },
+        "สแกนเข้า": { value: data.in, color: '#000080' },
+        "สแกนออก": { value: data.out, color: '#000080' },
+        "แลกบัตรเข้า": { value: data.exchange_card_in, color: '#000080' },
+        "บุคคลที่อยู่ในพื้นที่": { value: data.on_plant, color: '#000080' },
+        "แลกบัตรออก": { value: data.exchange_card_out, color: '#000080' },
+        "อุปกรณ์ Online": { value: data.online, color: '#000080' },
+        "อุปกรณ์ Offline": { value: data.offline, color: '#000080' },
       }),
     );
   };
@@ -723,15 +721,17 @@ const AcessControlPage = () => {
         >
           <Form
             form={form}
-            labelCol={{ span: 10 }}
-            wrapperCol={{ span: 16 }}
+            // labelCol={{ span: 10 }}
+            // wrapperCol={{ span: 16 }}
             name='nest-messages'
             onFinish={onFinish}
             onFinishFailed={onFinishFailed}
+            layout="vertical"
           >
             <Form.Item
               name="PTTStaffCode"
-              label='รหัสพนักงานผู้ควบคุมงาน'
+              // label='รหัสพนักงานผู้ควบคุมงาน'
+              label={<Divider orientation="left">รหัสพนักงานผู้ควบคุมงาน</Divider>}
             >
               <Select
                 showArrow
@@ -742,7 +742,8 @@ const AcessControlPage = () => {
 
             <Form.Item
               name="AgencyName"
-              label='หน่วยงานผู้ควบคุมงาน'
+              // label='หน่วยงานผู้ควบคุมงาน'
+              label={<Divider orientation="left">หน่วยงานผู้ควบคุมงาน</Divider>}
             >
               <Select
                 showArrow
@@ -773,7 +774,8 @@ const AcessControlPage = () => {
 
             <Form.Item
               name="AccDeviceName"
-              label='อุปกรณ์ Access Control'
+              // label='อุปกรณ์ Access Control'
+              label={<Divider orientation="left">อุปกรณ์ Access Control</Divider>}
             >
               <Select
                 showArrow
@@ -785,7 +787,8 @@ const AcessControlPage = () => {
 
             <Form.Item
               name="PersonalTypeName"
-              label='ประเภทกลุ่มบุคคล'
+              // label='ประเภทกลุ่มบุคคล'
+              label={<Divider orientation="left">ประเภทกลุ่มบุคคล</Divider>}
             >
               <Select
                 mode='multiple'
@@ -796,7 +799,7 @@ const AcessControlPage = () => {
               </Select>
             </Form.Item>
 
-            <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
+            <div className='text-center pt-3'>
 
               <Button type='primary' htmlType='submit' style={{ width: 100 }}>
                 ค้นหา
@@ -805,7 +808,7 @@ const AcessControlPage = () => {
               <Button style={{ width: 100 }} onClick={reset}>
                 ค่าเริ่มต้น
               </Button>
-            </Form.Item>
+            </div>
           </Form>
         </div>
         <div ref={refdetail} className='sysmbole esri-widget'>

@@ -4,7 +4,7 @@ import {
   Tag,
   Space,
   Form,
-  Input,
+  Divider,
   Button,
   Select,
   Row,
@@ -50,6 +50,7 @@ const ScaffoldingPage = () => {
       dataIndex: 'WorkPermitNo',
       key: 'WorkPermitNo',
       render: (text) => text ?? "-",
+      align: "center",
       width: 150
     },
     {
@@ -57,7 +58,7 @@ const ScaffoldingPage = () => {
       dataIndex: 'WorkName',
       key: 'WorkName',
       render: (text) => text ?? "-",
-      width: 250
+      width: 170
 
     },
     {
@@ -66,28 +67,28 @@ const ScaffoldingPage = () => {
       dataIndex: 'OwnerName',
       key: 'OwnerName',
       render: (text) => text ?? "-",
-      width: 200
+      width: 170
     },
     {
       title: 'ผู้ควบคุมงาน',
       dataIndex: 'PTTStaff',
       key: 'PTTStaff',
       render: (text) => text ?? "-",
-      width: 200
+      width: 170
     },
     {
       title: 'ประเภทใบอนุญาต',
       key: 'WorkpermitType',
       dataIndex: 'WorkpermitType',
       render: (text) => text ?? "-",
-      width: 150
+      width: 170,
     },
     {
       title: 'สถานที่ติดตั้ง',
       key: 'AreaName',
       dataIndex: 'AreaName',
       render: (text) => text ?? "-",
-      width: 150
+      width: 130
     },
     // {
     //   title: 'วันหมดอายุ',
@@ -101,14 +102,16 @@ const ScaffoldingPage = () => {
       dataIndex: 'WorkingStartDate',
       key: 'WorkingStartDate',
       render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD HH:mm:ss") : "-",
-      width: 200
+      width: 200,
+      align: "center",
     },
     {
       title: 'วัน-เวลา หมดอายุนั่งร้าน',
       dataIndex: 'WorkingEndDate',
       key: 'WorkingEndDate',
       render: (text) => text ? moment(new Date(text)).format("YYYY-MM-DD HH:mm:ss") : "-",
-      width: 200
+      width: 200,
+      align: "center",
     },
     {
       title: 'สถานะ work',
@@ -221,7 +224,7 @@ const ScaffoldingPage = () => {
 
       // let latlng = item.data;
       Status_cal(item.summary);
-      console.log('item', item)
+      // console.log('item', item)
       // console.log("data =>>>>>>>>>>>>>>>>>", item.data);
       // console.log("summary =>>>>>>>>>>>>>>>>>", _summary);
       if (isPlainObject(item.filter)) {
@@ -569,10 +572,10 @@ const ScaffoldingPage = () => {
 
 
     const Status = {}
-    if (data.all !== undefined) Status["นั่งร้านในพื้นที่"] = { value: data.all, color: '#112345' };
-    if (data.normal !== undefined) Status["ปกติ"] = { value: data.normal, color: '#17d149' };
-    if (data.near_expire !== undefined) Status["ใกล้ Exp."] = { value: data.near_expire ?? 0, color: '#F54', img: "/assets/iconmap/status/warning-yellow-2.png" };
-    if (data.expire !== undefined) Status["Exp."] = { value: data.expire, color: '#F89', img: "/assets/iconmap/status/warning-red-2.png" };
+    if (data.all !== undefined) Status["นั่งร้านในพื้นที่"] = { value: data.all, color: '#000080' };
+    if (data.normal !== undefined) Status["ปกติ"] = { value: data.normal, color: '#000080' };
+    if (data.near_expire !== undefined) Status["ใกล้หมดอายุ"] = { value: data.near_expire ?? 0, color: '#000080', img: "/assets/iconmap/status/warning-yellow-2.png" };
+    if (data.expire !== undefined) Status["หมดอายุ"] = { value: data.expire, color: '#000080', img: "/assets/iconmap/status/warning-red-2.png" };
 
     dispatch(
       setStatus(Status),
@@ -748,15 +751,17 @@ const ScaffoldingPage = () => {
           >
             <Form
               form={form}
-              labelCol={{ span: 10 }}
-              wrapperCol={{ span: 16 }}
+              // labelCol={{ span: 10 }}
+              // wrapperCol={{ span: 16 }}
               name='nest-messages'
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
+              layout="vertical"
             >
               <Form.Item
                 name="PTTStaffCode"
-                label='รหัสพนักงานผู้ควบคุมงาน'
+                // label='รหัสพนักงานผู้ควบคุมงาน'
+                label={<Divider orientation="left">รหัสพนักงานผู้ควบคุมงาน</Divider>}
               >
                 <Select
                   showArrow
@@ -767,7 +772,8 @@ const ScaffoldingPage = () => {
 
               <Form.Item
                 name="AgencyName"
-                label='หน่วยงานผู้ควบคุมงาน'
+                // label='หน่วยงานผู้ควบคุมงาน'
+                label={<Divider orientation="left">หน่วยงานผู้ควบคุมงาน</Divider>}
               >
                 <Select
                   showArrow
@@ -778,7 +784,8 @@ const ScaffoldingPage = () => {
 
               <Form.Item
                 name="StartDateTime"
-                label='วัน-เวลา ติดตั้ง'
+                // label='วัน-เวลา ติดตั้ง'
+                label={<Divider orientation="left">วัน-เวลา ติดตั้ง</Divider>}
               >
                 <DatePicker
                   showTime={{ format: 'HH:mm' }}
@@ -788,7 +795,8 @@ const ScaffoldingPage = () => {
 
               <Form.Item
                 name="EndDateTime"
-                label='วัน-เวลา หมดอายุ'
+                // label='วัน-เวลา หมดอายุ'
+                label={<Divider orientation="left">วัน-เวลา หมดอายุ</Divider>}
               >
                 <DatePicker
                   showTime={{ format: 'HH:mm' }}
@@ -798,7 +806,8 @@ const ScaffoldingPage = () => {
 
               <Form.Item
                 name="AreaName"
-                label='สถานที่ปฏิบัติงาน'
+                // label='สถานที่ปฏิบัติงาน'
+                label={<Divider orientation="left">สถานที่ปฏิบัติงาน</Divider>}
               >
                 <Select
                   showArrow
@@ -809,7 +818,8 @@ const ScaffoldingPage = () => {
 
               <Form.Item
                 name="ScaffoldingType"
-                label='ประเภทนั่งร้าน'
+                // label='ประเภทนั่งร้าน'
+                label={<Divider orientation="left">ประเภทนั่งร้าน</Divider>}
               >
                 <Select
                   mode='multiple'
@@ -819,7 +829,7 @@ const ScaffoldingPage = () => {
                 />
               </Form.Item>
 
-              <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
+              <div className='text-center pt-3'>
 
                 <Button type='primary' htmlType='submit' style={{ width: 100 }}>
                   ค้นหา
@@ -828,7 +838,7 @@ const ScaffoldingPage = () => {
                 <Button style={{ width: 100 }} onClick={reset}>
                   ค่าเริ่มต้น
                 </Button>
-              </Form.Item>
+              </div>
             </Form>
           </div>
 

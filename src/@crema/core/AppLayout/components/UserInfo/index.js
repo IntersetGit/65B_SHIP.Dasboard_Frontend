@@ -21,6 +21,7 @@ const UserInfo = ({ hasColor, onToggleSidebar, children }) => {
 
   const getUserAvatar = () => {
     if (user.displayName) {
+      console.log('user', user)
       return user.displayName.charAt(0).toUpperCase();
     }
     if (user.email) {
@@ -139,7 +140,7 @@ const UserInfo = ({ hasColor, onToggleSidebar, children }) => {
               <span className='cr-user-info-content user-hide'>
                 <span className='cr-user-name-info'>
                   <h3
-                    className={clsx('cr-user-name text-truncate', {
+                    className={clsx('cr-user-name ', {
                       light: themeMode === 'light',
                     })}
                   >
@@ -149,7 +150,7 @@ const UserInfo = ({ hasColor, onToggleSidebar, children }) => {
                     <FaChevronDown />
                   </span>
                 </span>
-                <span className='cr-user-designation text-truncate'>
+                <span className='cr-user-designation '>
                   {isPlainObject(user.group) ? user.group.group_name ?? "-" : '-'}
                 </span>
               </span>

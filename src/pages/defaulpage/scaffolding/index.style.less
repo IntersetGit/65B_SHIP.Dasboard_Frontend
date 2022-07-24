@@ -4,18 +4,73 @@
 
 .menuserchslide {
   position: fixed;
-  background-color: rgb(244, 244, 244) !important;
+  background-color: #242424 !important;
   right: 60px;
-  width: 450px;
+  width: 300px;
   min-width: 300px;
 
   border-radius: 10px;
   padding: 20px;
   z-index: 2;
+
   @media screen and (max-width: @screen-sm) {
     position: absolute;
     right: 0;
     height: 100%;
     overflow: auto;
   }
+
+  .ant-form-item {
+    margin: 0;
+    padding: 0;
+    padding-bottom: 13px;
+  }
+
+  .ant-form-item-label {
+    margin: 0;
+    padding: 0;
+  }
+
+  .ant-form-item-label>label {
+    color: #ffffff;
+    width: 100%;
+
+    .ant-divider-inner-text {
+      color: #ffffff;
+      font-size: 14px;
+    }
+
+    .ant-divider-horizontal.ant-divider-with-text {
+      padding: 0;
+      margin: 0;
+      padding-bottom: 10px;
+    }
+
+    .ant-divider-horizontal.ant-divider-with-text::before,
+    .ant-divider-horizontal.ant-divider-with-text::after {
+      position: relative;
+      border-top: 1px solid white;
+      border-top-color: #fff;
+      border-bottom: 0;
+      transform: translateY(50%);
+      content: '';
+    }
+
+    .ant-divider-horizontal.ant-divider-with-text::before {
+      top: 50%;
+      width: 15%;
+    }
+
+    .ant-divider-horizontal.ant-divider-with-text::after {
+      top: 50%;
+      width: 85%;
+    }
+
+
+  }
+
+}
+
+.ant-table-pagination.ant-pagination {
+  margin: 5px 0;
 }

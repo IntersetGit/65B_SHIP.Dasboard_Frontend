@@ -1,4 +1,4 @@
-import { Form, Button, Select } from 'antd';
+import { Form, Button, Select , Divider } from 'antd';
 import { isPlainObject, isArray } from 'lodash';
 import { useState, useEffect } from 'react';
 
@@ -26,15 +26,17 @@ const FromDataSearch = ({ form, onFinish, onFinishFailed, filter, reset }) => {
 
             <Form
                 form={form}
-                labelCol={{ span: 10 }}
-                wrapperCol={{ span: 16 }}
+                // labelCol={{ span: 10 }}
+                // wrapperCol={{ span: 16 }}
                 name='nest-messages'
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
+                layout="vertical"
             >
                 <Form.Item
                     name="PTTStaffCode"
-                    label='รหัสพนักงานผู้ควบคุมงาน'
+                    // label='รหัสพนักงานผู้ควบคุมงาน'
+                    label={<Divider orientation="left">รหัสพนักงานผู้ควบคุมงาน</Divider>}
                 >
                     <Select
                         showArrow
@@ -45,7 +47,8 @@ const FromDataSearch = ({ form, onFinish, onFinishFailed, filter, reset }) => {
 
                 <Form.Item
                     name="AgencyName"
-                    label='หน่วยงานผู้ควบคุมงาน'
+                    // label='หน่วยงานผู้ควบคุมงาน'
+                    label={<Divider orientation="left">หน่วยงานผู้ควบคุมงาน</Divider>}
                 >
                     <Select
                         showArrow
@@ -56,7 +59,8 @@ const FromDataSearch = ({ form, onFinish, onFinishFailed, filter, reset }) => {
 
                 <Form.Item
                     name="AreaName"
-                    label='สถานที่ติดตั้งอุปกรณ์'
+                    // label='สถานที่ติดตั้งอุปกรณ์'
+                    label={<Divider orientation="left">สถานที่ติดตั้งอุปกรณ์</Divider>}
                 >
                     <Select
                         showArrow
@@ -67,7 +71,8 @@ const FromDataSearch = ({ form, onFinish, onFinishFailed, filter, reset }) => {
 
                 <Form.Item
                     name="EquipmentType"
-                    label='ประเภทอุปกรณ์'
+                    // label='ประเภทอุปกรณ์'
+                    label={<Divider orientation="left">ประเภทอุปกรณ์</Divider>}
                 >
                     <Select
                         mode='multiple'
@@ -77,7 +82,7 @@ const FromDataSearch = ({ form, onFinish, onFinishFailed, filter, reset }) => {
                     />
                 </Form.Item>
 
-                <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
+                <div className='text-center pt-3'>
                     <Button type='primary' htmlType='submit' style={{ width: 100 }}>
                         ค้นหา
                     </Button>
@@ -85,7 +90,7 @@ const FromDataSearch = ({ form, onFinish, onFinishFailed, filter, reset }) => {
                     <Button style={{ width: 100 }} onClick={reset}>
                         ค่าเริ่มต้น
                     </Button>
-                </Form.Item>
+                </div>
             </Form>
 
         </>

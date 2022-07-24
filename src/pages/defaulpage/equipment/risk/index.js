@@ -410,13 +410,13 @@ const EquipmentRiskPage = () => {
     // console.log('data', data)
     dispatch(
       setStatus({
-        "สแกนเข้า": { value: data.in, color: '#F88' },
-        "สแกนออก": { value: data.out, color: '#F48' },
-        "แลกบัตรเข้า": { value: data.exchange_card_in, color: '#F82' },
-        "บุคคลที่อยู่ในพื้นที่": { value: data.on_plant, color: '#F445' },
-        "แลกบัตรออก": { value: data.exchange_card_out, color: '#F89' },
-        "อุปกรณ์ Online": { value: data.online, color: '#112341' },
-        "อุปกรณ์ Offline": { value: data.offline, color: '#112345' },
+        "สแกนเข้า": { value: data.in, color: '#000080' },
+        "สแกนออก": { value: data.out, color: '#000080' },
+        "แลกบัตรเข้า": { value: data.exchange_card_in, color: '#000080' },
+        "บุคคลที่อยู่ในพื้นที่": { value: data.on_plant, color: '#000080' },
+        "แลกบัตรออก": { value: data.exchange_card_out, color: '#000080' },
+        "อุปกรณ์ Online": { value: data.online, color: '#000080' },
+        "อุปกรณ์ Offline": { value: data.offline, color: '#000080' },
       }),
     );
   };

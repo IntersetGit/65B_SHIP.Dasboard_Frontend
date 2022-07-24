@@ -66,25 +66,25 @@ const WorkpermitPage = () => {
       title: 'ชื่อ - สกุล ผู้รับเหมา',
       dataIndex: 'Name',
       key: 'Name',
-      width: 150
+      width: 170
     },
     {
       title: 'ผู้อนุญาต/เจ้าของพื้นที่',
       dataIndex: 'OwnerName',
       key: 'OwnerName',
-      width: 150
+      width: 170
     },
     {
       title: 'ผู้ควบคุมงาน',
       dataIndex: 'PTTStaffName',
       key: 'PTTStaffName',
-      width: 150
+      width: 170
     },
     {
       title: 'ประเภทงาน',
       key: 'WorkType',
       dataIndex: 'WorkType',
-      width: 150
+      width: 180
     },
     {
       title: 'สถานที่ปฏิบัติงาน',
@@ -97,12 +97,14 @@ const WorkpermitPage = () => {
       title: 'วัน-เวลา เริ่มต้นของใบงาน',
       dataIndex: 'date_time_start',
       key: 'date_time_start',
+      align: "center",
       width: 200
     },
     {
       title: 'วัน-เวลา สิ้นสุดของใบงาน',
       dataIndex: 'date_time_end',
       key: 'date_time_end',
+      align: "center",
       width: 200
     },
     {
@@ -118,6 +120,7 @@ const WorkpermitPage = () => {
       dataIndex: 'notification',
       key: 'notification',
       width: 150,
+      align: "center",
       render: (text, record) => isArray(text.list) ? text.list.length > 1 ? (
         <>
           {/* <img src='/assets/iconmap/status/warning-all.png' width={15} />  */}
@@ -370,12 +373,12 @@ const WorkpermitPage = () => {
             if (obj.notification.near_expire) arr2.push("near_expire");
             if (obj.notification.expire) arr2.push("expire");
             if (obj.notification.gas) arr2.push("gas");
-            if (obj.notification.impairment) arr2.push("impairment");
+            // if (obj.notification.impairment) arr2.push("impairment");
 
-            if ((obj.notification.near_expire === true)) arr.push(" ใกล้ Exp.");
-            if ((obj.notification.expire === true)) arr.push(" Exp.");
+            if ((obj.notification.near_expire === true)) arr.push(" ใกล้หมดอายุ");
+            if ((obj.notification.expire === true)) arr.push(" หมดอายุ");
             if ((obj.notification.gas === true)) arr.push(" ก๊าซที่ต้องตรวจวัด");
-            if ((obj.notification.impairment === true)) arr.push(" Impairment");
+            // if ((obj.notification.impairment === true)) arr.push(" Impairment");
             obj.notification.list = arr;
             obj.notification.list2 = arr2;
           }
@@ -684,13 +687,13 @@ const WorkpermitPage = () => {
   const Status_cal = async (data) => {
 
     const Status = {}
-    if (data.total !== undefined) Status["ใบงานทั้งหมด"] = { value: data.total, color: '#112345' };
-    if (data.open !== undefined) Status["Open"] = { value: data.open, color: '#17d149' };
-    if (data.close !== undefined) Status["Close"] = { value: data.close, color: '#F09234', };
-    if (data.near_expire !== undefined) Status["ใกล้ Exp."] = { value: data.near_expire, color: '#F54', img: "/assets/iconmap/status/warning-yellow-2.png" };
-    if (data.expire !== undefined) Status["Exp."] = { value: data.expire, color: '#F89', img: "/assets/iconmap/status/warning-red-2.png" };
-    if (data.gas !== undefined) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#F024', img: '/assets/iconmap/status/warning-yellow.png' };
-    if (data.impairment !== undefined) Status["Impairment"] = { value: data.impairment, color: '#548', img: '/assets/iconmap/status/warning-red.png' };
+    if (data.total !== undefined) Status["ใบงานทั้งหมด"] = { value: data.total, color: '#000080' };
+    if (data.open !== undefined) Status["Open"] = { value: data.open, color: '#000080' };
+    if (data.close !== undefined) Status["Close"] = { value: data.close, color: '#000080', };
+    if (data.near_expire !== undefined) Status["ใกล้หมดอายุ"] = { value: data.near_expire, color: '#000080', img: "/assets/iconmap/status/warning-yellow-2.png" };
+    if (data.expire !== undefined) Status["หมดอายุ"] = { value: data.expire, color: '#000080', img: "/assets/iconmap/status/warning-red-2.png" };
+    if (data.gas !== undefined) Status["ก๊าซที่ต้องตรวจวัด"] = { value: data.gas, color: '#000080', img: '/assets/iconmap/status/warning-yellow.png' };
+    // if (data.impairment !== undefined) Status["Impairment"] = { value: data.impairment, color: '#000080', img: '/assets/iconmap/status/warning-red.png' };
     dispatch(
       setStatus(Status),
     );
@@ -892,15 +895,16 @@ const WorkpermitPage = () => {
 
             <Form
               form={form}
-              labelCol={{ span: 10 }}
-              wrapperCol={{ span: 16 }}
+              // labelCol={{ span: 10 }}
+              // wrapperCol={{ span: 16 }}
               name='nest-messages'
               onFinish={onFinish}
               onFinishFailed={onFinishFailed}
+              layout="vertical"
             >
               <Form.Item
                 name="SupervisorId"
-                label='รหัสพนักงานผู้ควบคุมงาน'
+                label={<Divider orientation="left">รหัสพนักงานผู้ควบคุมงาน</Divider>}
               >
                 <Select
                   showArrow
@@ -924,7 +928,8 @@ const WorkpermitPage = () => {
 
               <Form.Item
                 name="SupervisorAgencyName"
-                label='หน่วยงานผู้ควบคุม'
+                // label='หน่วยงานผู้ควบคุม'
+                label={<Divider orientation="left">หน่วยงานผู้ควบคุม</Divider>}
               >
                 <Select
                   loading={loading}
@@ -936,7 +941,8 @@ const WorkpermitPage = () => {
 
               <Form.Item
                 name="StartDateTime"
-                label='วัน-เวลา เริ่มต้น'
+                // label='วัน-เวลา เริ่มต้น'
+                label={<Divider orientation="left">วัน-เวลา เริ่มต้น</Divider>}
               >
                 <DatePicker
                   loading={loading}
@@ -947,7 +953,8 @@ const WorkpermitPage = () => {
 
               <Form.Item
                 name="EndDateTime"
-                label='วัน-เวลา สิ้นสุด'
+                // label='วัน-เวลา สิ้นสุด'
+                label={<Divider orientation="left">วัน-เวลา สิ้นสุด</Divider>}
               >
                 <DatePicker
                   loading={loading}
@@ -958,7 +965,8 @@ const WorkpermitPage = () => {
 
               <Form.Item
                 name="Location"
-                label='สถานที่ปฎิบัติงาน'
+                // label='สถานที่ปฎิบัติงาน'
+                label={<Divider orientation="left">สถานที่ปฎิบัติงาน</Divider>}
               >
                 <Select
                   loading={loading}
@@ -971,7 +979,8 @@ const WorkpermitPage = () => {
 
               <Form.Item
                 name="WorksheetStatusId"
-                label='สถานะ Work'
+                // label='สถานะ Work'
+                label={<Divider orientation="left">สถานะ Work</Divider>}
               >
                 <Select
                   loading={loading}
@@ -987,7 +996,8 @@ const WorkpermitPage = () => {
 
               <Form.Item
                 name="WorkTypeID"
-                label='ประเภทใบอนุญาต'
+                // label='ประเภทใบอนุญาต'
+                label={<Divider orientation="left">ประเภทใบอนุญาต</Divider>}
               >
                 <Select
                   loading={loading}
@@ -1000,7 +1010,7 @@ const WorkpermitPage = () => {
 
               </Form.Item>
 
-              <Form.Item wrapperCol={{ span: 24, offset: 5 }} style={{ textAlign: "end" }}>
+              <div className='text-center pt-3'>
 
                 <Button type='primary' htmlType='submit' style={{ width: 100 }} loading={loading}>
                   ค้นหา
@@ -1009,7 +1019,9 @@ const WorkpermitPage = () => {
                 <Button style={{ width: 100 }} onClick={reset} loading={loading}>
                   ค่าเริ่มต้น
                 </Button>
-              </Form.Item>
+
+              </div>
+
             </Form>
           </div>
           <div ref={refdetail} className='sysmbole esri-widget'>
@@ -1092,7 +1104,7 @@ const WorkpermitPage = () => {
           columns={columns}
           dataSource={tabledata}
         />
-      </div>
+      </div >
     </>
 
   )
